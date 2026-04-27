@@ -49,3 +49,4 @@ supabase/
 
 Out of scope for the MVP: auth, payments, dashboards, admin panels, reviews.
 The only job is to surface healthy restaurants and get users to Uber Eats or Deliveroo.
+# healthyhub-
