@@ -23,6 +23,9 @@ export type Restaurant = {
   recommended_for_muscle_gain: boolean | null;
   recommended_for_clean_eating: boolean | null;
   created_at: string;
+  /** Présent si la colonne existe en base */
+  service_type?: string | null;
+  opening_hours?: unknown | null;
 };
 
 export type RestaurantListItem = Pick<
@@ -42,6 +45,7 @@ export type RestaurantListItem = Pick<
   | "review_count"
   | "uber_eats_url"
   | "deliveroo_url"
+  | "created_at"
 > &
   Partial<
     Pick<
@@ -52,5 +56,7 @@ export type RestaurantListItem = Pick<
       | "recommended_for_weight_loss"
       | "recommended_for_muscle_gain"
       | "recommended_for_clean_eating"
+      | "service_type"
+      | "opening_hours"
     >
   >;
