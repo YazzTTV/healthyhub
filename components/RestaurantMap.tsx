@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import { trackEvent } from "@/lib/analytics";
 import type { RestaurantListItem } from "@/lib/types";
@@ -39,21 +39,20 @@ import {
 } from "@/lib/discover-recommendations";
 import { calculateDistanceKm } from "@/lib/geo";
 import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
+import {
+  FILTERS,
+  SORT_OPTIONS,
+  type DiscoverGoal,
+} from "@/components/discover/constants";
+import DiscoverFiltersSheet from "@/components/discover/DiscoverFiltersSheet";
+import type { FiltersDraft } from "@/components/discover/DiscoverFiltersSheet";
+import DiscoverGoalSheet from "@/components/discover/DiscoverGoalSheet";
+import DiscoverMobileTray from "@/components/discover/DiscoverMobileTray";
+import DiscoverToast from "@/components/discover/DiscoverToast";
+import DiscoverTopBar from "@/components/discover/DiscoverTopBar";
 
 const PARIS_CENTER: [number, number] = [48.8566, 2.3522];
-const FILTERS = [
-  "Tous",
-  "Poke",
-  "Salade",
-  "Vegan",
-  "Protein",
-  "Brunch",
-  "Coups de cœur",
-] as const;
-const SORT_OPTIONS = ["Plus proches", "Mieux notés", "Score healthy"] as const;
-const GOALS = ["Perte de poids", "Prise de muscle", "Manger clean"] as const;
 const FAVORITES_KEY = "healthyhub:favorites";
-type Goal = (typeof GOALS)[number];
 type NutritionLevel = "low" | "medium" | "high";
 
 type RestaurantProfile = {
@@ -65,7 +64,7 @@ type RestaurantProfile = {
   recommended_for_clean_eating: boolean;
 };
 
-function mapGoalToIntent(goal: Goal): IntentMode {
+function mapGoalToIntent(goal: DiscoverGoal): IntentMode {
   if (goal === "Perte de poids") return "LEAN_LIGHT";
   if (goal === "Prise de muscle") return "MUSCLE_RECOVERY";
   return "CLEAN_RESET";
@@ -135,7 +134,7 @@ function inferRestaurantProfile(restaurant: RestaurantListItem): RestaurantProfi
 
 function rankRestaurantForGoal(
   restaurant: RestaurantListItem,
-  goal: Goal,
+  goal: DiscoverGoal,
   distanceKm: number | null
 ) {
   const profile = inferRestaurantProfile(restaurant);
@@ -183,7 +182,7 @@ function rankRestaurantForGoal(
 }
 
 function getGoalFilteredRestaurants(
-  goal: Goal,
+  goal: DiscoverGoal,
   restaurants: RestaurantListItem[],
   getDistance: (restaurant: RestaurantListItem) => number | null
 ) {
@@ -272,30 +271,6 @@ function RecenterMap({ center }: { center: [number, number] }) {
 }
 
 // === Small UI primitives ===
-function Chip({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`shrink-0 rounded-full px-3.5 py-2 text-[12.5px] font-semibold tracking-tight transition duration-250 ease-out-expo ${
-        active
-          ? "bg-ink text-white shadow-soft"
-          : "bg-white text-ink/70 ring-1 ring-ink/[0.08] hover:text-ink hover:ring-ink/20"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
 function ScoreBadge({ score }: { score: number | null }) {
   if (score == null) return null;
   return (
@@ -389,16 +364,24 @@ export default function RestaurantMap({
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]>("Tous");
   const [sortBy, setSortBy] = useState<(typeof SORT_OPTIONS)[number]>("Score healthy");
-  const [activeGoal, setActiveGoal] = useState<(typeof GOALS)[number] | null>(null);
-  const [showGoalPanel, setShowGoalPanel] = useState(false);
+  const [activeGoal, setActiveGoal] = useState<DiscoverGoal | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [goalSheetOpen, setGoalSheetOpen] = useState(false);
+  const [mobileTrayExpanded, setMobileTrayExpanded] = useState(true);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  /** Évite l’erreur Leaflet « Map container is already initialized » avec React Strict Mode (double montage en dev). */
+  const [leafletReady, setLeafletReady] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number]>(PARIS_CENTER);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(null);
-  const [locationMessage, setLocationMessage] = useState<string | null>(null);
   const [activeRestaurantId, setActiveRestaurantId] = useState<string | null>(null);
+
+  const dismissToast = useCallback(() => {
+    setToastMessage(null);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -443,13 +426,11 @@ export default function RestaurantMap({
     void trackEvent({ event_name: "discover_page_loaded" });
   }, []);
 
-  const updateFilter = (filter: (typeof FILTERS)[number]) => {
-    setActiveFilter(filter);
-    void trackEvent({
-      event_name: "used_category_filter",
-      metadata: { filter },
-    });
-  };
+  useEffect(() => {
+    if (!hydrated) return;
+    setLeafletReady(true);
+    return () => setLeafletReady(false);
+  }, [hydrated]);
 
   const getRestaurantDistance = (restaurant: RestaurantListItem) => {
     if (!userPosition || restaurant.latitude == null || restaurant.longitude == null) {
@@ -463,7 +444,7 @@ export default function RestaurantMap({
 
   const handleLocate = () => {
     if (!navigator.geolocation) {
-      setLocationMessage("Géolocalisation indisponible sur ce navigateur.");
+      setToastMessage("Géolocalisation indisponible sur ce navigateur.");
       return;
     }
 
@@ -475,14 +456,14 @@ export default function RestaurantMap({
         ];
         setUserPosition(coords);
         setMapCenter(coords);
-        setLocationMessage(
+        setToastMessage(
           "Position détectée — on met en avant les spots les plus proches."
         );
       },
       () => {
         setUserPosition(null);
         setMapCenter(PARIS_CENTER);
-        setLocationMessage(
+        setToastMessage(
           "Localisation inactive — carte centrée sur Paris en attendant."
         );
       },
@@ -597,6 +578,36 @@ export default function RestaurantMap({
     return null;
   }, [activeGoal]);
 
+  useEffect(() => {
+    if (!activeGoal || !recommendationText) return;
+    setToastMessage(recommendationText);
+  }, [activeGoal, recommendationText]);
+
+  const filtersDraftSnapshot = useMemo<FiltersDraft>(
+    () => ({ search, filter: activeFilter, sort: sortBy }),
+    [search, activeFilter, sortBy]
+  );
+
+  const filtersActiveCount =
+    (search.trim() ? 1 : 0) +
+    (activeFilter !== "Tous" ? 1 : 0) +
+    (sortBy !== "Score healthy" ? 1 : 0);
+
+  const applyFilters = useCallback((draft: FiltersDraft) => {
+    setSearch(draft.search);
+    setActiveFilter(draft.filter);
+    setSortBy(draft.sort);
+    void trackEvent({
+      event_name: "used_category_filter",
+      metadata: { filter: draft.filter },
+    });
+  }, []);
+
+  const toastBottomClassName =
+    mobileTrayExpanded
+      ? "bottom-[min(46vh,300px)] sm:bottom-8 lg:bottom-6"
+      : "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] sm:bottom-8 lg:bottom-6";
+
   const getHighlightedDish = (restaurant: RestaurantListItem) => {
     const intent: IntentMode = activeGoal
       ? mapGoalToIntent(activeGoal)
@@ -623,181 +634,38 @@ export default function RestaurantMap({
 
   return (
     <section className="discover-ux relative h-[calc(100vh-4rem)] min-h-[680px] w-full overflow-hidden bg-cream-deep">
-      {/* === Top control bar === */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[1200] px-3 pt-3 sm:px-4 sm:pt-4">
-        <div className="pointer-events-auto mx-auto max-w-3xl">
-          <div className="overflow-hidden rounded-[26px] bg-white/95 shadow-floating ring-1 ring-ink/[0.06] backdrop-blur-xl supports-[backdrop-filter]:bg-white/85">
-            {/* Header row */}
-            <div className="flex items-start gap-3 border-b border-ink/[0.05] px-4 pb-3 pt-3.5">
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-deep/80">
-                  Découverte locale · healthy
-                </p>
-                <h1 className="mt-0.5 text-[17px] font-semibold tracking-tight-display text-ink">
-                  <span className="block truncate">
-                    {filtered.length} spots healthy
-                    {activeFilter !== "Tous" ? ` · ${activeFilter}` : " près de toi"}
-                  </span>
-                </h1>
-                <p className="mt-1 text-[11px] leading-snug text-ink/55">
-                  Selon ta localisation, tes objectifs et les restaurants les mieux notés.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleLocate}
-                aria-label="Me localiser"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink/5 text-ink/70 transition hover:bg-brand-light hover:text-brand-dark"
-              >
-                <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowGoalPanel((v) => !v)}
-                className={`inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-2.5 text-[11.5px] font-semibold transition sm:gap-1.5 sm:px-3.5 sm:text-[12.5px] ${
-                  activeGoal
-                    ? "bg-brand text-white"
-                    : "bg-ink/5 text-ink/70 hover:bg-brand-light hover:text-brand-dark"
-                }`}
-              >
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <circle cx="12" cy="12" r="5" />
-                  <circle cx="12" cy="12" r="1" />
-                </svg>
-                {activeGoal ?? "Mon objectif"}
-              </button>
-            </div>
+      <DiscoverTopBar
+        spotCount={filtered.length}
+        onLocate={handleLocate}
+        onOpenFilters={() => setFiltersOpen(true)}
+        filtersActiveCount={filtersActiveCount}
+        onOpenGoal={() => setGoalSheetOpen(true)}
+        activeGoal={activeGoal}
+        onClearGoal={() => setActiveGoal(null)}
+      />
 
-            {/* Filter chips row */}
-            <div className="scrollbar-none flex items-center gap-2 overflow-x-auto px-4 py-3">
-              {FILTERS.map((filter) => (
-                <Chip
-                  key={filter}
-                  active={filter === activeFilter}
-                  onClick={() => updateFilter(filter)}
-                >
-                  {filter}
-                </Chip>
-              ))}
-            </div>
+      <DiscoverFiltersSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        initialDraft={filtersDraftSnapshot}
+        onApply={applyFilters}
+      />
 
-            {/* Search + sort row */}
-            <div className="flex flex-col gap-2 border-t border-ink/[0.05] px-3 py-3 sm:flex-row sm:items-center sm:gap-3">
-              <div className="relative flex-1">
-                <svg
-                  viewBox="0 0 24 24"
-                  className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Chercher un spot, une cuisine, un quartier…"
-                  className="h-10 w-full rounded-full border border-ink/[0.08] bg-cream/80 pl-9 pr-4 text-[13.5px] text-ink placeholder:text-ink/40 focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-              <div className="flex items-center gap-2 sm:shrink-0">
-                <select
-                  value={sortBy}
-                  onChange={(event) =>
-                    setSortBy(event.target.value as (typeof SORT_OPTIONS)[number])
-                  }
-                  className="h-10 appearance-none rounded-full border border-ink/[0.08] bg-cream/80 px-4 pr-8 text-[12.5px] font-semibold text-ink/80 focus:border-brand/40 focus:outline-none"
-                  style={{
-                    backgroundImage:
-                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23141b1f' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 12px center",
-                  }}
-                >
-                  {SORT_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+      <DiscoverGoalSheet
+        open={goalSheetOpen}
+        onClose={() => setGoalSheetOpen(false)}
+        activeGoal={activeGoal}
+        onSelectGoal={(goal) => setActiveGoal(goal)}
+      />
 
-            {/* Goal panel — collapsible */}
-            {showGoalPanel ? (
-              <div className="border-t border-ink/[0.05] bg-brand-soft px-4 py-3 animate-fade-up">
-                <p className="text-[12px] font-semibold text-brand-deep">
-                  Objectif nutritionnel
-                </p>
-                <p className="mt-0.5 text-[11.5px] text-ink/65">
-                  Pour repérer vite un spot qui colle à ta journée.
-                </p>
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {GOALS.map((goal) => (
-                    <button
-                      key={goal}
-                      type="button"
-                      onClick={() => {
-                        setActiveGoal((current) => (current === goal ? null : goal));
-                        setShowGoalPanel(false);
-                        void trackEvent({
-                          event_name: "goal_filter_selected",
-                          metadata: { goal },
-                        });
-                      }}
-                      className={`rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition ${
-                        activeGoal === goal
-                          ? "bg-brand text-white"
-                          : "bg-white text-ink/75 ring-1 ring-ink/10 hover:text-brand"
-                      }`}
-                    >
-                      {goal}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {!showGoalPanel && recommendationText ? (
-              <div className="border-t border-ink/[0.05] bg-brand-soft px-4 py-2.5">
-                <p className="text-[11.5px] font-medium text-brand-deep">
-                  {recommendationText}
-                </p>
-              </div>
-            ) : null}
-
-            {locationMessage ? (
-              <div className="border-t border-ink/[0.05] px-4 py-2">
-                <p className="text-[11px] text-ink/60">{locationMessage}</p>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="mt-2 space-y-2">
-            {bestChoiceRestaurant ? (
-              <DiscoverBestChoiceCard
-                restaurant={bestChoiceRestaurant}
-                intentMode={intentModeForRanking}
-                intentLabel={
-                  activeGoal ?? getIntentTag(intentModeForRanking)
-                }
-                distanceKm={getRestaurantDistance(bestChoiceRestaurant)}
-                detailHref={`/restaurants/${bestChoiceRestaurant.id}`}
-              />
-            ) : null}
-            <DiscoverWeekStrip items={weekSpotlights} />
-          </div>
-        </div>
-      </div>
+      <DiscoverToast
+        message={toastMessage}
+        onDismiss={dismissToast}
+        bottomClassName={toastBottomClassName}
+      />
 
       {/* === Map === */}
+      {leafletReady ? (
       <MapContainer
         center={PARIS_CENTER}
         zoom={12}
@@ -984,16 +852,35 @@ export default function RestaurantMap({
           </Marker>
         ))}
       </MapContainer>
+      ) : (
+        <div
+          className="h-full w-full bg-cream-deep"
+          aria-hidden
+        />
+      )}
 
       {/* === Desktop sidebar === */}
-      <aside className="absolute bottom-6 left-4 top-[420px] z-[900] hidden w-[360px] overflow-hidden rounded-[28px] bg-white/95 shadow-floating ring-1 ring-ink/[0.06] backdrop-blur-xl lg:block">
-        <div className="flex items-baseline justify-between border-b border-ink/[0.05] px-5 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-deep/80">
-            Spots autour de toi
+      <aside className="absolute bottom-6 left-4 top-[5.25rem] z-[900] hidden w-[360px] overflow-hidden rounded-[28px] bg-white/95 shadow-floating ring-1 ring-ink/[0.06] backdrop-blur-xl lg:block">
+        <div className="flex items-center border-b border-ink/[0.05] px-4 py-2">
+          <p className="text-[14px] font-semibold tracking-tight text-ink">
+            {filtered.length} adresses
           </p>
-          <p className="text-[11px] text-ink/55">{filtered.length} lieux</p>
         </div>
-        <div className="scrollbar-premium h-full space-y-2.5 overflow-y-auto px-3 pb-16 pt-3">
+        <div className="scrollbar-premium h-full space-y-2 overflow-y-auto px-3 pb-16 pt-2">
+          {bestChoiceRestaurant ? (
+            <div className="pb-1">
+              <DiscoverBestChoiceCard
+                restaurant={bestChoiceRestaurant}
+                intentMode={intentModeForRanking}
+                intentLabel={
+                  activeGoal ?? getIntentTag(intentModeForRanking)
+                }
+                distanceKm={getRestaurantDistance(bestChoiceRestaurant)}
+                detailHref={`/restaurants/${bestChoiceRestaurant.id}`}
+              />
+            </div>
+          ) : null}
+          <DiscoverWeekStrip items={weekSpotlights} />
           {listForPanels.map((restaurant) => {
             const isFavorite = favorites.includes(restaurant.id);
             const distance = getRestaurantDistance(restaurant);
@@ -1170,168 +1057,188 @@ export default function RestaurantMap({
       </aside>
 
       {/* === Mobile bottom carousel === */}
-      <div className="absolute inset-x-0 bottom-0 z-[1000] px-3 pb-4 sm:px-4 sm:pb-6 lg:hidden">
-        {filtered.length === 0 ? (
-          <div className="rounded-3xl bg-white/95 p-4 text-[13px] text-ink/65 shadow-floating ring-1 ring-ink/[0.06] backdrop-blur">
-            Pas de spot avec ces critères. Essaie une autre catégorie.
-          </div>
-        ) : (
-          <div className="scrollbar-none flex gap-3 overflow-x-auto pb-1">
-            {listForPanels.map((restaurant) => {
+      <div className="lg:hidden">
+        <DiscoverMobileTray
+          spotCount={filtered.length}
+          expanded={mobileTrayExpanded}
+          onToggleExpanded={() => setMobileTrayExpanded((v) => !v)}
+        >
+          {filtered.length === 0 ? (
+            <div className="rounded-3xl bg-white/95 p-4 text-[13px] text-ink/65 shadow-floating ring-1 ring-ink/[0.06] backdrop-blur">
+              Pas de spot avec ces critères. Essaie une autre catégorie.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {bestChoiceRestaurant ? (
+                <DiscoverBestChoiceCard
+                  restaurant={bestChoiceRestaurant}
+                  intentMode={intentModeForRanking}
+                  intentLabel={
+                    activeGoal ?? getIntentTag(intentModeForRanking)
+                  }
+                  distanceKm={getRestaurantDistance(bestChoiceRestaurant)}
+                  detailHref={`/restaurants/${bestChoiceRestaurant.id}`}
+                />
+              ) : null}
+              <DiscoverWeekStrip items={weekSpotlights} />
+              <div className="scrollbar-none flex gap-3 overflow-x-auto pb-1">
+                {listForPanels.map((restaurant) => {
               const isFavorite = favorites.includes(restaurant.id);
               const distance = getRestaurantDistance(restaurant);
               const isActive = activeRestaurantId === restaurant.id;
               const dish = getHighlightedDish(restaurant);
-              return (
-                <article
-                  key={restaurant.id}
-                  className={`w-[280px] shrink-0 overflow-hidden rounded-[24px] bg-white shadow-floating ring-1 transition ${
-                    isActive ? "ring-brand/50" : "ring-ink/[0.06]"
-                  }`}
-                >
-                  <div className="relative h-36 overflow-hidden bg-brand-light">
-                    <RestaurantImage
-                      restaurant={restaurant}
-                      alt={restaurant.name}
-                      className="h-full w-full object-cover"
-                    />
-                    <HeartButton
-                      active={isFavorite}
-                      onClick={() => toggleFavorite(restaurant.id)}
-                      className="absolute right-2.5 top-2.5"
-                    />
-                    {restaurant.category ? (
-                      <span className="absolute left-2.5 top-2.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-brand-deep shadow-soft">
-                        {restaurant.category}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="space-y-2 px-4 pb-3 pt-3">
-                    <h3 className="truncate text-[14.5px] font-semibold tracking-tight text-ink">
-                      {restaurant.name}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {distance != null ? (
-                        <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10.5px] font-semibold text-ink/75">
-                          {distance.toFixed(1)} km
-                        </span>
-                      ) : null}
-                      <ScoreBadge score={displayHealthyScore(restaurant)} />
-                      <RatingMini
-                        rating={restaurant.rating}
-                        count={restaurant.review_count}
-                      />
-                    </div>
-                    <p className="text-[11.5px] leading-snug text-ink/75">
-                      <span className="font-semibold text-brand-deep">
-                        Pourquoi ce choix ·{" "}
-                      </span>
-                      {whyOneLine(restaurant)}
-                    </p>
-                    <ServiceAndHoursRow restaurant={restaurant} />
-                    <Link
-                      href={`/restaurants/${restaurant.id}`}
-                      className="line-clamp-2 block text-[12px] leading-snug text-ink/75"
-                      onClick={() =>
-                        void trackEvent({
-                          event_name: "recommended_dish_clicked",
-                          restaurant_id: restaurant.id,
-                          metadata: {
-                            source: "floating_card",
-                            intent: intentModeForRanking,
-                          },
-                        })
-                      }
+                  return (
+                    <article
+                      key={restaurant.id}
+                      className={`w-[280px] shrink-0 overflow-hidden rounded-[24px] bg-white shadow-floating ring-1 transition ${
+                        isActive ? "ring-brand/50" : "ring-ink/[0.06]"
+                      }`}
                     >
-                      <span className="font-semibold text-brand-deep">
-                        Plat conseillé ·{" "}
-                      </span>
-                      {dish}
-                    </Link>
-                    <div className="pt-1">
-                      <MacrosTeaser
-                        restaurant={restaurant}
-                        dishName={dish}
-                        variant="compact"
-                      />
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {restaurant.uber_eats_url || restaurant.deliveroo_url ? (
-                        <a
-                          href={getPrimaryActionUrl(restaurant) ?? "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      <div className="relative h-36 overflow-hidden bg-brand-light">
+                        <RestaurantImage
+                          restaurant={restaurant}
+                          alt={restaurant.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <HeartButton
+                          active={isFavorite}
+                          onClick={() => toggleFavorite(restaurant.id)}
+                          className="absolute right-2.5 top-2.5"
+                        />
+                        {restaurant.category ? (
+                          <span className="absolute left-2.5 top-2.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-brand-deep shadow-soft">
+                            {restaurant.category}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="space-y-2 px-4 pb-3 pt-3">
+                        <h3 className="truncate text-[14.5px] font-semibold tracking-tight text-ink">
+                          {restaurant.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {distance != null ? (
+                            <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10.5px] font-semibold text-ink/75">
+                              {distance.toFixed(1)} km
+                            </span>
+                          ) : null}
+                          <ScoreBadge score={displayHealthyScore(restaurant)} />
+                          <RatingMini
+                            rating={restaurant.rating}
+                            count={restaurant.review_count}
+                          />
+                        </div>
+                        <p className="text-[11.5px] leading-snug text-ink/75">
+                          <span className="font-semibold text-brand-deep">
+                            Pourquoi ce choix ·{" "}
+                          </span>
+                          {whyOneLine(restaurant)}
+                        </p>
+                        <ServiceAndHoursRow restaurant={restaurant} />
+                        <Link
+                          href={`/restaurants/${restaurant.id}`}
+                          className="line-clamp-2 block text-[12px] leading-snug text-ink/75"
                           onClick={() =>
-                            void (async () => {
-                              await trackEvent({
-                                event_name: "order_clicked",
-                                restaurant_id: restaurant.id,
-                                metadata: { source: "floating_card" },
-                              });
-                              await trackEvent({
-                                event_name: "restaurant_order_clicked",
-                                restaurant_id: restaurant.id,
-                                metadata: {
-                                  source: "floating_card",
-                                  platform: restaurant.uber_eats_url
-                                    ? "ubereats"
-                                    : "deliveroo",
-                                },
-                              });
-                              await trackUserHistory(
-                                restaurant.uber_eats_url
-                                  ? "clicked_order_ubereats"
-                                  : "clicked_order_deliveroo",
-                                restaurant.id,
-                                { source: "floating_card" }
-                              );
-                            })()
-                          }
-                          className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12.5px] font-semibold !text-white shadow-soft transition hover:bg-brand-dark"
-                        >
-                          Commander
-                        </a>
-                      ) : (
-                        <span className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 cursor-not-allowed items-center justify-center rounded-full bg-ink/5 px-3 text-[12px] font-semibold text-ink/45">
-                          Pas d&apos;app listée
-                        </span>
-                      )}
-                      <RestaurantNavigateCTA
-                        restaurant={restaurant}
-                        source="floating_card"
-                        hasOrderLinks={Boolean(
-                          restaurant.uber_eats_url || restaurant.deliveroo_url
-                        )}
-                        size="md"
-                        distanceKm={distance}
-                        showDistance
-                        className="min-w-[100px] flex-1 flex-col"
-                      />
-                      <Link
-                        href={`/restaurants/${restaurant.id}`}
-                        onClick={() =>
-                          void (async () => {
-                            await trackEvent({
-                              event_name: "restaurant_card_clicked",
+                            void trackEvent({
+                              event_name: "recommended_dish_clicked",
                               restaurant_id: restaurant.id,
-                              metadata: { source: "floating_card" },
-                            });
-                            await trackUserHistory("clicked_card", restaurant.id, {
-                              source: "floating_card",
-                            });
-                          })()
-                        }
-                        className="inline-flex h-9 min-h-[44px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-[12.5px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
-                      >
-                        Voir
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
+                              metadata: {
+                                source: "floating_card",
+                                intent: intentModeForRanking,
+                              },
+                            })
+                          }
+                        >
+                          <span className="font-semibold text-brand-deep">
+                            Plat conseillé ·{" "}
+                          </span>
+                          {dish}
+                        </Link>
+                        <div className="pt-1">
+                          <MacrosTeaser
+                            restaurant={restaurant}
+                            dishName={dish}
+                            variant="compact"
+                          />
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {restaurant.uber_eats_url || restaurant.deliveroo_url ? (
+                            <a
+                              href={getPrimaryActionUrl(restaurant) ?? "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() =>
+                                void (async () => {
+                                  await trackEvent({
+                                    event_name: "order_clicked",
+                                    restaurant_id: restaurant.id,
+                                    metadata: { source: "floating_card" },
+                                  });
+                                  await trackEvent({
+                                    event_name: "restaurant_order_clicked",
+                                    restaurant_id: restaurant.id,
+                                    metadata: {
+                                      source: "floating_card",
+                                      platform: restaurant.uber_eats_url
+                                        ? "ubereats"
+                                        : "deliveroo",
+                                    },
+                                  });
+                                  await trackUserHistory(
+                                    restaurant.uber_eats_url
+                                      ? "clicked_order_ubereats"
+                                      : "clicked_order_deliveroo",
+                                    restaurant.id,
+                                    { source: "floating_card" }
+                                  );
+                                })()
+                              }
+                              className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12.5px] font-semibold !text-white shadow-soft transition hover:bg-brand-dark"
+                            >
+                              Commander
+                            </a>
+                          ) : (
+                            <span className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 cursor-not-allowed items-center justify-center rounded-full bg-ink/5 px-3 text-[12px] font-semibold text-ink/45">
+                              Pas d&apos;app listée
+                            </span>
+                          )}
+                          <RestaurantNavigateCTA
+                            restaurant={restaurant}
+                            source="floating_card"
+                            hasOrderLinks={Boolean(
+                              restaurant.uber_eats_url || restaurant.deliveroo_url
+                            )}
+                            size="md"
+                            distanceKm={distance}
+                            showDistance
+                            className="min-w-[100px] flex-1 flex-col"
+                          />
+                          <Link
+                            href={`/restaurants/${restaurant.id}`}
+                            onClick={() =>
+                              void (async () => {
+                                await trackEvent({
+                                  event_name: "restaurant_card_clicked",
+                                  restaurant_id: restaurant.id,
+                                  metadata: { source: "floating_card" },
+                                });
+                                await trackUserHistory("clicked_card", restaurant.id, {
+                                  source: "floating_card",
+                                });
+                              })()
+                            }
+                            className="inline-flex h-9 min-h-[44px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-[12.5px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
+                          >
+                            Voir
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </DiscoverMobileTray>
       </div>
       {showLoginPrompt ? (
         <div className="fixed inset-0 z-[1400] flex items-end justify-center bg-black/35 p-4 sm:items-center">

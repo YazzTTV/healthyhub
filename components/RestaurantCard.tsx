@@ -8,6 +8,7 @@ import {
 } from "@/lib/restaurant-presentation";
 import RestaurantImage from "@/components/RestaurantImage";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import SocialProof from "@/components/SocialProof";
 import { isVerified } from "@/lib/restaurant-credibility";
 
 export default function RestaurantCard({
@@ -53,6 +54,7 @@ export default function RestaurantCard({
         {restaurant.cuisine ? (
           <p className="text-[13px] text-ink-mute">{restaurant.cuisine}</p>
         ) : null}
+        <SocialProof restaurant={restaurant} />
         {serviceLabels.length > 0 ? (
           <div className="flex flex-wrap gap-1.5 pt-1">
             {serviceLabels.map((label) => (

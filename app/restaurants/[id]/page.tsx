@@ -9,6 +9,8 @@ import RestaurantImage from "@/components/RestaurantImage";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import ScoreExplainer from "@/components/ScoreExplainer";
+import RestaurantViewTracker from "@/components/RestaurantViewTracker";
+import SocialProof from "@/components/SocialProof";
 import { isVerified } from "@/lib/restaurant-credibility";
 import { displayHealthyScore } from "@/lib/healthy-score";
 
@@ -157,6 +159,13 @@ export default async function RestaurantDetailPage({
 
   return (
     <article className="space-y-10 py-4 md:py-8">
+      <RestaurantViewTracker
+        id={restaurant.id}
+        name={restaurant.name}
+        image_url={restaurant.image_url}
+        category={restaurant.category}
+        city={restaurant.city}
+      />
       <Link
         href="/discover"
         className="inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-mute transition hover:text-brand"
@@ -200,6 +209,7 @@ export default async function RestaurantDetailPage({
             {restaurant.cuisine ? (
               <p className="text-[15px] text-ink-mute">{restaurant.cuisine}</p>
             ) : null}
+            <SocialProof restaurant={restaurant} />
           </div>
 
           {restaurant.description ? (

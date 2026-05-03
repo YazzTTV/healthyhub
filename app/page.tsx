@@ -1,11 +1,29 @@
 import DiscoverCTA from "@/components/DiscoverCTA";
 import EmailCapture from "@/components/EmailCapture";
+import TopPicksStrip from "@/components/TopPicksStrip";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import type { RestaurantListItem } from "@/lib/types";
 
 export const revalidate = 60;
 
 type Stat = { value: string; label: string };
+
+async function getRestaurantsForPicks(): Promise<RestaurantListItem[]> {
+  try {
+    const { data } = await supabase
+      .from("restaurants")
+      .select(
+        "id, slug, name, image_url, city, cuisine, category, healthy_score, tags, latitude, longitude, rating, review_count, uber_eats_url, deliveroo_url, protein_level, calorie_level, clean_level, recommended_for_weight_loss, recommended_for_muscle_gain, recommended_for_clean_eating, created_at"
+      )
+      .order("healthy_score", { ascending: false, nullsFirst: false })
+      .limit(120);
+    return (data ?? []) as RestaurantListItem[];
+  } catch {
+    return [];
+  }
+}
 
 async function getLiveStats(): Promise<Stat[]> {
   // Fallback shown only if DB is unreachable. Conservative numbers.
@@ -147,7 +165,10 @@ const PILLARS = [
 ];
 
 export default async function LandingPage() {
-  const stats = await getLiveStats();
+  const [stats, restaurants] = await Promise.all([
+    getLiveStats(),
+    getRestaurantsForPicks(),
+  ]);
   return (
     <div className="space-y-24 pb-12 md:space-y-32 md:pb-20">
       {/* === HERO === */}
@@ -258,6 +279,12 @@ export default async function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* === TOP PICKS — decision authority === */}
+      {restaurants.length > 0 ? <TopPicksStrip restaurants={restaurants} /> : null}
+
+      {/* === RECENTLY VIEWED — return reason === */}
+      <RecentlyViewed />
 
       {/* === HOW IT WORKS === */}
       <section className="space-y-10">
