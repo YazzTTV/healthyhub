@@ -1,3 +1,8 @@
+import {
+  effectiveCalorieBand,
+  effectiveCleanBand,
+  effectiveProteinBand,
+} from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
 
 const MIN_SCORE = 3.2;
@@ -87,19 +92,17 @@ export function getScoreBandMeta(
   return { min: 3.75, max: 4.55, tag: "default" };
 }
 
-function nutritionNudge(
-  restaurant: Pick<
-    RestaurantListItem,
-    "clean_level" | "calorie_level" | "protein_level"
-  >
-): number {
+function nutritionNudge(restaurant: RestaurantListItem): number {
+  const clean = effectiveCleanBand(restaurant);
+  const cal = effectiveCalorieBand(restaurant);
+  const prot = effectiveProteinBand(restaurant);
   let n = 0;
-  if (restaurant.clean_level === "high") n += 0.07;
-  if (restaurant.clean_level === "low") n -= 0.09;
-  if (restaurant.calorie_level === "low") n += 0.05;
-  if (restaurant.calorie_level === "high") n -= 0.06;
-  if (restaurant.protein_level === "high") n += 0.04;
-  if (restaurant.protein_level === "low") n -= 0.03;
+  if (clean === "high") n += 0.07;
+  if (clean === "low") n -= 0.09;
+  if (cal === "low") n += 0.05;
+  if (cal === "high") n -= 0.06;
+  if (prot === "high") n += 0.04;
+  if (prot === "low") n -= 0.03;
   return n;
 }
 
@@ -168,9 +171,15 @@ export function getHealthyScoreExplainer(
   const score = getEffectiveHealthyScore(restaurant);
   const band = getScoreBandMeta(restaurant);
 
+  const why = restaurant.why_this_score?.trim();
+  const editor = restaurant.healthyhub_editor_note?.trim();
+
   let tierLabel: string;
   let tierLine: string;
-  if (score >= 4.65) {
+  if (why) {
+    tierLabel = "Pourquoi ce score";
+    tierLine = why;
+  } else if (score >= 4.65) {
     tierLabel = "Référence";
     tierLine =
       "Carte très alignée « healthy » : ingrédients frais, peu transformés, lecture du menu simple.";
@@ -221,8 +230,9 @@ export function getHealthyScoreExplainer(
       "Focus performance et protéines — énergie plus dense selon les plats choisis.",
   };
 
-  const contextLine =
-    tagLines[band.tag] ?? tagLines.default;
+  const contextLine = editor
+    ? editor
+    : tagLines[band.tag] ?? tagLines.default;
 
   return { score, tierLabel, tierLine, contextLine };
 }

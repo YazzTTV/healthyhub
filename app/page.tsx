@@ -3,6 +3,7 @@ import EmailCapture from "@/components/EmailCapture";
 import TopPicksStrip from "@/components/TopPicksStrip";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import Link from "next/link";
+import { fetchRestaurantListRows } from "@/lib/fetch-restaurant-list";
 import { supabase } from "@/lib/supabase";
 import type { RestaurantListItem } from "@/lib/types";
 
@@ -12,14 +13,11 @@ type Stat = { value: string; label: string };
 
 async function getRestaurantsForPicks(): Promise<RestaurantListItem[]> {
   try {
-    const { data } = await supabase
-      .from("restaurants")
-      .select(
-        "id, slug, name, image_url, city, cuisine, category, healthy_score, tags, latitude, longitude, rating, review_count, uber_eats_url, deliveroo_url, protein_level, calorie_level, clean_level, recommended_for_weight_loss, recommended_for_muscle_gain, recommended_for_clean_eating, created_at"
-      )
-      .order("healthy_score", { ascending: false, nullsFirst: false })
-      .limit(120);
-    return (data ?? []) as RestaurantListItem[];
+    const { data, error } = await fetchRestaurantListRows(supabase, {
+      limit: 120,
+    });
+    if (error) return [];
+    return data;
   } catch {
     return [];
   }
@@ -41,7 +39,9 @@ async function getLiveStats(): Promise<Stat[]> {
         .select("*", { count: "exact", head: true }),
       supabase
         .from("restaurants")
-        .select("category, city, rating, healthy_score")
+        .select(
+          "category, city, rating, healthy_score, google_rating, google_review_count, arrondissement"
+        )
         .limit(1000),
     ]);
 
@@ -56,6 +56,11 @@ async function getLiveStats(): Promise<Stat[]> {
     const arrondissements = new Set(
       rows
         .map((r) => {
+          const arr = (r as { arrondissement?: string | null }).arrondissement;
+          if (arr && String(arr).trim()) {
+            const m = String(arr).match(/(\d{1,2})/);
+            return m ? m[1] : String(arr).trim();
+          }
           const city = (r.city as string | null) ?? "";
           const m = city.match(/(\d{1,2})\s*(?:e|er|ème|eme)?/);
           return m ? m[1] : null;
@@ -64,8 +69,17 @@ async function getLiveStats(): Promise<Stat[]> {
     );
 
     const ratings = rows
-      .map((r) => Number(r.rating))
-      .filter((n) => !Number.isNaN(n) && n > 0);
+      .map((r) => {
+        const row = r as {
+          google_rating?: number | null;
+          rating?: number | null;
+        };
+        const g = Number(row.google_rating);
+        if (!Number.isNaN(g) && g > 0) return g;
+        const x = Number(row.rating);
+        return !Number.isNaN(x) && x > 0 ? x : null;
+      })
+      .filter((n): n is number => n != null);
 
     const avgRating =
       ratings.length > 0

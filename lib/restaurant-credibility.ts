@@ -1,14 +1,22 @@
 import { displayHealthyScore } from "@/lib/healthy-score";
+import {
+  effectiveCalorieBand,
+  effectiveCleanBand,
+  effectiveProteinBand,
+  hasSignatureDishMacros,
+} from "@/lib/restaurant-helpers";
 import type { Restaurant, RestaurantListItem } from "@/lib/types";
 
 /**
- * Verified by HealthyHub badge.
- * For now: based on score >= 4.5 + presence of structured metadata.
- * Later: backed by an `is_verified` column when editorial team has visited.
+ * Badge « vérifié HealthyHub » : priorité à la colonne éditoriale,
+ * sinon heuristique legacy (score + métadonnées).
  */
 export function isVerified(
   restaurant: RestaurantListItem | Restaurant
 ): boolean {
+  if (restaurant.verified_by_healthyhub === true) return true;
+  if (restaurant.verified_by_healthyhub === false) return false;
+
   const score = displayHealthyScore(restaurant);
   if (score < 4.5) return false;
   const hasMeta =
@@ -18,27 +26,39 @@ export function isVerified(
   return hasMeta;
 }
 
-type EstimatedMacros = {
-  kcal: string; // "~480"
-  protein: string; // "32g"
-  carbs: string; // "45g"
-  fat: string; // "14g"
-  confidence: "estimated" | "approximated";
+export type EstimatedMacros = {
+  kcal: string;
+  protein: string;
+  carbs: string;
+  fat: string;
+  confidence: "estimated" | "approximated" | "from_menu";
 };
 
 /**
- * Estimated macros for the signature dish.
- * Heuristic (clearly labeled "estimé") based on category + nutrition profile.
- * NOT a substitute for actual labeling.
+ * Macros du plat signature si la base fournit les 4 valeurs,
+ * sinon estimation heuristique (étiquetée « estimé »).
  */
 export function estimateMacros(
   restaurant: RestaurantListItem | Restaurant
 ): EstimatedMacros | null {
-  const category = (restaurant.category ?? "").toLowerCase();
-  const proteinLevel = restaurant.protein_level ?? null;
-  const calorieLevel = restaurant.calorie_level ?? null;
+  if (hasSignatureDishMacros(restaurant)) {
+    const k = Number(restaurant.signature_dish_calories);
+    const p = Number(restaurant.signature_dish_protein);
+    const c = Number(restaurant.signature_dish_carbs);
+    const f = Number(restaurant.signature_dish_fats);
+    return {
+      kcal: `${Math.round(k)}`,
+      protein: `${Math.round(p)}g`,
+      carbs: `${Math.round(c)}g`,
+      fat: `${Math.round(f)}g`,
+      confidence: "from_menu",
+    };
+  }
 
-  // base by category
+  const category = (restaurant.category ?? "").toLowerCase();
+  const proteinLevel = effectiveProteinBand(restaurant);
+  const calorieLevel = effectiveCalorieBand(restaurant);
+
   let kcal = 500;
   let protein = 25;
   let carbs = 50;
@@ -96,11 +116,9 @@ export function estimateMacros(
     fat = 16;
   }
 
-  // adjust by protein_level
   if (proteinLevel === "high") protein = Math.round(protein * 1.25);
   if (proteinLevel === "low") protein = Math.round(protein * 0.75);
 
-  // adjust by calorie_level
   if (calorieLevel === "high") {
     kcal = Math.round(kcal * 1.15);
     fat = Math.round(fat * 1.2);

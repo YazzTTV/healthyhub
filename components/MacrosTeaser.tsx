@@ -13,6 +13,13 @@ export default function MacrosTeaser({
   const macros = estimateMacros(restaurant);
   if (!macros) return null;
 
+  const fromMenu = macros.confidence === "from_menu";
+  const title = fromMenu ? "Macros du plat phare" : "Macros estimés";
+  const badge = fromMenu ? "fiche lieu" : "estimé";
+  const badgeTitle = fromMenu
+    ? "Valeurs renseignées pour le plat signature en base de données."
+    : "Estimation HealthyHub fondée sur la catégorie et le profil nutritionnel — pas de mesure laboratoire.";
+
   const items = [
     { label: "kcal", value: macros.kcal },
     { label: "protéines", value: macros.protein },
@@ -20,18 +27,23 @@ export default function MacrosTeaser({
     { label: "lipides", value: macros.fat },
   ];
 
+  const resolvedDish =
+    dishName?.trim() ||
+    restaurant.signature_dish_name?.trim() ||
+    undefined;
+
   if (variant === "compact") {
     return (
       <div className="rounded-xl bg-brand-soft/90 px-2.5 py-2 ring-1 ring-brand/12">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-brand-deep">
-            Macros estimés
+            {title}
           </p>
           <span
             className="text-[9px] font-medium text-ink-mute"
-            title="Estimation HealthyHub — pas de mesure laboratoire."
+            title={badgeTitle}
           >
-            estimé
+            {badge}
           </span>
         </div>
         <div className="mt-1.5 grid grid-cols-4 gap-1">
@@ -57,18 +69,18 @@ export default function MacrosTeaser({
     <div className="rounded-[20px] bg-brand-soft p-4 ring-1 ring-brand/15 sm:p-5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep">
-          Macros estimés
+          {title}
         </p>
         <span
           className="text-[10.5px] font-medium text-ink-mute"
-          title="Estimation HealthyHub fondée sur la catégorie et le profil nutritionnel — pas de mesure laboratoire."
+          title={badgeTitle}
         >
-          estimé
+          {badge}
         </span>
       </div>
-      {dishName ? (
+      {resolvedDish ? (
         <p className="mt-1 text-[12.5px] text-ink-soft">
-          Sur le plat phare : <span className="font-medium">{dishName}</span>
+          Sur le plat phare : <span className="font-medium">{resolvedDish}</span>
         </p>
       ) : null}
       <div className="mt-3 grid grid-cols-4 gap-2">

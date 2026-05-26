@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { trackSignupStarted } from "@/lib/analytics";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -8,8 +9,21 @@ export default function LoginPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  useEffect(() => {
+    trackSignupStarted({
+      source: "login_page",
+      method: "magic_link",
+      step: "view",
+    });
+  }, []);
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    trackSignupStarted({
+      source: "login_page",
+      method: "magic_link",
+      step: "email_submit",
+    });
     setStatus("loading");
     setErrorMessage("");
 

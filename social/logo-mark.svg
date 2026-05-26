@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <!-- Tile -->
+  <rect x="0" y="10" width="60" height="60" rx="14" fill="#1F4A36"/>
+  <g stroke="#FAF7F0" stroke-width="3.6" stroke-linecap="round" fill="none">
+    <line x1="14" y1="22" x2="14" y2="58"/>
+    <line x1="22" y1="22" x2="22" y2="58"/>
+    <line x1="14" y1="40" x2="22" y2="40"/>
+    <line x1="38" y1="22" x2="38" y2="58"/>
+    <line x1="46" y1="22" x2="46" y2="58"/>
+    <line x1="38" y1="40" x2="46" y2="40"/>
+  </g>
+  <circle cx="30" cy="40" r="2" fill="#86EFAC"/>
+
+  <!-- Wordmark -->
+  <text x="80" y="52" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="28" font-weight="600" fill="#141B1F" letter-spacing="-0.6">Healthy<tspan fill="#2F6D4E">Hub</tspan></text>
+</svg>

@@ -7,6 +7,7 @@ export type ViewedEntry = {
   id: string;
   name: string;
   image_url: string | null;
+  image_status?: string | null;
   category: string | null;
   city: string | null;
   viewed_at: number;

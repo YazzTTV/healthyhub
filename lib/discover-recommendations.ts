@@ -1,6 +1,7 @@
 import { calculateDistanceKm } from "@/lib/geo";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import { getRestaurantIntentScore, type IntentMode } from "@/lib/intent";
+import { getBestOrderLink } from "@/lib/order-links";
 import type { RestaurantListItem } from "@/lib/types";
 
 /** Objectifs carte « Mon objectif » → mode intent */
@@ -67,9 +68,9 @@ export function getBestChoice(
 }
 
 export function getPrimaryActionUrl(
-  restaurant: Pick<RestaurantListItem, "uber_eats_url" | "deliveroo_url">
+  restaurant: Parameters<typeof getBestOrderLink>[0]
 ): string | null {
-  return restaurant.uber_eats_url ?? restaurant.deliveroo_url ?? null;
+  return getBestOrderLink(restaurant)?.url ?? null;
 }
 
 export type WeekSpotlight = {
@@ -78,6 +79,11 @@ export type WeekSpotlight = {
   title: string;
   subtitle: string;
   restaurantId: string;
+  /** Champs dénormalisés pour analytics (évite un lookup côté UI). */
+  restaurantSnapshot: Pick<
+    RestaurantListItem,
+    "id" | "name" | "slug" | "category" | "arrondissement" | "healthy_score" | "city"
+  >;
 };
 
 /** Signaux « dynamiques » déterministes — formulations prudentes si données partielles. */
@@ -100,7 +106,11 @@ export function buildWeekSpotlights(
     ];
   }
 
-  const verifiedPool = restaurants.filter((r) => displayHealthyScore(r) >= 4.5);
+  const editorial = restaurants.filter((r) => r.verified_by_healthyhub === true);
+  const verifiedPool =
+    editorial.length > 0
+      ? editorial
+      : restaurants.filter((r) => displayHealthyScore(r) >= 4.5);
   const verifiedPick =
     verifiedPool.length > 0
       ? rankRestaurantsForIntent(verifiedPool, "CLEAN_RESET", null)[0]
@@ -119,6 +129,15 @@ export function buildWeekSpotlights(
           ? "Récemment ajoutés au catalogue HealthyHub."
           : "Sélection mise à jour régulièrement.",
       restaurantId: newest.id,
+      restaurantSnapshot: {
+        id: newest.id,
+        name: newest.name,
+        slug: newest.slug,
+        category: newest.category,
+        arrondissement: newest.arrondissement,
+        healthy_score: newest.healthy_score,
+        city: newest.city,
+      },
     },
     {
       id: "verified",
@@ -129,6 +148,15 @@ export function buildWeekSpotlights(
           ? "Repères avec score HealthyHub élevé (≥ 4,5)."
           : "Sélection mise à jour régulièrement.",
       restaurantId: verifiedPick?.id ?? newest.id,
+      restaurantSnapshot: {
+        id: (verifiedPick ?? newest).id,
+        name: (verifiedPick ?? newest).name,
+        slug: (verifiedPick ?? newest).slug,
+        category: (verifiedPick ?? newest).category,
+        arrondissement: (verifiedPick ?? newest).arrondissement,
+        healthy_score: (verifiedPick ?? newest).healthy_score,
+        city: (verifiedPick ?? newest).city,
+      },
     },
     {
       id: "clean",
@@ -136,6 +164,15 @@ export function buildWeekSpotlights(
       title: topClean.name,
       subtitle: "Mis en avant selon l’objectif « clean » et le score.",
       restaurantId: topClean.id,
+      restaurantSnapshot: {
+        id: topClean.id,
+        name: topClean.name,
+        slug: topClean.slug,
+        category: topClean.category,
+        arrondissement: topClean.arrondissement,
+        healthy_score: topClean.healthy_score,
+        city: topClean.city,
+      },
     },
   ];
 }

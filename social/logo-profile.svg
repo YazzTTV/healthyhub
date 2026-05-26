@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <!-- Background: brand-deep forest -->
+  <rect width="1080" height="1080" fill="#1F4A36"/>
+
+  <!-- Subtle leaf accent top-right (survives circle crop, adds organic touch) -->
+  <path d="M 820 160 Q 940 160 940 280 Q 940 330 880 330 Q 770 330 770 220 Q 770 160 820 160 Z"
+        fill="#86EFAC" opacity="0.18"/>
+
+  <!-- Inner circle safe area: ~840px diameter, centered -->
+  <!-- HH double monogram -->
+  <g stroke="#FAF7F0" stroke-width="64" stroke-linecap="round" fill="none">
+    <!-- First H -->
+    <line x1="280" y1="380" x2="280" y2="700"/>
+    <line x1="460" y1="380" x2="460" y2="700"/>
+    <line x1="280" y1="540" x2="460" y2="540"/>
+    <!-- Second H -->
+    <line x1="620" y1="380" x2="620" y2="700"/>
+    <line x1="800" y1="380" x2="800" y2="700"/>
+    <line x1="620" y1="540" x2="800" y2="540"/>
+  </g>
+
+  <!-- Tiny leaf signature between the two H's -->
+  <circle cx="540" cy="540" r="14" fill="#86EFAC"/>
+
+  <!-- Subtle wordmark under (hidden after Instagram circular crop but visible if used full square) -->
+  <text x="540" y="900" text-anchor="middle"
+        font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="58" font-weight="600" fill="#FAF7F0" letter-spacing="-1">HealthyHub</text>
+</svg>

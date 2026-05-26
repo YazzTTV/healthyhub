@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { trackRestaurantClick } from "@/lib/analytics";
 import type { WeekSpotlight } from "@/lib/discover-recommendations";
 
 export default function DiscoverWeekStrip({
@@ -23,6 +24,14 @@ export default function DiscoverWeekStrip({
               <Link
                 href={`/restaurants/${it.restaurantId}`}
                 className="mt-0.5 block truncate text-[12.5px] font-medium text-brand-dark underline-offset-2 hover:underline"
+                onClick={() =>
+                  trackRestaurantClick({
+                    restaurant: it.restaurantSnapshot,
+                    surface: "card",
+                    placement: "week_strip",
+                    extra: { week_spotlight_id: it.id },
+                  })
+                }
               >
                 {it.title}
               </Link>

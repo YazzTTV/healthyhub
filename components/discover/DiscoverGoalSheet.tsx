@@ -6,7 +6,7 @@ import {
   GOALS,
   type DiscoverGoal,
 } from "./constants";
-import { trackEvent } from "@/lib/analytics";
+import { trackObjectiveSelection } from "@/lib/analytics";
 
 type Props = {
   open: boolean;
@@ -67,12 +67,18 @@ export default function DiscoverGoalSheet({
                   <button
                     type="button"
                     onClick={() => {
+                      const prev = activeGoal;
                       const next = selected ? null : goal;
                       onSelectGoal(next);
                       if (next) {
-                        void trackEvent({
-                          event_name: "goal_filter_selected",
-                          metadata: { goal: next },
+                        trackObjectiveSelection({
+                          objective_name: GOAL_DESCRIPTIONS[next].title,
+                          objective_key: next,
+                          previous_objective_name: prev
+                            ? GOAL_DESCRIPTIONS[prev].title
+                            : null,
+                          previous_objective_key: prev,
+                          source: "discover_goal_sheet",
                         });
                       }
                       onClose();

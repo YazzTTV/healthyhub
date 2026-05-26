@@ -1,4 +1,5 @@
 import { displayHealthyScore } from "@/lib/healthy-score";
+import { hasDisplayableRestaurantImage } from "@/lib/restaurant-images";
 import type { RestaurantListItem } from "@/lib/types";
 
 function hashString(value: string): number {
@@ -36,7 +37,9 @@ export function getPickOfTheDay(
 ): RestaurantListItem | null {
   if (restaurants.length === 0) return null;
   const eligible = restaurants
-    .filter((r) => displayHealthyScore(r) >= 4.3 && r.image_url)
+    .filter(
+      (r) => displayHealthyScore(r) >= 4.3 && hasDisplayableRestaurantImage(r)
+    )
     .slice(0, 60);
   const pool = eligible.length > 0 ? eligible : restaurants.slice(0, 30);
   const seed = hashString(dayKey());

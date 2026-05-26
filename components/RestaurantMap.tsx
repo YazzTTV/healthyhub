@@ -3,12 +3,35 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { fetchDiscoverCatalogAction } from "@/app/discover/actions";
+import DiscoverCatalogSkeleton from "@/components/discover/DiscoverCatalogSkeleton";
+import DiscoverPanelCard from "@/components/discover/DiscoverPanelCard";
+import LoadMore from "@/components/discover/LoadMore";
+import { DISCOVER_PAGE_SIZE } from "@/lib/discover-constants";
+import type { DiscoverMapPin } from "@/lib/fetch-discover-map-pins";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-import { trackEvent } from "@/lib/analytics";
+import {
+  trackCategorySelected,
+  trackDiscoverOpened,
+  trackFavoriteAdded,
+  trackFavoriteRemoved,
+  trackFilterUsed,
+  trackRestaurantCardClick,
+  trackRestaurantMarkerClick,
+  trackScrollDepth,
+  trackTimeOnDiscover,
+} from "@/lib/analytics";
+import MapMoveTracker from "@/components/map/MapMoveTracker";
 import type { RestaurantListItem } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import {
+  readFavoriteIdsFromStorage,
+  writeFavoriteIdsToStorage,
+  notifyLocalFavoritesChanged,
+  LOCAL_FAVORITES_CHANGED_EVENT,
+} from "@/lib/local-favorites";
 import {
   addFavorite,
   getCurrentUser,
@@ -24,6 +47,8 @@ import DiscoverBestChoiceCard from "@/components/DiscoverBestChoiceCard";
 import DiscoverWeekStrip from "@/components/DiscoverWeekStrip";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import RestaurantImage from "@/components/RestaurantImage";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { isVerified } from "@/lib/restaurant-credibility";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import {
   getIntentReason,
@@ -34,11 +59,17 @@ import {
 import {
   buildWeekSpotlights,
   getBestChoice,
-  getPrimaryActionUrl,
   rankRestaurantsForIntent,
 } from "@/lib/discover-recommendations";
+import {
+  effectiveCalorieBand,
+  effectiveCleanBand,
+  effectiveProteinBand,
+  getDisplayRating,
+  getDisplayReviewCount,
+  isValidMapCoordinates,
+} from "@/lib/restaurant-helpers";
 import { calculateDistanceKm } from "@/lib/geo";
-import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
 import {
   FILTERS,
   SORT_OPTIONS,
@@ -52,7 +83,6 @@ import DiscoverToast from "@/components/discover/DiscoverToast";
 import DiscoverTopBar from "@/components/discover/DiscoverTopBar";
 
 const PARIS_CENTER: [number, number] = [48.8566, 2.3522];
-const FAVORITES_KEY = "healthyhub:favorites";
 type NutritionLevel = "low" | "medium" | "high";
 
 type RestaurantProfile = {
@@ -114,17 +144,22 @@ function inferRestaurantProfile(restaurant: RestaurantListItem): RestaurantProfi
         ? "medium"
         : "low";
 
+  const resolvedCalorie =
+    effectiveCalorieBand(restaurant) ?? calorie_level;
+
   return {
-    protein_level: restaurant.protein_level ?? protein_level,
-    calorie_level: restaurant.calorie_level ?? calorie_level,
-    clean_level: restaurant.clean_level ?? clean_level,
+    protein_level: effectiveProteinBand(restaurant) ?? protein_level,
+    calorie_level: resolvedCalorie,
+    clean_level: effectiveCleanBand(restaurant) ?? clean_level,
     recommended_for_weight_loss:
       restaurant.recommended_for_weight_loss ??
+      restaurant.lunch_light_fit ??
       ((calorie_level === "low" || calorie_level === "medium") &&
         clean_level === "high" &&
         healthyScore >= 4),
     recommended_for_muscle_gain:
       restaurant.recommended_for_muscle_gain ??
+      restaurant.muscle_recovery_fit ??
       (protein_level === "high" && healthyScore >= 3),
     recommended_for_clean_eating:
       restaurant.recommended_for_clean_eating ??
@@ -195,6 +230,7 @@ function getGoalFilteredRestaurants(
   const strict = scored.filter(({ restaurant, profile }) => {
     const healthyScore = displayHealthyScore(restaurant);
     if (goal === "Perte de poids") {
+      if (restaurant.lunch_light_fit === true && healthyScore >= 3.4) return true;
       return (
         (profile.calorie_level === "low" || profile.calorie_level === "medium") &&
         profile.clean_level === "high" &&
@@ -203,12 +239,14 @@ function getGoalFilteredRestaurants(
       );
     }
     if (goal === "Prise de muscle") {
+      if (restaurant.muscle_recovery_fit === true && healthyScore >= 3.2) return true;
       return (
         profile.protein_level === "high" &&
         healthyScore >= 3 &&
         profile.recommended_for_muscle_gain
       );
     }
+    if (restaurant.focus_productivity_fit === true && healthyScore >= 3.5) return true;
     return (
       profile.clean_level === "high" &&
       healthyScore >= 4 &&
@@ -355,12 +393,37 @@ function HeartButton({
   );
 }
 
+function mapPinToListItem(pin: DiscoverMapPin): RestaurantListItem {
+  return {
+    ...pin,
+    description: null,
+    cuisine: null,
+    tags: null,
+    review_count: null,
+    website_url: null,
+    uber_eats_url: null,
+    deliveroo_url: null,
+    created_at: null,
+  } as RestaurantListItem;
+}
+
 // === Main component ===
 export default function RestaurantMap({
-  restaurants,
+  mapPins,
+  initialPageRestaurants,
+  initialPage,
+  totalCount,
 }: {
-  restaurants: RestaurantListItem[];
+  mapPins: DiscoverMapPin[];
+  initialPageRestaurants: RestaurantListItem[];
+  initialPage: number;
+  totalCount: number;
 }) {
+  const [catalog, setCatalog] = useState<RestaurantListItem[] | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [listVisibleCount, setListVisibleCount] = useState(DISCOVER_PAGE_SIZE);
+  const [loadedServerPage, setLoadedServerPage] = useState(initialPage);
+
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]>("Tous");
   const [sortBy, setSortBy] = useState<(typeof SORT_OPTIONS)[number]>("Score healthy");
@@ -371,7 +434,6 @@ export default function RestaurantMap({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [user, setUser] = useState<User | null>(null);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   /** Évite l’erreur Leaflet « Map container is already initialized » avec React Strict Mode (double montage en dev). */
   const [leafletReady, setLeafletReady] = useState(false);
@@ -394,13 +456,7 @@ export default function RestaurantMap({
         if (!mounted) return;
         setFavorites(rows.map((row) => row.restaurant_id));
       } else {
-        try {
-          const raw = localStorage.getItem(FAVORITES_KEY);
-          const parsed = raw ? (JSON.parse(raw) as string[]) : [];
-          setFavorites(parsed);
-        } catch {
-          setFavorites([]);
-        }
+        setFavorites(readFavoriteIdsFromStorage());
       }
       setHydrated(true);
     };
@@ -409,11 +465,14 @@ export default function RestaurantMap({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) {
-        const raw = localStorage.getItem(FAVORITES_KEY);
-        const parsed = raw ? (JSON.parse(raw) as string[]) : [];
-        setFavorites(parsed);
+      const nextUser = session?.user ?? null;
+      setUser(nextUser);
+      if (nextUser) {
+        void getUserFavorites(nextUser.id).then((rows) => {
+          setFavorites(rows.map((r) => r.restaurant_id));
+        });
+      } else {
+        setFavorites(readFavoriteIdsFromStorage());
       }
     });
     return () => {
@@ -423,8 +482,65 @@ export default function RestaurantMap({
   }, []);
 
   useEffect(() => {
-    void trackEvent({ event_name: "discover_page_loaded" });
+    if (user) return;
+    const onLocalFav = () => setFavorites(readFavoriteIdsFromStorage());
+    window.addEventListener(LOCAL_FAVORITES_CHANGED_EVENT, onLocalFav);
+    return () =>
+      window.removeEventListener(LOCAL_FAVORITES_CHANGED_EVENT, onLocalFav);
+  }, [user]);
+
+  useEffect(() => {
+    let mounted = true;
+    void (async () => {
+      const { restaurants: full, error } = await fetchDiscoverCatalogAction();
+      if (!mounted) return;
+      if (!error && full.length > 0) {
+        setCatalog(full);
+      }
+      setCatalogLoading(false);
+    })();
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const restaurants = catalog ?? initialPageRestaurants;
+
+  useEffect(() => {
+    setListVisibleCount(DISCOVER_PAGE_SIZE);
+    setLoadedServerPage(1);
+  }, [search, activeFilter, sortBy, activeGoal]);
+
+  const filtersActive =
+    Boolean(search.trim()) ||
+    activeFilter !== "Tous" ||
+    sortBy !== "Score healthy" ||
+    activeGoal != null;
+
+  useEffect(() => {
+    trackDiscoverOpened({ restaurant_count: totalCount });
+    const startedAt = Date.now();
+    let maxScroll = 0;
+
+    const onScroll = () => {
+      const el = document.documentElement;
+      const scrollable = el.scrollHeight - window.innerHeight;
+      if (scrollable <= 0) return;
+      const pct = Math.round((window.scrollY / scrollable) * 100);
+      if (pct > maxScroll) maxScroll = pct;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      const seconds = Math.round((Date.now() - startedAt) / 1000);
+      if (seconds >= 5) trackTimeOnDiscover(seconds);
+      if (maxScroll >= 25) {
+        trackScrollDepth("discover", maxScroll);
+      }
+    };
+  }, [totalCount]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -472,8 +588,25 @@ export default function RestaurantMap({
   };
 
   const toggleFavorite = async (restaurantId: string) => {
+    const restaurant = restaurants.find((r) => r.id === restaurantId);
+
     if (!user) {
-      setShowLoginPrompt(true);
+      setFavorites((previous) => {
+        const exists = previous.includes(restaurantId);
+        const next = exists
+          ? previous.filter((id) => id !== restaurantId)
+          : [...previous, restaurantId];
+        writeFavoriteIdsToStorage(next);
+        if (restaurant) {
+          if (exists) {
+            trackFavoriteRemoved(restaurant, { source: "discover_map_local" });
+          } else {
+            trackFavoriteAdded(restaurant, { source: "discover_map_local" });
+          }
+        }
+        notifyLocalFavoritesChanged();
+        return next;
+      });
       return;
     }
 
@@ -482,11 +615,10 @@ export default function RestaurantMap({
       const next = exists
         ? previous.filter((id) => id !== restaurantId)
         : [...previous, restaurantId];
-      void trackEvent({
-        event_name: "clicked_favorite",
-        restaurant_id: restaurantId,
-        metadata: { action: exists ? "removed" : "added" },
-      });
+      if (restaurant) {
+        if (exists) trackFavoriteRemoved(restaurant, { source: "discover_map" });
+        else trackFavoriteAdded(restaurant, { source: "discover_map" });
+      }
       void (async () => {
         if (exists) await removeFavorite(user.id, restaurantId);
         else await addFavorite(user.id, restaurantId);
@@ -505,7 +637,9 @@ export default function RestaurantMap({
     let result = restaurants.filter((restaurant) => {
       const matchesFilter =
         activeFilter === "Tous" ||
-        (activeFilter === "Coups de cœur" && favorites.includes(restaurant.id)) ||
+        ((activeFilter === "Coups de cœur" ||
+          activeFilter === "Mes favoris") &&
+          favorites.includes(restaurant.id)) ||
         (restaurant.category ?? "")
           .toLowerCase()
           .includes(activeFilter.toLowerCase().replace("salade", "salad"));
@@ -530,7 +664,9 @@ export default function RestaurantMap({
       return rankRestaurantsForIntent(list, intentModeForRanking, userPosition);
     }
     if (sortBy === "Mieux notés") {
-      return list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+      return list.sort(
+        (a, b) => (getDisplayRating(b) ?? 0) - (getDisplayRating(a) ?? 0)
+      );
     }
     if (!userPosition) {
       return list.sort((a, b) => displayHealthyScore(b) - displayHealthyScore(a));
@@ -560,13 +696,33 @@ export default function RestaurantMap({
     return filtered.filter((r) => r.id !== bestChoiceRestaurant.id);
   }, [filtered, bestChoiceRestaurant]);
 
-  const mappableRestaurants = useMemo(
-    () =>
-      filtered.filter(
-        (restaurant) => restaurant.latitude != null && restaurant.longitude != null
-      ),
+  const visibleListForPanels = useMemo(
+    () => listForPanels.slice(0, listVisibleCount),
+    [listForPanels, listVisibleCount]
+  );
+
+  const listHasMore = catalog
+    ? listVisibleCount < listForPanels.length
+    : loadedServerPage * DISCOVER_PAGE_SIZE < totalCount;
+
+  const restaurantById = useMemo(
+    () => new Map(restaurants.map((r) => [r.id, r])),
+    [restaurants]
+  );
+
+  const filteredIds = useMemo(
+    () => new Set(filtered.map((r) => r.id)),
     [filtered]
   );
+
+  const mappablePins = useMemo(() => {
+    const pool = catalog
+      ? mapPins.filter((p) => filteredIds.has(p.id))
+      : mapPins;
+    return pool.filter((p) =>
+      isValidMapCoordinates(p.latitude, p.longitude)
+    );
+  }, [mapPins, catalog, filteredIds]);
 
   const recommendationText = useMemo(() => {
     if (activeGoal === "Perte de poids")
@@ -593,15 +749,35 @@ export default function RestaurantMap({
     (activeFilter !== "Tous" ? 1 : 0) +
     (sortBy !== "Score healthy" ? 1 : 0);
 
-  const applyFilters = useCallback((draft: FiltersDraft) => {
-    setSearch(draft.search);
-    setActiveFilter(draft.filter);
-    setSortBy(draft.sort);
-    void trackEvent({
-      event_name: "used_category_filter",
-      metadata: { filter: draft.filter },
-    });
-  }, []);
+  const applyFilters = useCallback(
+    (draft: FiltersDraft) => {
+      setSearch(draft.search);
+      setActiveFilter(draft.filter);
+      setSortBy(draft.sort);
+      const filter_type = draft.search.trim()
+        ? "search"
+        : draft.filter !== "Tous"
+          ? "category"
+          : draft.sort !== "Score healthy"
+            ? "sort"
+            : "combined";
+      trackFilterUsed({
+        filter_type,
+        filter: draft.filter,
+        sort: draft.sort,
+        has_search: Boolean(draft.search.trim()),
+        objective_name: activeGoal,
+        source: "discover_filters",
+      });
+      if (draft.filter !== "Tous") {
+        trackCategorySelected(draft.filter, {
+          objective_name: activeGoal,
+          source: "discover_filters",
+        });
+      }
+    },
+    [activeGoal]
+  );
 
   const toastBottomClassName =
     mobileTrayExpanded
@@ -674,6 +850,7 @@ export default function RestaurantMap({
         className="h-full w-full"
       >
         <RecenterMap center={mapCenter} />
+        <MapMoveTracker />
         <TileLayer
           attribution='&copy; OpenStreetMap contributors &copy; CARTO'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -685,164 +862,101 @@ export default function RestaurantMap({
           </Marker>
         ) : null}
 
-        {mappableRestaurants.map((restaurant) => (
+        {mappablePins.map((pin) => {
+          const restaurant =
+            restaurantById.get(pin.id) ?? mapPinToListItem(pin);
+          return (
           <Marker
-            key={restaurant.id}
-            position={[restaurant.latitude!, restaurant.longitude!]}
+            key={pin.id}
+            position={[pin.latitude!, pin.longitude!]}
             icon={createRestaurantMarkerIcon(
               restaurant,
-              activeRestaurantId === restaurant.id
+              activeRestaurantId === pin.id
             )}
             eventHandlers={{
               click: () => {
-                setActiveRestaurantId(restaurant.id);
+                setActiveRestaurantId(pin.id);
                 setMapCenter([
-                  restaurant.latitude! + 0.0016,
-                  restaurant.longitude!,
+                  pin.latitude! + 0.0016,
+                  pin.longitude!,
                 ]);
-                void trackEvent({
-                  event_name: "restaurant_marker_clicked",
-                  restaurant_id: restaurant.id,
-                  metadata: { source: "map_marker" },
-                });
-                void trackUserHistory("clicked_marker", restaurant.id, {
+                trackRestaurantMarkerClick(restaurant, "map_marker");
+                void trackUserHistory("clicked_marker", pin.id, {
                   source: "map_marker",
                 });
               },
             }}
           >
             <Popup className="healthyhub-popup" closeButton={false} maxWidth={300}>
-              <div className="w-[280px] space-y-3">
-                <div className="relative h-32 overflow-hidden rounded-2xl bg-brand-light">
-                  <RestaurantImage
-                    restaurant={restaurant}
-                    alt={restaurant.name}
-                    className="h-full w-full object-cover"
-                  />
-                  <HeartButton
-                    active={favorites.includes(restaurant.id)}
-                    onClick={() => toggleFavorite(restaurant.id)}
-                    className="absolute right-2.5 top-2.5"
-                  />
-                  <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
-                    {restaurant.category ? (
-                      <span className="rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-brand-deep shadow-soft">
-                        {restaurant.category}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-[15px] font-semibold tracking-tight text-ink">
-                    {restaurant.name}
-                  </h3>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    {getRestaurantDistance(restaurant) != null ? (
-                      <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10.5px] font-semibold text-ink/75">
-                        {getRestaurantDistance(restaurant)!.toFixed(1)} km
-                      </span>
-                    ) : null}
-                    <ScoreBadge score={displayHealthyScore(restaurant)} />
-                    <RatingMini
-                      rating={restaurant.rating}
-                      count={restaurant.review_count}
-                    />
-                  </div>
-                  <p className="mt-2 text-[11.5px] leading-snug text-ink/75">
-                    <span className="font-semibold text-brand-deep">
-                      Pourquoi ce choix ·{" "}
-                    </span>
-                    {whyOneLine(restaurant)}
-                  </p>
-                  <ServiceAndHoursRow restaurant={restaurant} />
-                  <Link
-                    href={`/restaurants/${restaurant.id}`}
-                    className="mt-2 block text-[12.5px] leading-snug text-ink/85"
-                    onClick={() =>
-                      void trackEvent({
-                        event_name: "recommended_dish_clicked",
-                        restaurant_id: restaurant.id,
-                        metadata: {
-                          source: "map_popup",
-                          intent: intentModeForRanking,
-                        },
-                      })
-                    }
-                  >
-                    <span className="font-semibold text-brand-deep">
-                      Plat conseillé ·{" "}
-                    </span>
-                    {getHighlightedDish(restaurant)}
-                  </Link>
-                  <div className="mt-2">
-                    <MacrosTeaser
+              <div className="w-[260px]">
+                {/* Header — name + heart + thumb */}
+                <div className="flex items-start gap-3">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-brand-light">
+                    <RestaurantImage
                       restaurant={restaurant}
-                      dishName={getHighlightedDish(restaurant)}
-                      variant="compact"
+                      alt={restaurant.name}
+                      sizes="56px"
+                      className="h-full w-full object-cover"
                     />
                   </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="line-clamp-2 text-[14px] font-semibold leading-tight tracking-tight text-ink">
+                        {restaurant.name}
+                      </h3>
+                      <HeartButton
+                        active={favorites.includes(restaurant.id)}
+                        onClick={() => toggleFavorite(restaurant.id)}
+                        className="h-7 w-7 shrink-0"
+                      />
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1">
+                      <span className="inline-flex h-5 items-center gap-0.5 rounded-full bg-brand px-1.5 text-[10.5px] font-semibold text-white">
+                        ● {displayHealthyScore(restaurant).toFixed(1)}
+                      </span>
+                      {isVerified(restaurant) ? <VerifiedBadge /> : null}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {getPrimaryActionUrl(restaurant) ? (
-                    <a
-                      href={getPrimaryActionUrl(restaurant)!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() =>
-                        void (async () => {
-                          await trackEvent({
-                            event_name: "order_clicked",
-                            restaurant_id: restaurant.id,
-                            metadata: { source: "map_popup" },
-                          });
-                          await trackEvent({
-                            event_name: "restaurant_order_clicked",
-                            restaurant_id: restaurant.id,
-                            metadata: {
-                              source: "map_popup",
-                              platform: restaurant.uber_eats_url
-                                ? "ubereats"
-                                : "deliveroo",
-                            },
-                          });
-                          await trackUserHistory(
-                            restaurant.uber_eats_url
-                              ? "clicked_order_ubereats"
-                              : "clicked_order_deliveroo",
-                            restaurant.id,
-                            { source: "map_popup" }
-                          );
-                        })()
-                      }
-                      className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12.5px] font-semibold !text-white shadow-soft transition hover:bg-brand-dark"
-                    >
-                      Commander
-                    </a>
-                  ) : null}
-                  <RestaurantNavigateCTA
-                    restaurant={restaurant}
-                    source="map_popup"
-                    hasOrderLinks={Boolean(getPrimaryActionUrl(restaurant))}
-                    size="md"
-                    distanceKm={getRestaurantDistance(restaurant)}
-                    showDistance
-                    className="min-w-[100px] flex-1 flex-col"
-                  />
+
+                {/* Metadata line */}
+                <p className="mt-2 truncate text-[11px] text-ink-mute">
+                  {[
+                    getRestaurantDistance(restaurant) != null
+                      ? `${getRestaurantDistance(restaurant)!.toFixed(1)} km`
+                      : null,
+                    restaurant.category,
+                    getDisplayRating(restaurant) != null
+                      ? `★ ${getDisplayRating(restaurant)!.toFixed(1)}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+
+                {/* Why + Dish — 1 line each */}
+                <p className="mt-1.5 truncate text-[11.5px] leading-snug text-ink/75">
+                  <span className="font-semibold text-brand-deep">Pourquoi · </span>
+                  {whyOneLine(restaurant)}
+                </p>
+                <p className="mt-0.5 truncate text-[11.5px] leading-snug text-ink/70">
+                  <span className="font-semibold text-brand-deep">Plat · </span>
+                  {getHighlightedDish(restaurant)}
+                </p>
+
+                {/* CTA — uniquement fiche restaurant */}
+                <div className="mt-3 flex">
                   <Link
                     href={`/restaurants/${restaurant.id}`}
                     onClick={() =>
-                        void (async () => {
-                          await trackEvent({
-                            event_name: "restaurant_card_clicked",
-                            restaurant_id: restaurant.id,
-                            metadata: { source: "map_popup" },
-                          });
-                          await trackUserHistory("clicked_card", restaurant.id, {
-                            source: "map_popup",
-                          });
-                        })()
+                      void (async () => {
+                        trackRestaurantCardClick(restaurant, "map_popup");
+                        await trackUserHistory("clicked_card", restaurant.id, {
+                          source: "map_popup",
+                        });
+                      })()
                     }
-                    className="inline-flex h-9 min-h-[44px] min-w-[72px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-[12.5px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
+                    className="inline-flex h-8 w-full flex-1 items-center justify-center rounded-full bg-white px-2.5 text-[11.5px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
                   >
                     Voir
                   </Link>
@@ -850,7 +964,8 @@ export default function RestaurantMap({
               </div>
             </Popup>
           </Marker>
-        ))}
+          );
+        })}
       </MapContainer>
       ) : (
         <div
@@ -881,173 +996,63 @@ export default function RestaurantMap({
             </div>
           ) : null}
           <DiscoverWeekStrip items={weekSpotlights} />
-          {listForPanels.map((restaurant) => {
-            const isFavorite = favorites.includes(restaurant.id);
+          {catalogLoading && !catalog ? <DiscoverCatalogSkeleton /> : null}
+          {visibleListForPanels.map((restaurant) => {
             const distance = getRestaurantDistance(restaurant);
-            const isActive = activeRestaurantId === restaurant.id;
-            const dish = getHighlightedDish(restaurant);
             return (
-              <article
+              <DiscoverPanelCard
                 key={`desktop-${restaurant.id}`}
-                onClick={() => {
+                layout="desktop"
+                restaurant={restaurant}
+                isFavorite={favorites.includes(restaurant.id)}
+                isActive={activeRestaurantId === restaurant.id}
+                distanceLabel={
+                  distance != null ? `${distance.toFixed(1)} km` : null
+                }
+                whyLine={whyOneLine(restaurant)}
+                dishLine={getHighlightedDish(restaurant)}
+                onSelect={() => {
                   setActiveRestaurantId(restaurant.id);
-                  if (restaurant.latitude != null && restaurant.longitude != null) {
+                  if (
+                    restaurant.latitude != null &&
+                    restaurant.longitude != null
+                  ) {
                     setMapCenter([restaurant.latitude, restaurant.longitude]);
                   }
                 }}
-                className={`group cursor-pointer rounded-2xl bg-white p-3 ring-1 transition duration-250 ease-out-expo hover:-translate-y-0.5 hover:shadow-elevated ${
-                  isActive
-                    ? "ring-brand/40 shadow-elevated"
-                    : "ring-ink/[0.06]"
-                }`}
-              >
-                <div className="relative h-32 overflow-hidden rounded-xl bg-brand-light">
-                  <RestaurantImage
-                    restaurant={restaurant}
-                    alt={restaurant.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                  />
-                  <HeartButton
-                    active={isFavorite}
-                    onClick={() => toggleFavorite(restaurant.id)}
-                    className="absolute right-2 top-2"
-                  />
-                  {restaurant.category ? (
-                    <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-deep shadow-soft">
-                      {restaurant.category}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="mt-3 space-y-1.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="truncate text-[14.5px] font-semibold tracking-tight text-ink">
-                      {restaurant.name}
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {distance != null ? (
-                      <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10.5px] font-semibold text-ink/75">
-                        {distance.toFixed(1)} km
-                      </span>
-                    ) : null}
-                    <ScoreBadge score={displayHealthyScore(restaurant)} />
-                    <RatingMini
-                      rating={restaurant.rating}
-                      count={restaurant.review_count}
-                    />
-                  </div>
-                  <p className="text-[11.5px] leading-snug text-ink/75">
-                    <span className="font-semibold text-brand-deep">
-                      Pourquoi ce choix ·{" "}
-                    </span>
-                    {whyOneLine(restaurant)}
-                  </p>
-                  <ServiceAndHoursRow restaurant={restaurant} />
-                  <Link
-                    href={`/restaurants/${restaurant.id}`}
-                    className="mt-1.5 block text-[12px] leading-snug text-ink/80"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      void trackEvent({
-                        event_name: "recommended_dish_clicked",
-                        restaurant_id: restaurant.id,
-                        metadata: {
-                          source: "desktop_panel",
-                          intent: intentModeForRanking,
-                        },
-                      });
-                    }}
-                  >
-                    <span className="font-semibold text-brand-deep">
-                      Plat conseillé ·{" "}
-                    </span>
-                    {dish}
-                  </Link>
-                  <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                    <MacrosTeaser
-                      restaurant={restaurant}
-                      dishName={dish}
-                      variant="compact"
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {restaurant.uber_eats_url || restaurant.deliveroo_url ? (
-                    <a
-                      href={getPrimaryActionUrl(restaurant) ?? "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        void trackEvent({
-                          event_name: "order_clicked",
-                          restaurant_id: restaurant.id,
-                          metadata: { source: "desktop_panel" },
-                        });
-                        void trackEvent({
-                          event_name: "restaurant_order_clicked",
-                          restaurant_id: restaurant.id,
-                          metadata: {
-                            source: "desktop_panel",
-                            platform: restaurant.uber_eats_url
-                              ? "ubereats"
-                              : "deliveroo",
-                          },
-                        });
-                        void trackUserHistory(
-                          restaurant.uber_eats_url
-                            ? "clicked_order_ubereats"
-                            : "clicked_order_deliveroo",
-                          restaurant.id,
-                          {
-                          source: "desktop_panel",
-                          platform: restaurant.uber_eats_url
-                            ? "ubereats"
-                            : "deliveroo",
-                          }
-                        );
-                      }}
-                      className="inline-flex h-8 min-h-[36px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12px] font-semibold !text-white shadow-soft transition hover:bg-brand-dark"
-                    >
-                      Commander
-                    </a>
-                  ) : (
-                    <span className="inline-flex h-8 min-h-[36px] min-w-[100px] flex-1 cursor-not-allowed items-center justify-center rounded-full bg-ink/5 px-3 text-[11.5px] font-semibold text-ink/45">
-                      Pas d&apos;app livraison listée
-                    </span>
-                  )}
-                  <RestaurantNavigateCTA
-                    restaurant={restaurant}
-                    source="desktop_panel"
-                    hasOrderLinks={Boolean(
-                      restaurant.uber_eats_url || restaurant.deliveroo_url
-                    )}
-                    size="sm"
-                    distanceKm={distance}
-                    showDistance
-                    className="min-w-[100px] flex-1 flex-col"
-                  />
-                  <Link
-                    href={`/restaurants/${restaurant.id}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      void trackEvent({
-                        event_name: "restaurant_card_clicked",
-                        restaurant_id: restaurant.id,
-                        metadata: { source: "desktop_panel" },
-                      });
-                      void trackUserHistory("clicked_card", restaurant.id, {
-                        source: "desktop_panel",
-                      });
-                    }}
-                    className="inline-flex h-8 min-h-[36px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-[12px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
-                  >
-                    Voir
-                  </Link>
-                </div>
-              </article>
+                onToggleFavorite={() => toggleFavorite(restaurant.id)}
+                onCardClick={() => {
+                  trackRestaurantCardClick(restaurant, "desktop_panel");
+                  void trackUserHistory("clicked_card", restaurant.id, {
+                    source: "desktop_panel",
+                  });
+                }}
+              />
             );
           })}
+          <Suspense fallback={null}>
+            <LoadMore
+              currentPage={loadedServerPage}
+              hasMore={listHasMore}
+              filtersActive={filtersActive}
+              onClientLoadMore={() =>
+                setListVisibleCount((c) => c + DISCOVER_PAGE_SIZE)
+              }
+              onServerAppend={(items, nextPage) => {
+                setCatalog((prev) => {
+                  const base = prev ?? [...initialPageRestaurants];
+                  const ids = new Set(base.map((r) => r.id));
+                  const merged = [...base];
+                  for (const r of items) {
+                    if (!ids.has(r.id)) merged.push(r);
+                  }
+                  return merged;
+                });
+                setLoadedServerPage(nextPage);
+                setListVisibleCount(nextPage * DISCOVER_PAGE_SIZE);
+              }}
+            />
+          </Suspense>
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-ink/15 p-6 text-center text-[12.5px] text-ink/55">
               Pas de spot avec ces critères. Essaie une autre catégorie.
@@ -1082,188 +1087,76 @@ export default function RestaurantMap({
               ) : null}
               <DiscoverWeekStrip items={weekSpotlights} />
               <div className="scrollbar-none flex gap-3 overflow-x-auto pb-1">
-                {listForPanels.map((restaurant) => {
-              const isFavorite = favorites.includes(restaurant.id);
-              const distance = getRestaurantDistance(restaurant);
-              const isActive = activeRestaurantId === restaurant.id;
-              const dish = getHighlightedDish(restaurant);
+                {catalogLoading && !catalog ? (
+                  <div className="w-[300px] shrink-0">
+                    <DiscoverCatalogSkeleton />
+                  </div>
+                ) : null}
+                {visibleListForPanels.map((restaurant) => {
+                  const distance = getRestaurantDistance(restaurant);
                   return (
-                    <article
+                    <DiscoverPanelCard
                       key={restaurant.id}
-                      className={`w-[280px] shrink-0 overflow-hidden rounded-[24px] bg-white shadow-floating ring-1 transition ${
-                        isActive ? "ring-brand/50" : "ring-ink/[0.06]"
-                      }`}
-                    >
-                      <div className="relative h-36 overflow-hidden bg-brand-light">
-                        <RestaurantImage
-                          restaurant={restaurant}
-                          alt={restaurant.name}
-                          className="h-full w-full object-cover"
-                        />
-                        <HeartButton
-                          active={isFavorite}
-                          onClick={() => toggleFavorite(restaurant.id)}
-                          className="absolute right-2.5 top-2.5"
-                        />
-                        {restaurant.category ? (
-                          <span className="absolute left-2.5 top-2.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide text-brand-deep shadow-soft">
-                            {restaurant.category}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="space-y-2 px-4 pb-3 pt-3">
-                        <h3 className="truncate text-[14.5px] font-semibold tracking-tight text-ink">
-                          {restaurant.name}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {distance != null ? (
-                            <span className="rounded-full bg-ink/5 px-2 py-0.5 text-[10.5px] font-semibold text-ink/75">
-                              {distance.toFixed(1)} km
-                            </span>
-                          ) : null}
-                          <ScoreBadge score={displayHealthyScore(restaurant)} />
-                          <RatingMini
-                            rating={restaurant.rating}
-                            count={restaurant.review_count}
-                          />
-                        </div>
-                        <p className="text-[11.5px] leading-snug text-ink/75">
-                          <span className="font-semibold text-brand-deep">
-                            Pourquoi ce choix ·{" "}
-                          </span>
-                          {whyOneLine(restaurant)}
-                        </p>
-                        <ServiceAndHoursRow restaurant={restaurant} />
-                        <Link
-                          href={`/restaurants/${restaurant.id}`}
-                          className="line-clamp-2 block text-[12px] leading-snug text-ink/75"
-                          onClick={() =>
-                            void trackEvent({
-                              event_name: "recommended_dish_clicked",
-                              restaurant_id: restaurant.id,
-                              metadata: {
-                                source: "floating_card",
-                                intent: intentModeForRanking,
-                              },
-                            })
-                          }
-                        >
-                          <span className="font-semibold text-brand-deep">
-                            Plat conseillé ·{" "}
-                          </span>
-                          {dish}
-                        </Link>
-                        <div className="pt-1">
-                          <MacrosTeaser
-                            restaurant={restaurant}
-                            dishName={dish}
-                            variant="compact"
-                          />
-                        </div>
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {restaurant.uber_eats_url || restaurant.deliveroo_url ? (
-                            <a
-                              href={getPrimaryActionUrl(restaurant) ?? "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() =>
-                                void (async () => {
-                                  await trackEvent({
-                                    event_name: "order_clicked",
-                                    restaurant_id: restaurant.id,
-                                    metadata: { source: "floating_card" },
-                                  });
-                                  await trackEvent({
-                                    event_name: "restaurant_order_clicked",
-                                    restaurant_id: restaurant.id,
-                                    metadata: {
-                                      source: "floating_card",
-                                      platform: restaurant.uber_eats_url
-                                        ? "ubereats"
-                                        : "deliveroo",
-                                    },
-                                  });
-                                  await trackUserHistory(
-                                    restaurant.uber_eats_url
-                                      ? "clicked_order_ubereats"
-                                      : "clicked_order_deliveroo",
-                                    restaurant.id,
-                                    { source: "floating_card" }
-                                  );
-                                })()
-                              }
-                              className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12.5px] font-semibold !text-white shadow-soft transition hover:bg-brand-dark"
-                            >
-                              Commander
-                            </a>
-                          ) : (
-                            <span className="inline-flex h-9 min-h-[44px] min-w-[100px] flex-1 cursor-not-allowed items-center justify-center rounded-full bg-ink/5 px-3 text-[12px] font-semibold text-ink/45">
-                              Pas d&apos;app listée
-                            </span>
-                          )}
-                          <RestaurantNavigateCTA
-                            restaurant={restaurant}
-                            source="floating_card"
-                            hasOrderLinks={Boolean(
-                              restaurant.uber_eats_url || restaurant.deliveroo_url
-                            )}
-                            size="md"
-                            distanceKm={distance}
-                            showDistance
-                            className="min-w-[100px] flex-1 flex-col"
-                          />
-                          <Link
-                            href={`/restaurants/${restaurant.id}`}
-                            onClick={() =>
-                              void (async () => {
-                                await trackEvent({
-                                  event_name: "restaurant_card_clicked",
-                                  restaurant_id: restaurant.id,
-                                  metadata: { source: "floating_card" },
-                                });
-                                await trackUserHistory("clicked_card", restaurant.id, {
-                                  source: "floating_card",
-                                });
-                              })()
-                            }
-                            className="inline-flex h-9 min-h-[44px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-[12.5px] font-semibold !text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
-                          >
-                            Voir
-                          </Link>
-                        </div>
-                      </div>
-                    </article>
+                      layout="mobile"
+                      restaurant={restaurant}
+                      isFavorite={favorites.includes(restaurant.id)}
+                      isActive={activeRestaurantId === restaurant.id}
+                      distanceLabel={
+                        distance != null ? `${distance.toFixed(1)} km` : null
+                      }
+                      whyLine={whyOneLine(restaurant)}
+                      dishLine={getHighlightedDish(restaurant)}
+                      onSelect={() => {
+                        setActiveRestaurantId(restaurant.id);
+                        if (
+                          restaurant.latitude != null &&
+                          restaurant.longitude != null
+                        ) {
+                          setMapCenter([
+                            restaurant.latitude,
+                            restaurant.longitude,
+                          ]);
+                        }
+                      }}
+                      onToggleFavorite={() => toggleFavorite(restaurant.id)}
+                      onCardClick={() => {
+                        trackRestaurantCardClick(restaurant, "floating_card");
+                        void trackUserHistory("clicked_card", restaurant.id, {
+                          source: "floating_card",
+                        });
+                      }}
+                    />
                   );
                 })}
               </div>
+              <Suspense fallback={null}>
+                <LoadMore
+                  currentPage={loadedServerPage}
+                  hasMore={listHasMore}
+                  filtersActive={filtersActive}
+                  onClientLoadMore={() =>
+                    setListVisibleCount((c) => c + DISCOVER_PAGE_SIZE)
+                  }
+                  onServerAppend={(items, nextPage) => {
+                    setCatalog((prev) => {
+                      const base = prev ?? [...initialPageRestaurants];
+                      const ids = new Set(base.map((r) => r.id));
+                      const merged = [...base];
+                      for (const r of items) {
+                        if (!ids.has(r.id)) merged.push(r);
+                      }
+                      return merged;
+                    });
+                    setLoadedServerPage(nextPage);
+                    setListVisibleCount(nextPage * DISCOVER_PAGE_SIZE);
+                  }}
+                  className="px-2"
+                />
+              </Suspense>
             </div>
           )}
         </DiscoverMobileTray>
       </div>
-      {showLoginPrompt ? (
-        <div className="fixed inset-0 z-[1400] flex items-end justify-center bg-black/35 p-4 sm:items-center">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
-            <p className="text-base font-semibold text-ink">
-              Connecte-toi pour garder tes spots en favoris.
-            </p>
-            <div className="mt-4 flex gap-2">
-              <Link
-                href="/login"
-                className="inline-flex h-10 flex-1 items-center justify-center rounded-full bg-brand px-4 text-sm font-semibold text-white"
-              >
-                Se connecter
-              </Link>
-              <button
-                type="button"
-                onClick={() => setShowLoginPrompt(false)}
-                className="inline-flex h-10 flex-1 items-center justify-center rounded-full bg-white px-4 text-sm font-semibold text-ink ring-1 ring-ink/15"
-              >
-                Plus tard
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 }

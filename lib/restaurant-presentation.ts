@@ -1,4 +1,17 @@
+import { getBestOrderLink } from "@/lib/order-links";
 import type { RestaurantListItem } from "@/lib/types";
+
+function hasValidatedDeliveryLink(
+  restaurant: Pick<
+    RestaurantListItem,
+    | "uber_eats_url"
+    | "uber_eats_status"
+    | "deliveroo_url"
+    | "deliveroo_status"
+  >
+): boolean {
+  return getBestOrderLink(restaurant) != null;
+}
 
 /** Raison courte « éditoriale » pour expliquer pourquoi le spot est mis en avant */
 export function getBenefitTag(category: string | null) {
@@ -13,23 +26,80 @@ export function getBenefitTag(category: string | null) {
 }
 
 /**
- * Modes de service déductibles des données (pas de champ sur place explicite en base).
+ * Modes de service : colonnes booléennes en priorité, sinon `service_type` + apps.
  */
 export function getServiceModeLabels(
-  restaurant: Pick<RestaurantListItem, "uber_eats_url" | "deliveroo_url">
+  restaurant: Pick<
+    RestaurantListItem,
+    | "uber_eats_url"
+    | "uber_eats_status"
+    | "deliveroo_url"
+    | "deliveroo_status"
+    | "takeaway_possible"
+    | "dine_in_possible"
+    | "delivery_possible"
+  >
 ): string[] {
-  if (restaurant.uber_eats_url || restaurant.deliveroo_url) {
+  const hasBool =
+    restaurant.dine_in_possible != null ||
+    restaurant.takeaway_possible != null ||
+    restaurant.delivery_possible != null;
+
+  if (hasBool) {
+    const out: string[] = [];
+    if (restaurant.dine_in_possible) out.push("Sur place");
+    if (restaurant.takeaway_possible) out.push("À emporter");
+    if (restaurant.delivery_possible) out.push("Livraison");
+    if (out.length > 0) return out;
+  }
+
+  if (hasValidatedDeliveryLink(restaurant)) {
     return ["Livraison & à emporter"];
   }
   return [];
 }
 
-/** Modes de service : sur place uniquement si indiqué ; sinon déduit des apps (emporter/livraison). */
+function dedupeChips(chips: { label: string }[]) {
+  const seen = new Set<string>();
+  return chips.filter((c) => {
+    if (seen.has(c.label)) return false;
+    seen.add(c.label);
+    return true;
+  });
+}
+
 export function getServiceAvailabilityChips(
-  restaurant: Pick<RestaurantListItem, "uber_eats_url" | "deliveroo_url"> & {
-    service_type?: string | null;
-  }
+  restaurant: Pick<
+    RestaurantListItem,
+    | "uber_eats_url"
+    | "uber_eats_status"
+    | "deliveroo_url"
+    | "deliveroo_status"
+    | "service_type"
+    | "dine_in_possible"
+    | "takeaway_possible"
+    | "delivery_possible"
+  >
 ): { label: string }[] {
+  const hasBool =
+    restaurant.dine_in_possible != null ||
+    restaurant.takeaway_possible != null ||
+    restaurant.delivery_possible != null;
+
+  if (hasBool) {
+    const chips: { label: string }[] = [];
+    if (restaurant.dine_in_possible) chips.push({ label: "Sur place" });
+    if (restaurant.takeaway_possible) chips.push({ label: "À emporter" });
+    if (restaurant.delivery_possible) chips.push({ label: "Livraison" });
+    if (
+      chips.length === 0 &&
+      hasValidatedDeliveryLink(restaurant)
+    ) {
+      chips.push({ label: "À emporter" }, { label: "Livraison" });
+    }
+    return dedupeChips(chips);
+  }
+
   const chips: { label: string }[] = [];
   const raw = (restaurant.service_type ?? "").toLowerCase().trim();
   if (raw) {
@@ -57,16 +127,11 @@ export function getServiceAvailabilityChips(
       chips.push({ label: "Livraison" });
     }
   }
-  if (restaurant.uber_eats_url || restaurant.deliveroo_url) {
+  if (hasValidatedDeliveryLink(restaurant)) {
     chips.push({ label: "À emporter" });
     chips.push({ label: "Livraison" });
   }
-  const seen = new Set<string>();
-  return chips.filter((c) => {
-    if (seen.has(c.label)) return false;
-    seen.add(c.label);
-    return true;
-  });
+  return dedupeChips(chips);
 }
 
 /**
@@ -81,4 +146,3 @@ export function getOpeningHoursShortLabel(restaurant: {
   }
   return "Vérifier les horaires";
 }
-

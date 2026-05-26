@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" width="1080" height="1350">
+  <rect width="1080" height="1350" fill="#FAF7F0"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(96, 130)">
+    <circle cx="10" cy="18" r="8" fill="#2F6D4E"/>
+    <text x="32" y="26" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="22" font-weight="600" fill="#1F4A36" letter-spacing="3">CARTE HEALTHY · PARIS</text>
+  </g>
+
+  <!-- Headline 3 lines -->
+  <text x="96" y="500" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="118" font-weight="600" fill="#141B1F" letter-spacing="-4">Manger sain,</text>
+  <text x="96" y="630" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="118" font-weight="600" fill="#141B1F" letter-spacing="-4">sans y passer</text>
+  <text x="96" y="760" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="118" font-weight="600" fill="#1F4A36" letter-spacing="-4">20 minutes.</text>
+
+  <!-- Subtitle -->
+  <text x="96" y="900" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="30" font-weight="400" fill="#3A4549">On a fait la carte qu'on aurait voulu avoir.</text>
+  <text x="96" y="946" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="30" font-weight="400" fill="#3A4549">200+ spots healthy à Paris, classés par objectif.</text>
+
+  <!-- Footer logo (left) -->
+  <g transform="translate(96, 1220)">
+    <rect x="0" y="0" width="56" height="56" rx="13" fill="#1F4A36"/>
+    <g stroke="#FAF7F0" stroke-width="3.2" stroke-linecap="round" fill="none">
+      <line x1="13" y1="16" x2="13" y2="40"/>
+      <line x1="22" y1="16" x2="22" y2="40"/>
+      <line x1="13" y1="28" x2="22" y2="28"/>
+      <line x1="34" y1="16" x2="34" y2="40"/>
+      <line x1="43" y1="16" x2="43" y2="40"/>
+      <line x1="34" y1="28" x2="43" y2="28"/>
+    </g>
+    <text x="76" y="38" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="26" font-weight="600" fill="#141B1F" letter-spacing="-0.5">Healthy<tspan fill="#2F6D4E">Hub</tspan></text>
+  </g>
+
+  <!-- CTA right -->
+  <text x="984" y="1255" text-anchor="end" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="22" font-weight="600" fill="#1F4A36" letter-spacing="2">LIEN EN BIO →</text>
+</svg>

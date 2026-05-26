@@ -22,8 +22,12 @@ import {
   type IntentMode,
 } from "@/lib/intent";
 import RestaurantImage from "@/components/RestaurantImage";
+import {
+  getDisplayRating,
+  getDisplayReviewCount,
+  isValidMapCoordinates,
+} from "@/lib/restaurant-helpers";
 import { calculateDistanceKm } from "@/lib/geo";
-import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
 
 // Paris center — fallback when user geolocation is denied / unavailable
 const PARIS: [number, number] = [48.8566, 2.3522];
@@ -158,7 +162,7 @@ export default function DiscoverMap({
 
   const mappable = withIntent
     .map((entry) => entry.restaurant)
-    .filter((r) => r.latitude != null && r.longitude != null);
+    .filter((r) => isValidMapCoordinates(r.latitude, r.longitude));
 
   const distanceKmNumber = (restaurant: RestaurantListItem) => {
     if (!userPos || restaurant.latitude == null || restaurant.longitude == null) {
@@ -271,7 +275,7 @@ export default function DiscoverMap({
                   onMouseEnter={() => setSelectedId(r.id)}
                   onClick={() => {
                     setSelectedId(r.id);
-                    if (r.latitude != null && r.longitude != null) {
+                    if (isValidMapCoordinates(r.latitude, r.longitude)) {
                       setFlyTo([Number(r.latitude), Number(r.longitude)]);
                     }
                   }}
@@ -293,7 +297,10 @@ export default function DiscoverMap({
                       <h3 className="truncate font-semibold text-ink">
                         {r.name}
                       </h3>
-                      <Rating rating={r.rating} count={r.review_count} />
+                      <Rating
+                        rating={getDisplayRating(r)}
+                        count={getDisplayReviewCount(r)}
+                      />
                     </div>
                     <p className="truncate text-sm text-ink/60">
                       {[r.category, r.city].filter(Boolean).join(" · ")}
@@ -324,9 +331,13 @@ export default function DiscoverMap({
                       <div className="mt-1 space-y-1 text-xs text-ink/70">
                         <p>
                           <span className="font-semibold text-ink">Plat phare :</span>{" "}
-                          Bowl equilibre maison
+                          {r.signature_dish_name?.trim() ||
+                            getRecommendedDishForIntent(r, "CLEAN_RESET")}
                         </p>
-                        <p>Recommendation generale selon score healthy et categorie.</p>
+                        <p>
+                          {r.why_this_score?.trim() ||
+                            "Repère sélectionné selon le score healthy et la catégorie."}
+                        </p>
                       </div>
                     )}
 
@@ -338,33 +349,10 @@ export default function DiscoverMap({
                       >
                         ♡
                       </button>
-                      {r.uber_eats_url || r.deliveroo_url ? (
-                        <a
-                          href={r.uber_eats_url || r.deliveroo_url || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex min-h-[40px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-dark"
-                        >
-                          Commander
-                        </a>
-                      ) : null}
-                      <RestaurantNavigateCTA
-                        restaurant={r}
-                        source="discover_list"
-                        hasOrderLinks={Boolean(
-                          r.uber_eats_url || r.deliveroo_url
-                        )}
-                        size="md"
-                        distanceKm={distanceKmNumber(r)}
-                        showDistance
-                        className="min-w-[100px] flex-1 flex-col"
-                        buttonClassName="w-full"
-                      />
                       <Link
                         href={`/restaurants/${r.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex min-h-[40px] shrink-0 items-center justify-center rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
+                        className="inline-flex min-h-[40px] min-w-0 flex-1 items-center justify-center rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
                       >
                         Voir
                       </Link>
@@ -415,11 +403,11 @@ export default function DiscoverMap({
                     <p className="text-xs text-ink/70">
                       Score healthy : {displayHealthyScore(r).toFixed(1)}
                     </p>
-                    {r.rating != null ? (
+                    {getDisplayRating(r) != null ? (
                       <p className="text-xs">
-                        ★ {r.rating.toFixed(1)}
-                        {r.review_count
-                          ? ` (${r.review_count} avis)`
+                        ★ {getDisplayRating(r)!.toFixed(1)}
+                        {getDisplayReviewCount(r)
+                          ? ` (${getDisplayReviewCount(r)} avis)`
                           : ""}
                       </p>
                     ) : null}
@@ -437,32 +425,10 @@ export default function DiscoverMap({
                         </p>
                       </>
                     ) : null}
-                    <div className="flex flex-wrap gap-2 border-t border-ink/10 pt-2">
-                      {r.uber_eats_url || r.deliveroo_url ? (
-                        <a
-                          href={r.uber_eats_url || r.deliveroo_url || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-h-[36px] min-w-[100px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-dark"
-                        >
-                          Commander
-                        </a>
-                      ) : null}
-                      <RestaurantNavigateCTA
-                        restaurant={r}
-                        source="discover_map_popup"
-                        hasOrderLinks={Boolean(
-                          r.uber_eats_url || r.deliveroo_url
-                        )}
-                        size="sm"
-                        distanceKm={distanceKmNumber(r)}
-                        showDistance
-                        className="min-w-[100px] flex-1 flex-col"
-                        buttonClassName="w-full"
-                      />
+                    <div className="flex border-t border-ink/10 pt-2">
                       <Link
                         href={`/restaurants/${r.id}`}
-                        className="inline-flex min-h-[36px] shrink-0 items-center justify-center rounded-full bg-white px-3 text-xs font-semibold text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
+                        className="inline-flex min-h-[36px] w-full flex-1 items-center justify-center rounded-full bg-white px-3 text-xs font-semibold text-ink ring-1 ring-ink/10 transition hover:ring-brand/30"
                       >
                         Voir
                       </Link>

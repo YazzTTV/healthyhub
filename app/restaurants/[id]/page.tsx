@@ -1,10 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { supabase } from "@/lib/supabase";
 import OrderActions from "@/components/OrderActions";
 import RestaurantDetailActions from "@/components/RestaurantDetailActions";
 import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
 import type { Restaurant } from "@/lib/types";
+import { getTrustedRestaurantImageForSharing } from "@/lib/restaurant-images";
 import RestaurantImage from "@/components/RestaurantImage";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import MacrosTeaser from "@/components/MacrosTeaser";
@@ -12,9 +15,17 @@ import ScoreExplainer from "@/components/ScoreExplainer";
 import RestaurantViewTracker from "@/components/RestaurantViewTracker";
 import SocialProof from "@/components/SocialProof";
 import { isVerified } from "@/lib/restaurant-credibility";
+import { getBestOrderLink } from "@/lib/order-links";
+import {
+  canShowCommanderForRestaurant,
+  isDeliveryStatusCommanderAllowed,
+} from "@/lib/order-delivery-status";
+import { formatParisLocationLine } from "@/lib/restaurant-helpers";
 import { displayHealthyScore } from "@/lib/healthy-score";
+import { fetchRestaurantByIdOrSlug } from "@/lib/fetch-restaurant-detail";
+import RestaurantShareButton from "@/components/RestaurantShareButton";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 const FALLBACK_DETAILS: Record<string, Restaurant> = {
   "fallback-1": {
@@ -33,8 +44,8 @@ const FALLBACK_DETAILS: Record<string, Restaurant> = {
     rating: null,
     review_count: null,
     website_url: null,
-    uber_eats_url: "https://www.ubereats.com/fr",
-    deliveroo_url: "https://deliveroo.fr",
+    uber_eats_url: null,
+    deliveroo_url: null,
     protein_level: "medium",
     calorie_level: "low",
     clean_level: "high",
@@ -59,8 +70,8 @@ const FALLBACK_DETAILS: Record<string, Restaurant> = {
     rating: null,
     review_count: null,
     website_url: null,
-    uber_eats_url: "https://www.ubereats.com/fr",
-    deliveroo_url: "https://deliveroo.fr",
+    uber_eats_url: null,
+    deliveroo_url: null,
     protein_level: "high",
     calorie_level: "medium",
     clean_level: "high",
@@ -85,8 +96,8 @@ const FALLBACK_DETAILS: Record<string, Restaurant> = {
     rating: null,
     review_count: null,
     website_url: null,
-    uber_eats_url: "https://www.ubereats.com/fr",
-    deliveroo_url: "https://deliveroo.fr",
+    uber_eats_url: null,
+    deliveroo_url: null,
     protein_level: "high",
     calorie_level: "medium",
     clean_level: "high",
@@ -111,8 +122,8 @@ const FALLBACK_DETAILS: Record<string, Restaurant> = {
     rating: null,
     review_count: null,
     website_url: null,
-    uber_eats_url: "https://www.ubereats.com/fr",
-    deliveroo_url: "https://deliveroo.fr",
+    uber_eats_url: null,
+    deliveroo_url: null,
     protein_level: "medium",
     calorie_level: "medium",
     clean_level: "high",
@@ -123,27 +134,60 @@ const FALLBACK_DETAILS: Record<string, Restaurant> = {
   },
 };
 
-async function getRestaurant(id: string): Promise<Restaurant | null> {
-  if (id in FALLBACK_DETAILS) {
-    return FALLBACK_DETAILS[id];
-  }
+const loadRestaurantRemote = cache((idOrSlug: string) =>
+  fetchRestaurantByIdOrSlug(supabase, idOrSlug)
+);
 
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+async function getRestaurant(idOrSlug: string): Promise<Restaurant | null> {
+  if (idOrSlug in FALLBACK_DETAILS) {
+    return FALLBACK_DETAILS[idOrSlug];
+  }
+  const row = await loadRestaurantRemote(idOrSlug);
+  return row as Restaurant | null;
+}
 
-  if (error) {
-    console.error("[restaurant] Supabase error:", error.message);
-    throw new Error(
-      "Impossible de charger ce restaurant pour le moment. Réessaie dans un instant."
-    );
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const restaurant = await getRestaurant(params.id);
+  if (!restaurant) {
+    return { title: "Restaurant · HealthyHub" };
   }
-  if (!data) {
-    return null;
-  }
-  return data as Restaurant;
+  const title = `${restaurant.name} · HealthyHub`;
+  const description = (
+    restaurant.llm_summary?.trim() ||
+    restaurant.description?.trim() ||
+    "Spot healthy curé sur HealthyHub — Paris."
+  ).slice(0, 200);
+
+  const ogImage = getTrustedRestaurantImageForSharing(restaurant);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: restaurant.name,
+      description,
+      ...(ogImage
+        ? {
+            images: [
+              {
+                url: ogImage,
+                alt: restaurant.name,
+              },
+            ],
+          }
+        : {}),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: restaurant.name,
+      description,
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
+  };
 }
 
 export default async function RestaurantDetailPage({
@@ -154,16 +198,25 @@ export default async function RestaurantDetailPage({
   const restaurant = await getRestaurant(params.id);
   if (!restaurant) notFound();
 
-  const { uber_eats_url, deliveroo_url } = restaurant;
+  const orderLink = getBestOrderLink(restaurant);
+  const showCommander = canShowCommanderForRestaurant(restaurant);
   const healthyDisplay = displayHealthyScore(restaurant);
+  const siteBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  const shareUrl = siteBase
+    ? `${siteBase}/restaurants/${restaurant.id}`
+    : undefined;
 
   return (
     <article className="space-y-10 py-4 md:py-8">
       <RestaurantViewTracker
         id={restaurant.id}
         name={restaurant.name}
+        slug={restaurant.slug}
         image_url={restaurant.image_url}
+        image_status={restaurant.image_status}
         category={restaurant.category}
+        arrondissement={restaurant.arrondissement}
+        healthy_score={restaurant.healthy_score}
         city={restaurant.city}
       />
       <Link
@@ -209,7 +262,27 @@ export default async function RestaurantDetailPage({
             {restaurant.cuisine ? (
               <p className="text-[15px] text-ink-mute">{restaurant.cuisine}</p>
             ) : null}
+            {formatParisLocationLine(restaurant) ? (
+              <p className="text-[14px] leading-relaxed text-ink-soft">
+                {formatParisLocationLine(restaurant)}
+              </p>
+            ) : null}
+            {restaurant.google_maps_url ? (
+              <p>
+                <a
+                  href={restaurant.google_maps_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[13px] font-semibold text-brand-dark underline-offset-2 hover:underline"
+                >
+                  Voir sur Google Maps
+                </a>
+              </p>
+            ) : null}
             <SocialProof restaurant={restaurant} />
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <RestaurantShareButton shareUrl={shareUrl} />
+            </div>
           </div>
 
           {restaurant.description ? (
@@ -220,7 +293,10 @@ export default async function RestaurantDetailPage({
 
           <ScoreExplainer restaurant={restaurant} />
 
-          <MacrosTeaser restaurant={restaurant} />
+          <MacrosTeaser
+            restaurant={restaurant}
+            dishName={restaurant.signature_dish_name ?? undefined}
+          />
 
           {restaurant.tags && restaurant.tags.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
@@ -242,11 +318,7 @@ export default async function RestaurantDetailPage({
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-end gap-3">
-                <OrderActions
-                  restaurantId={restaurant.id}
-                  uberEatsUrl={uber_eats_url}
-                  deliverooUrl={deliveroo_url}
-                />
+                <OrderActions restaurantId={restaurant.id} restaurant={restaurant} />
                 <RestaurantNavigateCTA
                   restaurant={{
                     id: restaurant.id,
@@ -255,16 +327,20 @@ export default async function RestaurantDetailPage({
                     longitude: restaurant.longitude,
                   }}
                   source="restaurant_detail"
-                  hasOrderLinks={Boolean(uber_eats_url || deliveroo_url)}
+                  hasOrderLinks={canShowCommanderForRestaurant(restaurant)}
                   size="lg"
                   showDistance
                   className="flex flex-col"
                 />
               </div>
-              {!uber_eats_url && !deliveroo_url ? (
+              {!showCommander ? (
                 <p className="text-[13px] text-ink-mute">
-                  Pas de livraison sur ce spot — passe le voir sur place,
-                  ça vaut le détour.
+                  {orderLink &&
+                  !isDeliveryStatusCommanderAllowed(restaurant.delivery_status)
+                    ? "La commande via Uber Eats / Deliveroo n’est pas proposée tant que le statut livraison n’est pas validé (exact ou chaîne / lieu flou)."
+                    : restaurant.uber_eats_url || restaurant.deliveroo_url
+                      ? "Livraison non disponible pour ce spot pour le moment."
+                      : "Pas de livraison sur ce spot — passe le voir sur place, ça vaut le détour."}
                 </p>
               ) : null}
             </div>

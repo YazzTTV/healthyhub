@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type MouseEvent } from "react";
-import { trackEvent } from "@/lib/analytics";
+import { trackNavigationClick } from "@/lib/analytics";
 import { calculateDistanceKm } from "@/lib/geo";
 import {
   formatDistanceLabel,
@@ -100,23 +100,9 @@ export default function RestaurantNavigateCTA({
     e.stopPropagation();
     if (!url) return;
     onNavigatePress?.();
-    void trackEvent({
-      event_name: "navigation_clicked",
-      restaurant_id: restaurant.id,
-      metadata: {
-        restaurant_name: restaurant.name,
-        device_type: getNavigationDeviceType(),
-        source,
-      },
-    });
-    void trackEvent({
-      event_name: "restaurant_navigation_clicked",
-      restaurant_id: restaurant.id,
-      metadata: {
-        restaurant_name: restaurant.name,
-        device_type: getNavigationDeviceType(),
-        source,
-      },
+    trackNavigationClick(restaurant, {
+      device_type: getNavigationDeviceType(),
+      source,
     });
     window.open(url, "_blank", "noopener,noreferrer");
   };

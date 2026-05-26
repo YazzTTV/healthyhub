@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" width="1080" height="1350">
+  <rect width="1080" height="1350" fill="#FAF7F0"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(96, 130)">
+    <circle cx="10" cy="18" r="8" fill="#2F6D4E"/>
+    <text x="32" y="26" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="22" font-weight="600" fill="#1F4A36" letter-spacing="3">CARTE LOCALE</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="96" y="320" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="102" font-weight="600" fill="#141B1F" letter-spacing="-3">Paris, 12h32.</text>
+  <text x="96" y="430" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="102" font-weight="600" fill="#1F4A36" letter-spacing="-3">Tu as 45 min.</text>
+
+  <!-- Map mock -->
+  <g transform="translate(96, 550)">
+    <rect x="0" y="0" width="888" height="540" rx="32" fill="#F4EFE4"/>
+
+    <!-- Roads -->
+    <line x1="0" y1="200" x2="888" y2="200" stroke="#141B1F" stroke-width="2" stroke-opacity="0.05"/>
+    <line x1="0" y1="380" x2="888" y2="380" stroke="#141B1F" stroke-width="2" stroke-opacity="0.05"/>
+    <line x1="280" y1="0" x2="280" y2="540" stroke="#141B1F" stroke-width="2" stroke-opacity="0.05"/>
+    <line x1="600" y1="0" x2="600" y2="540" stroke="#141B1F" stroke-width="2" stroke-opacity="0.05"/>
+
+    <!-- River curve -->
+    <path d="M 0 340 Q 280 300 444 340 T 888 360" stroke="#2F6D4E" stroke-width="4" stroke-opacity="0.12" fill="none"/>
+
+    <!-- Pins -->
+    <g transform="translate(220, 170)">
+      <circle cx="0" cy="0" r="22" fill="#2F6D4E" stroke="#FAF7F0" stroke-width="4"/>
+    </g>
+    <!-- Active pin (with score) -->
+    <g transform="translate(460, 280)">
+      <circle cx="0" cy="0" r="38" fill="#1F4A36" stroke="#FAF7F0" stroke-width="6"/>
+      <text x="0" y="9" text-anchor="middle" font-family="Inter, sans-serif"
+            font-size="20" font-weight="700" fill="#FAF7F0">4.7</text>
+    </g>
+    <g transform="translate(660, 380)">
+      <circle cx="0" cy="0" r="22" fill="#2F6D4E" stroke="#FAF7F0" stroke-width="4"/>
+    </g>
+    <g transform="translate(340, 420)">
+      <circle cx="0" cy="0" r="22" fill="#2F6D4E" stroke="#FAF7F0" stroke-width="4"/>
+    </g>
+    <g transform="translate(760, 130)">
+      <circle cx="0" cy="0" r="22" fill="#2F6D4E" stroke="#FAF7F0" stroke-width="4"/>
+    </g>
+
+    <!-- User location -->
+    <g transform="translate(380, 220)">
+      <circle cx="0" cy="0" r="28" fill="#2563EB" opacity="0.15"/>
+      <circle cx="0" cy="0" r="14" fill="#2563EB" stroke="#FAF7F0" stroke-width="4"/>
+    </g>
+  </g>
+
+  <!-- Caption -->
+  <text x="540" y="1185" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="32" font-weight="500" fill="#3A4549">On t'ouvre la map. On filtre. Tu choisis.</text>
+
+  <!-- Footer -->
+  <text x="540" y="1278" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="22" font-weight="600" fill="#1F4A36" letter-spacing="2">HEALTHYHUB · LIEN EN BIO</text>
+</svg>

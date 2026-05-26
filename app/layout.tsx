@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Logo from "@/components/Logo";
+import Providers from "@/app/providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -12,6 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"
+  ),
   title: "HealthyHub — Trouve le bon spot healthy autour de toi",
   description:
     "Selon ta localisation, tes objectifs et les restaurants les mieux notés. Découvre des spots healthy pour livraison, à emporter ou sur place — carte pensée comme un compagnon de découverte locale.",
@@ -25,14 +29,18 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${inter.className}`}>
       <body className="min-h-screen bg-cream font-sans text-ink antialiased">
-        <Navbar />
-        <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
+        <Providers>
+          <Navbar />
+          <main className="mx-auto max-w-6xl px-5 py-10">{children}</main>
         <footer className="mx-auto mt-16 flex max-w-6xl flex-col gap-6 border-t border-ink/[0.06] px-5 py-12 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
             <Logo showWordmark />
             <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-ink-soft">
               <Link href="/discover" className="hover:text-brand-dark">
                 La carte
+              </Link>
+              <Link href="/classement" className="hover:text-brand-dark">
+                Classement
               </Link>
               <Link href="/about" className="hover:text-brand-dark">
                 Méthodologie
@@ -52,6 +60,7 @@ export default function RootLayout({
             © {new Date().getFullYear()} HealthyHub · Spots healthy autour de toi.
           </span>
         </footer>
+        </Providers>
       </body>
     </html>
   );

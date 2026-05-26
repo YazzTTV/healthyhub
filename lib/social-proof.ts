@@ -1,4 +1,9 @@
 import { displayHealthyScore } from "@/lib/healthy-score";
+import {
+  effectiveCalorieBand,
+  effectiveCleanBand,
+  effectiveProteinBand,
+} from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
 
 function hash(value: string): number {
@@ -11,34 +16,38 @@ function hash(value: string): number {
 }
 
 /**
- * Stable pseudo-real "saved by N users this month" count.
- * Higher healthy_score → more saves. Stable per restaurant.
- * Returns null if confidence is too low (no score / no slug).
+ * Compteur « sauvegardes » déterministe — masqué si de vrais avis Google existent.
  */
 export function getSavedCount(r: RestaurantListItem): number | null {
+  const gRev = r.google_review_count;
+  if (gRev != null && Number(gRev) > 0) return null;
+
   const score = displayHealthyScore(r);
   const key = r.slug || r.id || r.name;
   if (!key || score < 3.5) return null;
 
-  // Higher healthy_score = base higher. Add stable noise from hash.
   const base = Math.round(80 + (score - 3.5) * 280);
   const noise = hash(`${key}-saves`) % 240;
-  const total = base + noise;
-  return total;
+  return base + noise;
 }
 
 /**
- * "Often chosen for X" — derives the dominant intent fit.
+ * « Souvent choisi pour… » — priorité aux flags base, sinon heuristique catégorie.
  */
 export function getOftenChosenFor(r: RestaurantListItem): string | null {
+  if (r.muscle_recovery_fit === true) return "Muscle & Recovery";
+  if (r.lunch_light_fit === true) return "Lean & Light";
+  if (r.focus_productivity_fit === true) return "Focus & Productivité";
+  if (r.pleasure_without_cracking_fit === true) return "Plaisir sans craquer";
+
   const cat = (r.category ?? "").toLowerCase();
-  if (r.protein_level === "high" || cat.includes("protein")) {
+  if (effectiveProteinBand(r) === "high" || cat.includes("protein")) {
     return "Muscle & Recovery";
   }
-  if (r.calorie_level === "low" || cat.includes("salad") || cat.includes("juice")) {
+  if (effectiveCalorieBand(r) === "low" || cat.includes("salad") || cat.includes("juice")) {
     return "Lean & Light";
   }
-  if (r.clean_level === "high" && displayHealthyScore(r) >= 4.5) {
+  if (effectiveCleanBand(r) === "high" && displayHealthyScore(r) >= 4.5) {
     return "Clean Reset";
   }
   if (cat.includes("brunch") || cat.includes("burger")) {

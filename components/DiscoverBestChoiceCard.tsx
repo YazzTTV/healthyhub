@@ -2,16 +2,21 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { trackEvent } from "@/lib/analytics";
+import {
+  trackBestChoiceClicked,
+  trackBestChoiceViewed,
+  trackRestaurantClick,
+} from "@/lib/analytics";
 import RestaurantImage from "@/components/RestaurantImage";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import { displayHealthyScore } from "@/lib/healthy-score";
-import { getPrimaryActionUrl } from "@/lib/discover-recommendations";
+import CommanderLink from "@/components/CommanderLink";
 import {
   getIntentReason,
   getRecommendedDishForIntent,
   type IntentMode,
 } from "@/lib/intent";
+import { canShowCommanderForRestaurant } from "@/lib/order-delivery-status";
 import type { RestaurantListItem } from "@/lib/types";
 import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
 
@@ -32,25 +37,16 @@ export default function DiscoverBestChoiceCard({
 }: Props) {
   const dish = getRecommendedDishForIntent(restaurant, intentMode);
   const why = getIntentReason(restaurant, intentMode);
-  const orderUrl = getPrimaryActionUrl(restaurant);
 
   useEffect(() => {
-    void trackEvent({
-      event_name: "best_choice_viewed",
-      restaurant_id: restaurant.id,
-      metadata: {
-        intent: intentMode,
-        has_location: distanceKm != null,
-      },
+    trackBestChoiceViewed(restaurant.id, {
+      intent: intentMode,
+      has_location: distanceKm != null,
     });
   }, [restaurant.id, intentMode, distanceKm]);
 
   const fireChoice = (cta: string) => {
-    void trackEvent({
-      event_name: "best_choice_clicked",
-      restaurant_id: restaurant.id,
-      metadata: { intent: intentMode, cta },
-    });
+    trackBestChoiceClicked(restaurant.id, { intent: intentMode, cta });
   };
 
   return (
@@ -102,10 +98,11 @@ export default function DiscoverBestChoiceCard({
           href={detailHref}
           className="group block w-full text-left"
           onClick={() => {
-            void trackEvent({
-              event_name: "recommended_dish_clicked",
-              restaurant_id: restaurant.id,
-              metadata: { source: "best_choice", intent: intentMode },
+            trackRestaurantClick({
+              restaurant,
+              surface: "card",
+              placement: "best_choice_dish",
+              extra: { intent: intentMode, cta: "dish" },
             });
             fireChoice("dish");
           }}
@@ -131,7 +128,7 @@ export default function DiscoverBestChoiceCard({
         <RestaurantNavigateCTA
           restaurant={restaurant}
           source="best_choice"
-          hasOrderLinks={Boolean(orderUrl)}
+          hasOrderLinks={canShowCommanderForRestaurant(restaurant)}
           size="sm"
           distanceKm={distanceKm}
           showDistance={false}
@@ -139,27 +136,25 @@ export default function DiscoverBestChoiceCard({
           buttonClassName="w-full"
           onNavigatePress={() => fireChoice("navigate")}
         />
-        {orderUrl ? (
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => {
-              fireChoice("order");
-              void trackEvent({
-                event_name: "order_clicked",
-                restaurant_id: restaurant.id,
-                metadata: { source: "best_choice" },
-              });
-            }}
+        {canShowCommanderForRestaurant(restaurant) ? (
+          <CommanderLink
+            restaurant={restaurant}
+            analyticsSource="best_choice"
+            onClick={() => fireChoice("order")}
             className="inline-flex h-8 min-h-[40px] flex-1 items-center justify-center rounded-full bg-brand px-3 text-[12px] font-semibold text-white shadow-soft transition hover:bg-brand-dark sm:min-h-[36px]"
-          >
-            Commander
-          </a>
+          />
         ) : null}
         <Link
           href={detailHref}
-          onClick={() => fireChoice("view")}
+          onClick={() => {
+            trackRestaurantClick({
+              restaurant,
+              surface: "card",
+              placement: "best_choice_view",
+              extra: { intent: intentMode, cta: "view" },
+            });
+            fireChoice("view");
+          }}
           className="inline-flex h-8 min-h-[40px] min-w-[72px] items-center justify-center rounded-full bg-white px-3 text-[12px] font-semibold text-ink ring-1 ring-ink/12 transition hover:ring-brand/35 sm:min-h-[36px]"
         >
           Voir

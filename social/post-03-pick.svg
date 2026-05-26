@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" width="1080" height="1350">
+  <defs>
+    <linearGradient id="bowlBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DCFCE7"/>
+      <stop offset="55%" stop-color="#86EFAC"/>
+      <stop offset="100%" stop-color="#2F6D4E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top: bowl illustration as photo placeholder -->
+  <rect width="1080" height="900" fill="url(#bowlBg)"/>
+
+  <g transform="translate(540, 450)">
+    <!-- Plate shadow -->
+    <ellipse cx="0" cy="20" rx="290" ry="34" fill="#143427" opacity="0.18"/>
+    <!-- Plate -->
+    <circle cx="0" cy="0" r="280" fill="#FAF7F0"/>
+    <circle cx="0" cy="0" r="270" fill="none" stroke="#1F4A36" stroke-width="2" stroke-opacity="0.08"/>
+    <!-- Bowl contents (abstract food shapes) -->
+    <circle cx="-90" cy="-50" r="60" fill="#FFA94D" opacity="0.85"/>
+    <circle cx="70" cy="-70" r="48" fill="#2F6D4E" opacity="0.9"/>
+    <circle cx="30" cy="70" r="70" fill="#86EFAC"/>
+    <circle cx="-70" cy="90" r="42" fill="#1F4A36"/>
+    <circle cx="120" cy="50" r="36" fill="#FFA94D"/>
+    <circle cx="-130" cy="20" r="30" fill="#2F6D4E"/>
+    <circle cx="80" cy="120" r="22" fill="#86EFAC" opacity="0.7"/>
+    <circle cx="-30" cy="-90" r="24" fill="#2F6D4E"/>
+    <!-- Sesame -->
+    <circle cx="-50" cy="-30" r="4" fill="#FAF7F0"/>
+    <circle cx="20" cy="-50" r="4" fill="#FAF7F0"/>
+    <circle cx="-20" cy="40" r="4" fill="#FAF7F0"/>
+    <circle cx="50" cy="80" r="4" fill="#FAF7F0"/>
+  </g>
+
+  <!-- Badge top-left -->
+  <g transform="translate(60, 80)">
+    <rect x="0" y="0" width="280" height="60" rx="30" fill="#1F4A36"/>
+    <text x="140" y="38" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="20" font-weight="700" fill="#FAF7F0" letter-spacing="3">PICK DU JOUR</text>
+  </g>
+
+  <!-- Verified badge top-right -->
+  <g transform="translate(900, 80)">
+    <rect x="0" y="0" width="120" height="60" rx="30" fill="#2F6D4E"/>
+    <text x="60" y="38" text-anchor="middle" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="18" font-weight="700" fill="#FAF7F0" letter-spacing="2">VÉRIFIÉ</text>
+  </g>
+
+  <!-- Cream bottom panel -->
+  <rect y="900" width="1080" height="450" fill="#FAF7F0"/>
+
+  <text x="60" y="980" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="22" font-weight="600" fill="#2F6D4E" letter-spacing="2">PARIS 3E · POKÉ</text>
+
+  <text x="60" y="1078" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="68" font-weight="600" fill="#141B1F" letter-spacing="-2">Pokawa Marais</text>
+
+  <text x="60" y="1146" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="26" font-weight="400" fill="#3A4549">Saumon, avocat, riz vinaigré, edamame.</text>
+
+  <!-- Stats row -->
+  <g transform="translate(60, 1200)">
+    <text x="0" y="42" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="34" font-weight="700" fill="#1F4A36">● 4.7</text>
+    <text x="0" y="78" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="14" font-weight="600" fill="#6B757A" letter-spacing="2">HEALTHY</text>
+
+    <text x="200" y="42" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="34" font-weight="700" fill="#141B1F">540</text>
+    <text x="200" y="78" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="14" font-weight="600" fill="#6B757A" letter-spacing="2">KCAL</text>
+
+    <text x="380" y="42" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="34" font-weight="700" fill="#141B1F">32g</text>
+    <text x="380" y="78" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="14" font-weight="600" fill="#6B757A" letter-spacing="2">PROTÉINES</text>
+
+    <text x="580" y="42" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="34" font-weight="700" fill="#141B1F">0,4 km</text>
+    <text x="580" y="78" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+          font-size="14" font-weight="600" fill="#6B757A" letter-spacing="2">DE TOI</text>
+  </g>
+
+  <!-- Signature right -->
+  <text x="1020" y="1305" text-anchor="end" font-family="Inter, Helvetica Neue, Arial, sans-serif"
+        font-size="18" font-weight="600" fill="#1F4A36" letter-spacing="2">HEALTHYHUB · #HHPICK</text>
+</svg>

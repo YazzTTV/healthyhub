@@ -1,5 +1,6 @@
 export const FILTERS = [
   "Tous",
+  "Mes favoris",
   "Poke",
   "Salade",
   "Vegan",

@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchRestaurantsByIds } from "@/lib/fetch-restaurant-list";
 import { supabase } from "@/lib/supabase";
 import type { RestaurantListItem } from "@/lib/types";
 
@@ -53,16 +54,9 @@ export async function getFavoriteRestaurants(userId: string) {
   const ids = favorites.map((f) => f.restaurant_id);
   if (ids.length === 0) return [] as RestaurantListItem[];
 
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select(
-      "id, slug, name, image_url, city, cuisine, category, healthy_score, tags, latitude, longitude, rating, review_count, uber_eats_url, deliveroo_url"
-    )
-    .in("id", ids);
+  const data = await fetchRestaurantsByIds(supabase, ids);
 
-  if (error) throw error;
-
-  const byId = new Map((data ?? []).map((r) => [r.id, r as RestaurantListItem]));
+  const byId = new Map(data.map((r) => [r.id, r as RestaurantListItem]));
   return ids.map((id) => byId.get(id)).filter(Boolean) as RestaurantListItem[];
 }
 

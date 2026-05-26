@@ -1,5 +1,5 @@
 /**
- * Vérifie, pour chaque restaurant, si l’URL d’image affichée par l’app (getRestaurantImage)
+ * Vérifie, pour chaque restaurant, si l’URL d’image affichée par l’app (getTrustedRestaurantImage)
  * répond en HTTP. Aucune modification en base.
  *
  * Usage: npm run check:images
@@ -10,8 +10,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { config } from "dotenv";
 import {
-  getRestaurantImage,
+  getTrustedRestaurantImage,
   isCredibleRestaurantImageUrl,
+  normalizeRestaurantImageStatus,
 } from "@/lib/restaurant-images";
 import type { RestaurantListItem } from "@/lib/types";
 
@@ -130,23 +131,22 @@ async function probeImageUrlWithFallback(url: string): Promise<{
 }
 
 function rowForRestaurant(r: RestaurantListItem) {
-  const source: Parameters<typeof getRestaurantImage>[0] = {
-    id: r.id,
-    name: r.name,
-    slug: r.slug,
-    image_url: r.image_url,
-    category: r.category,
-  };
-  const resolved = getRestaurantImage(source);
+  const trusted = getTrustedRestaurantImage(r);
   const raw = r.image_url?.trim() ?? "";
   const credible = isCredibleRestaurantImageUrl(r.image_url);
-  const imageSource = credible ? "database_url" : "unsplash_pool";
+  const status = normalizeRestaurantImageStatus(r.image_status);
+  const imageSource =
+    trusted.mode === "placeholder"
+      ? "placeholder"
+      : status ?? (credible ? "legacy_url" : "unknown");
   return {
     r,
-    resolved,
+    trusted,
+    resolved: trusted.src ?? "",
     raw,
     credible,
     imageSource,
+    status: status ?? "",
   };
 }
 
@@ -163,7 +163,7 @@ async function main(): Promise<void> {
   const supabase = createClient(url, key);
   const { data, error } = await supabase
     .from("restaurants")
-    .select("id, name, slug, image_url, category")
+    .select("id, name, slug, image_url, image_status, image_source_note, image_source_url, category")
     .order("name", { ascending: true });
 
   if (error) {
@@ -177,18 +177,42 @@ async function main(): Promise<void> {
   );
 
   const csv: string[] = [
-    "name,slug,image_url_in_db,uses_credible_db_url,image_source_for_ui,resolved_url,http_status,final_url_after_redirect,notes",
+    "name,slug,image_status,image_url_in_db,uses_credible_db_url,image_source_for_ui,resolved_url,http_status,final_url_after_redirect,notes",
   ];
 
   const tally: Record<string, number> = {};
 
   for (const r of rows) {
-    const { resolved, raw, credible, imageSource } = rowForRestaurant(r);
+    const { resolved, raw, credible, imageSource, status, trusted } =
+      rowForRestaurant(r);
+    if (trusted.mode === "placeholder" || !resolved) {
+      tally.placeholder = (tally.placeholder ?? 0) + 1;
+      console.log("—".repeat(64));
+      console.log(`${r.name} (${r.slug ?? r.id})`);
+      console.log(`  Source UI: ${imageSource}`);
+      console.log(`  Affichage: placeholder (pas d’URL à sonder)`);
+      csv.push(
+        [
+          csvEscape(r.name),
+          csvEscape(r.slug ?? ""),
+          csvEscape(status),
+          csvEscape(raw),
+          credible ? "yes" : "no",
+          csvEscape(imageSource),
+          "",
+          "placeholder",
+          "",
+          csvEscape("Aucune image affichée — placeholder neutre"),
+        ].join(",")
+      );
+      continue;
+    }
     const result = await probeImageUrlWithFallback(resolved);
     tally[result.status] = (tally[result.status] ?? 0) + 1;
 
     const notes = [
-      raw && !credible ? "URL base ignorée (non crédible ou placeholder)" : "",
+      status ? `image_status=${status}` : "",
+      raw && !credible ? "URL base ignorée (non crédible)" : "",
       result.notes,
     ]
       .filter(Boolean)
@@ -212,6 +236,7 @@ async function main(): Promise<void> {
       [
         csvEscape(r.name),
         csvEscape(r.slug ?? ""),
+        csvEscape(status),
         csvEscape(raw),
         credible ? "yes" : "no",
         csvEscape(imageSource),

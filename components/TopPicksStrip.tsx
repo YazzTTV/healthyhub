@@ -11,7 +11,8 @@ import {
 } from "@/lib/recommendations";
 import { isVerified } from "@/lib/restaurant-credibility";
 import VerifiedBadge from "@/components/VerifiedBadge";
-import { getRestaurantImage } from "@/lib/restaurant-images";
+import RestaurantImage from "@/components/RestaurantImage";
+import TrackedRestaurantNavLink from "@/components/analytics/TrackedRestaurantNavLink";
 
 type Pick = {
   badge: string;
@@ -101,15 +102,17 @@ export default function TopPicksStrip({
           const reason = getReasonSentence(r);
           const chips = getReasonChips(r);
           return (
-            <Link
+            <TrackedRestaurantNavLink
               key={r.id}
               href={`/restaurants/${r.id}`}
+              restaurant={r}
+              placement="top_picks_strip"
+              extra={{ pick_badge: pick.badge }}
               className="group relative flex flex-col overflow-hidden rounded-[28px] bg-white shadow-soft ring-1 ring-ink/[0.06] transition duration-250 ease-out-expo hover:-translate-y-0.5 hover:shadow-floating hover:ring-brand/30"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-brand-light">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={getRestaurantImage(r)}
+                <RestaurantImage
+                  restaurant={r}
                   alt={r.name}
                   className="h-full w-full object-cover transition duration-500 ease-out-expo group-hover:scale-[1.04]"
                 />
@@ -163,7 +166,7 @@ export default function TopPicksStrip({
                   </span>
                 </div>
               </div>
-            </Link>
+            </TrackedRestaurantNavLink>
           );
         })}
       </div>

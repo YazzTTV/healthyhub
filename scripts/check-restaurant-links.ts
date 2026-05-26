@@ -139,9 +139,26 @@ async function checkLink(raw: string | null): Promise<CheckResult> {
     const code = res.status;
     const server = res.headers.get("server") ?? "";
     const cfRay = res.headers.get("cf-ray") ?? "";
+    let bodySnippet = "";
+    try {
+      bodySnippet = (await res.text()).slice(0, 120_000);
+    } catch {
+      /* ignore */
+    }
 
     const redirected =
       normalizeComparableUrl(finalUrl) !== normalizeComparableUrl(trimmed);
+
+    if (
+      finalUrl.includes("taco-bout-awkward") ||
+      bodySnippet.includes("taco-bout-awkward")
+    ) {
+      return {
+        status: "broken",
+        finalUrl,
+        notes: "uber_404_placeholder (taco-bout-awkward)",
+      };
+    }
 
     if (code === 404 || code === 410) {
       return {
@@ -210,8 +227,10 @@ type RestaurantRow = {
   id: string;
   name: string;
   slug: string | null;
-  ubereats_url: string | null;
+  uber_eats_url: string | null;
+  uber_eats_status: string | null;
   deliveroo_url: string | null;
+  deliveroo_status: string | null;
 };
 
 async function fetchAllRestaurants(
@@ -224,7 +243,9 @@ async function fetchAllRestaurants(
   for (;;) {
     const { data, error } = await supabase
       .from("restaurants")
-      .select("id, name, slug, ubereats_url, deliveroo_url")
+      .select(
+        "id, name, slug, uber_eats_url, uber_eats_status, deliveroo_url, deliveroo_status"
+      )
       .order("name", { ascending: true })
       .range(from, from + pageSize - 1);
 
@@ -271,7 +292,7 @@ async function main(): Promise<void> {
     fs.writeFileSync(
       path.resolve(process.cwd(), REPORT_CSV),
       [
-        "name,slug,ubereats_url,ubereats_status,ubereats_final_url,deliveroo_url,deliveroo_status,deliveroo_final_url,notes",
+        "name,slug,uber_eats_url,uber_eats_status,uber_eats_final_url,deliveroo_url,deliveroo_status,deliveroo_final_url,notes",
       ].join("\n"),
       "utf8"
     );
@@ -279,7 +300,7 @@ async function main(): Promise<void> {
   }
 
   const csvLines: string[] = [
-    "name,slug,ubereats_url,ubereats_status,ubereats_final_url,deliveroo_url,deliveroo_status,deliveroo_final_url,notes",
+    "name,slug,uber_eats_url,uber_eats_status,uber_eats_final_url,deliveroo_url,deliveroo_status,deliveroo_final_url,notes",
   ];
 
   console.log(
@@ -291,7 +312,7 @@ async function main(): Promise<void> {
 
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    const uber = await checkLink(r.ubereats_url);
+    const uber = await checkLink(r.uber_eats_url);
     const deliveroo = await checkLink(r.deliveroo_url);
 
     tallyUber[uber.status] = (tallyUber[uber.status] ?? 0) + 1;
@@ -309,11 +330,11 @@ async function main(): Promise<void> {
     console.log(`Restaurant: ${r.name}`);
     console.log(`  slug: ${r.slug ?? "(none)"}`);
     console.log(
-      `  Uber Eats:    ${uber.status.padEnd(14)} ${uber.finalUrl ? `→ ${uber.finalUrl}` : r.ubereats_url || "(empty)"}`
+      `  Uber Eats:    ${uber.status.padEnd(14)} ${uber.finalUrl ? `→ ${uber.finalUrl}` : r.uber_eats_url || "(empty)"} (${r.uber_eats_status ?? "—"})`
     );
     if (uber.notes) console.log(`                (${uber.notes})`);
     console.log(
-      `  Deliveroo:    ${deliveroo.status.padEnd(14)} ${deliveroo.finalUrl ? `→ ${deliveroo.finalUrl}` : r.deliveroo_url || "(empty)"}`
+      `  Deliveroo:    ${deliveroo.status.padEnd(14)} ${deliveroo.finalUrl ? `→ ${deliveroo.finalUrl}` : r.deliveroo_url || "(empty)"} (${r.deliveroo_status ?? "—"})`
     );
     if (deliveroo.notes) console.log(`                (${deliveroo.notes})`);
     if (rowNotes) console.log(`  Notes: ${rowNotes}`);
@@ -322,7 +343,7 @@ async function main(): Promise<void> {
       [
         csvEscape(r.name),
         csvEscape(r.slug ?? ""),
-        csvEscape(r.ubereats_url ?? ""),
+        csvEscape(r.uber_eats_url ?? ""),
         csvEscape(uber.status),
         csvEscape(uber.finalUrl),
         csvEscape(r.deliveroo_url ?? ""),

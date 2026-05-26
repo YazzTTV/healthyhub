@@ -1,29 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { trackEvent } from "@/lib/analytics";
+import { trackCommanderClick, trackEvent } from "@/lib/analytics";
+import {
+  getValidatedDeliverooUrl,
+  getValidatedUberEatsUrl,
+  type OrderProvider,
+} from "@/lib/order-links";
+import { isDeliveryStatusCommanderAllowed } from "@/lib/order-delivery-status";
 import { trackUserHistory } from "@/lib/user-data";
+import type { RestaurantListItem } from "@/lib/types";
 
 type Props = {
   restaurantId: string;
-  uberEatsUrl: string | null;
-  deliverooUrl: string | null;
+  restaurant: Pick<
+    RestaurantListItem,
+    | "id"
+    | "name"
+    | "slug"
+    | "category"
+    | "arrondissement"
+    | "healthy_score"
+    | "city"
+    | "uber_eats_url"
+    | "uber_eats_status"
+    | "deliveroo_url"
+    | "deliveroo_status"
+    | "delivery_status"
+  >;
 };
 
-export default function OrderActions({
-  restaurantId,
-  uberEatsUrl,
-  deliverooUrl,
-}: Props) {
+export default function OrderActions({ restaurantId, restaurant }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOrderClick = (platform: "ubereats" | "deliveroo", url: string) => {
+  const uberEatsUrl = getValidatedUberEatsUrl(restaurant);
+  const deliverooUrl = getValidatedDeliverooUrl(restaurant);
+  const hasPlatforms = Boolean(uberEatsUrl || deliverooUrl);
+
+  if (!hasPlatforms || !isDeliveryStatusCommanderAllowed(restaurant.delivery_status)) {
+    return null;
+  }
+
+  const handleOrderClick = (platform: OrderProvider, url: string) => {
     window.open(url, "_blank", "noopener,noreferrer");
-    void trackEvent({
-      event_name: "restaurant_order_clicked",
-      restaurant_id: restaurantId,
-      metadata: { platform },
-    });
+    trackCommanderClick(restaurant, platform, "restaurant_detail");
     void trackUserHistory(
       platform === "ubereats"
         ? "clicked_order_ubereats"
@@ -53,7 +73,15 @@ export default function OrderActions({
             className="inline-flex h-12 items-center gap-2 rounded-full bg-black px-5 text-[14px] font-semibold text-white shadow-soft transition duration-250 ease-out-expo hover:bg-ink hover:shadow-elevated active:translate-y-px"
           >
             Uber Eats
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M7 17 17 7M9 7h8v8" />
             </svg>
           </button>
@@ -65,7 +93,15 @@ export default function OrderActions({
             className="inline-flex h-12 items-center gap-2 rounded-full bg-[#00CCBC] px-5 text-[14px] font-semibold text-white shadow-soft transition duration-250 ease-out-expo hover:bg-[#00b6a8] hover:shadow-elevated active:translate-y-px"
           >
             Deliveroo
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M7 17 17 7M9 7h8v8" />
             </svg>
           </button>

@@ -1,0 +1,366 @@
+name,slug,ubereats_url,ubereats_status,ubereats_final_url,deliveroo_url,deliveroo_status,deliveroo_final_url,notes
+42 Degrés,42-degres,,missing,,https://deliveroo.fr/fr/search?query=42+Degres,broken,https://deliveroo.fr/fr/search?query=42+Degres,Deliveroo: HTTP 404
+Abattoir Végétal,abattoir-vegetal,,missing,,https://deliveroo.fr/fr/search?query=Abattoir+V%C3%A9g%C3%A9tal,broken,https://deliveroo.fr/fr/search?query=Abattoir+V%C3%A9g%C3%A9tal,Deliveroo: HTTP 404
+Açaí House Paris,acai-house-paris,,missing,,https://deliveroo.fr/fr/search?query=Acai+House+Paris,broken,https://deliveroo.fr/fr/search?query=Acai+House+Paris,Deliveroo: HTTP 404
+Açaí Lab,acai-lab,,missing,,https://deliveroo.fr/fr/search?query=Acai+Lab,broken,https://deliveroo.fr/fr/search?query=Acai+Lab,Deliveroo: HTTP 404
+Aki Boulangerie,aki-boulangerie,,missing,,https://deliveroo.fr/fr/search?query=Aki+Boulangerie,broken,https://deliveroo.fr/fr/search?query=Aki+Boulangerie,Deliveroo: HTTP 404
+Aloha Poke Bastille,aloha-poke-bastille,,missing,,https://deliveroo.fr/fr/search?query=Aloha+Poke+Bastille,broken,https://deliveroo.fr/fr/search?query=Aloha+Poke+Bastille,Deliveroo: HTTP 404
+Aloha Poke Marais,aloha-poke-marais,,missing,,https://deliveroo.fr/fr/search?query=Aloha+Poke+Marais,broken,https://deliveroo.fr/fr/search?query=Aloha+Poke+Marais,Deliveroo: HTTP 404
+Asian Bowl Paris,asian-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Asian+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Asian+Bowl+Paris,Deliveroo: HTTP 404
+Athletic Plate,athletic-plate,,missing,,https://deliveroo.fr/fr/search?query=Athletic+Plate,broken,https://deliveroo.fr/fr/search?query=Athletic+Plate,Deliveroo: HTTP 404
+Aztec Bowl,aztec-bowl,,missing,,https://deliveroo.fr/fr/search?query=Aztec+Bowl,broken,https://deliveroo.fr/fr/search?query=Aztec+Bowl,Deliveroo: HTTP 404
+Bali Bowl Paris,bali-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Bali+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Bali+Bowl+Paris,Deliveroo: HTTP 404
+Bao Bowl Paris,bao-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Bao+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Bao+Bowl+Paris,Deliveroo: HTTP 404
+Bears & Raccoons,bears-and-raccoons,,missing,,https://deliveroo.fr/fr/search?query=Bears+%26+Raccoons,broken,https://deliveroo.fr/fr/search?query=Bears+%26+Raccoons,Deliveroo: HTTP 404
+Bears & Raccoons Latin,bears-and-raccoons-latin,,missing,,https://deliveroo.fr/fr/search?query=Bears+Raccoons+Latin,broken,https://deliveroo.fr/fr/search?query=Bears+Raccoons+Latin,Deliveroo: HTTP 404
+Beef & Greens,beef-and-greens,,missing,,https://deliveroo.fr/fr/search?query=Beef+et+Greens,broken,https://deliveroo.fr/fr/search?query=Beef+et+Greens,Deliveroo: HTTP 404
+Belleville Brûlerie,belleville-brulerie,,missing,,https://deliveroo.fr/fr/search?query=Belleville+Brulerie,broken,https://deliveroo.fr/fr/search?query=Belleville+Brulerie,Deliveroo: HTTP 404
+Berries Paris,berries-paris,,missing,,https://deliveroo.fr/fr/search?query=Berries+Paris,broken,https://deliveroo.fr/fr/search?query=Berries+Paris,Deliveroo: HTTP 404
+Berry Bar Paris,berry-bar-paris,,missing,,https://deliveroo.fr/fr/search?query=Berry+Bar+Paris,broken,https://deliveroo.fr/fr/search?query=Berry+Bar+Paris,Deliveroo: HTTP 404
+Big Fernand Bastille,big-fernand-bastille,,missing,,https://deliveroo.fr/fr/search?query=Big+Fernand+Bastille,broken,https://deliveroo.fr/fr/search?query=Big+Fernand+Bastille,Deliveroo: HTTP 404
+Big Fernand Châtelet,big-fernand-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Big+Fernand+Chatelet,broken,https://deliveroo.fr/fr/search?query=Big+Fernand+Chatelet,Deliveroo: HTTP 404
+Big Fernand Marais,big-fernand-marais,,missing,,https://deliveroo.fr/fr/search?query=Big+Fernand+Marais,broken,https://deliveroo.fr/fr/search?query=Big+Fernand+Marais,Deliveroo: HTTP 404
+Big Fernand République,big-fernand-republique,,missing,,https://deliveroo.fr/fr/search?query=Big+Fernand+Republique,broken,https://deliveroo.fr/fr/search?query=Big+Fernand+Republique,Deliveroo: HTTP 404
+Big Fernand Saint-Germain,big-fernand-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Big+Fernand+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Big+Fernand+Saint-Germain,Deliveroo: HTTP 404
+Bio Bistrot Marais,bio-bistrot-marais,,missing,,https://deliveroo.fr/fr/search?query=Bio+Bistrot+Marais,broken,https://deliveroo.fr/fr/search?query=Bio+Bistrot+Marais,Deliveroo: HTTP 404
+Bio Bowl Marais,bio-bowl-marais,,missing,,https://deliveroo.fr/fr/search?query=Bio+Bowl+Marais,broken,https://deliveroo.fr/fr/search?query=Bio+Bowl+Marais,Deliveroo: HTTP 404
+Bio C Bon Express,bio-c-bon-express,,missing,,https://deliveroo.fr/fr/search?query=Bio+C+Bon+Express,broken,https://deliveroo.fr/fr/search?query=Bio+C+Bon+Express,Deliveroo: HTTP 404
+Bio C Bon Lunch,bio-c-bon-lunch,,missing,,https://deliveroo.fr/fr/search?query=Bio+C+Bon+Lunch,broken,https://deliveroo.fr/fr/search?query=Bio+C+Bon+Lunch,Deliveroo: HTTP 404
+Bio Lunch Bastille,bio-lunch-bastille,,missing,,https://deliveroo.fr/fr/search?query=Bio+Lunch+Bastille,broken,https://deliveroo.fr/fr/search?query=Bio+Lunch+Bastille,Deliveroo: HTTP 404
+Bioburger Beaubourg,bioburger-beaubourg,,missing,,https://deliveroo.fr/fr/search?query=Bioburger+Beaubourg,broken,https://deliveroo.fr/fr/search?query=Bioburger+Beaubourg,Deliveroo: HTTP 404
+Bioburger Marais,bioburger-marais,,missing,,https://deliveroo.fr/fr/search?query=Bioburger+Marais,broken,https://deliveroo.fr/fr/search?query=Bioburger+Marais,Deliveroo: HTTP 404
+Bioburger République,bioburger-republique,,missing,,https://deliveroo.fr/fr/search?query=Bioburger+Republique,broken,https://deliveroo.fr/fr/search?query=Bioburger+Republique,Deliveroo: HTTP 404
+Bioburger Saint-Lazare,bioburger-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Bioburger+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Bioburger+Saint-Lazare,Deliveroo: HTTP 404
+Blend Hermel,blend-hermel,,missing,,https://deliveroo.fr/fr/search?query=Blend+Hermel,broken,https://deliveroo.fr/fr/search?query=Blend+Hermel,Deliveroo: HTTP 404
+Bob's Bake Shop,bobs-bake-shop,,missing,,https://deliveroo.fr/fr/search?query=Bob+Bake+Shop,broken,https://deliveroo.fr/fr/search?query=Bob+Bake+Shop,Deliveroo: HTTP 404
+Bob's Juice Bar,bobs-juice-bar,,missing,,https://deliveroo.fr/fr/search?query=Bob+Juice+Bar,broken,https://deliveroo.fr/fr/search?query=Bob+Juice+Bar,Deliveroo: HTTP 404
+Bob's Kitchen,bobs-kitchen,,missing,,https://deliveroo.fr/fr/search?query=Bob%27s+Kitchen,broken,https://deliveroo.fr/fr/search?query=Bob%27s+Kitchen,Deliveroo: HTTP 404
+Boco Bourse,boco-bourse,,missing,,https://deliveroo.fr/fr/search?query=Boco+Bourse,broken,https://deliveroo.fr/fr/search?query=Boco+Bourse,Deliveroo: HTTP 404
+Boco Madeleine,boco-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Boco+Madeleine,broken,https://deliveroo.fr/fr/search?query=Boco+Madeleine,Deliveroo: HTTP 404
+Boco Saint-Lazare,boco-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Boco+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Boco+Saint-Lazare,Deliveroo: HTTP 404
+Body Fuel Paris,body-fuel-paris,,missing,,https://deliveroo.fr/fr/search?query=Body+Fuel+Paris,broken,https://deliveroo.fr/fr/search?query=Body+Fuel+Paris,Deliveroo: HTTP 404
+Boneshaker Doughnuts,boneshaker-doughnuts,,missing,,https://deliveroo.fr/fr/search?query=Boneshaker+Doughnuts,broken,https://deliveroo.fr/fr/search?query=Boneshaker+Doughnuts,Deliveroo: HTTP 404
+Bonjour Jacob,bonjour-jacob,,missing,,https://deliveroo.fr/fr/search?query=Bonjour+Jacob,broken,https://deliveroo.fr/fr/search?query=Bonjour+Jacob,Deliveroo: HTTP 404
+Boot Café,boot-cafe,,missing,,https://deliveroo.fr/fr/search?query=Boot+Cafe,broken,https://deliveroo.fr/fr/search?query=Boot+Cafe,Deliveroo: HTTP 404
+Bowl & Soul,bowl-and-soul,,missing,,https://deliveroo.fr/fr/search?query=Bowl+et+Soul,broken,https://deliveroo.fr/fr/search?query=Bowl+et+Soul,Deliveroo: HTTP 404
+Bowl District,bowl-district,,missing,,https://deliveroo.fr/fr/search?query=Bowl+District,broken,https://deliveroo.fr/fr/search?query=Bowl+District,Deliveroo: HTTP 404
+Bowl Light Paris,bowl-light-paris,,missing,,https://deliveroo.fr/fr/search?query=Bowl+Light+Paris,broken,https://deliveroo.fr/fr/search?query=Bowl+Light+Paris,Deliveroo: HTTP 404
+Bowl Republic,bowl-republic,,missing,,https://deliveroo.fr/fr/search?query=Bowl+Republic,broken,https://deliveroo.fr/fr/search?query=Bowl+Republic,Deliveroo: HTTP 404
+Bowl Society,bowl-society,,missing,,https://deliveroo.fr/fr/search?query=Bowl+Society,broken,https://deliveroo.fr/fr/search?query=Bowl+Society,Deliveroo: HTTP 404
+Bowls & Co,bowls-and-co,,missing,,https://deliveroo.fr/fr/search?query=Bowls+et+Co,broken,https://deliveroo.fr/fr/search?query=Bowls+et+Co,Deliveroo: HTTP 404
+Buddha Bowl Paris,buddha-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Buddha+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Buddha+Bowl+Paris,Deliveroo: HTTP 404
+Buddha Lab,buddha-lab,,missing,,https://deliveroo.fr/fr/search?query=Buddha+Lab,broken,https://deliveroo.fr/fr/search?query=Buddha+Lab,Deliveroo: HTTP 404
+Cabane Café,cabane-cafe,,missing,,https://deliveroo.fr/fr/search?query=Cabane+Cafe,broken,https://deliveroo.fr/fr/search?query=Cabane+Cafe,Deliveroo: HTTP 404
+Café Charlot,cafe-charlot,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Charlot,broken,https://deliveroo.fr/fr/search?query=Cafe+Charlot,Deliveroo: HTTP 404
+Café Lomi,cafe-lomi,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Lomi,broken,https://deliveroo.fr/fr/search?query=Cafe+Lomi,Deliveroo: HTTP 404
+Café Mareva,cafe-mareva,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Mareva,broken,https://deliveroo.fr/fr/search?query=Cafe+Mareva,Deliveroo: HTTP 404
+Café Méricourt,cafe-mericourt,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Mericourt,broken,https://deliveroo.fr/fr/search?query=Cafe+Mericourt,Deliveroo: HTTP 404
+Café Pinson Filles du Calvaire,cafe-pinson-filles-du-calvaire,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Pinson+Filles+du+Calvaire,broken,https://deliveroo.fr/fr/search?query=Cafe+Pinson+Filles+du+Calvaire,Deliveroo: HTTP 404
+Café Pinson Marais,cafe-pinson-marais,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Pinson+Marais,broken,https://deliveroo.fr/fr/search?query=Cafe+Pinson+Marais,Deliveroo: HTTP 404
+Café Smörgås,cafe-smorgas,,missing,,https://deliveroo.fr/fr/search?query=Cafe+Smorgas,broken,https://deliveroo.fr/fr/search?query=Cafe+Smorgas,Deliveroo: HTTP 404
+Carette Trocadéro,carette-trocadero,,missing,,https://deliveroo.fr/fr/search?query=Carette+Trocadero,broken,https://deliveroo.fr/fr/search?query=Carette+Trocadero,Deliveroo: HTTP 404
+Chambelland,chambelland,,missing,,https://deliveroo.fr/fr/search?query=Chambelland,broken,https://deliveroo.fr/fr/search?query=Chambelland,Deliveroo: HTTP 404
+Class Croute Marais,class-croute-marais,,missing,,https://deliveroo.fr/fr/search?query=Class+Croute+Marais,broken,https://deliveroo.fr/fr/search?query=Class+Croute+Marais,Deliveroo: HTTP 404
+Class Croute Opéra,class-croute-opera,,missing,,https://deliveroo.fr/fr/search?query=Class+Croute+Opera,broken,https://deliveroo.fr/fr/search?query=Class+Croute+Opera,Deliveroo: HTTP 404
+Clean Burger Marais,clean-burger-marais,,missing,,https://deliveroo.fr/fr/search?query=Clean+Burger+Marais,broken,https://deliveroo.fr/fr/search?query=Clean+Burger+Marais,Deliveroo: HTTP 404
+Cloud Cakes,cloud-cakes,,missing,,https://deliveroo.fr/fr/search?query=Cloud+Cakes,broken,https://deliveroo.fr/fr/search?query=Cloud+Cakes,Deliveroo: HTTP 404
+Cojean,cojean-dc3ecb84,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Cojean,cojean-dc8717c0,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Cojean,cojean-58ae0dd3,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Cojean,cojean-05cb6c4b,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Cojean,cojean-9600c08f,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Cojean Bastille,cojean-bastille,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Bastille,broken,https://deliveroo.fr/fr/search?query=Cojean+Bastille,Deliveroo: HTTP 404
+Cojean Bourse,cojean-bourse,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Bourse,broken,https://deliveroo.fr/fr/search?query=Cojean+Bourse,Deliveroo: HTTP 404
+Cojean Champs-Élysées,cojean-champs-elysees,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Champs-Elysees,broken,https://deliveroo.fr/fr/search?query=Cojean+Champs-Elysees,Deliveroo: HTTP 404
+Cojean Châtelet,cojean-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Chatelet,broken,https://deliveroo.fr/fr/search?query=Cojean+Chatelet,Deliveroo: HTTP 404
+Cojean Étienne Marcel,cojean-etienne-marcel,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Etienne+Marcel,broken,https://deliveroo.fr/fr/search?query=Cojean+Etienne+Marcel,Deliveroo: HTTP 404
+Cojean Madeleine,cojean-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Madeleine,broken,https://deliveroo.fr/fr/search?query=Cojean+Madeleine,Deliveroo: HTTP 404
+Cojean Protein Opéra,cojean-protein-opera,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Protein+Opera,broken,https://deliveroo.fr/fr/search?query=Cojean+Protein+Opera,Deliveroo: HTTP 404
+Cojean République,cojean-republique,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Republique,broken,https://deliveroo.fr/fr/search?query=Cojean+Republique,Deliveroo: HTTP 404
+Cojean Saint-Lazare,cojean-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Cojean+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Cojean+Saint-Lazare,Deliveroo: HTTP 404
+Cold Press Lab,cold-press-lab,,missing,,https://deliveroo.fr/fr/search?query=Cold+Press+Lab,broken,https://deliveroo.fr/fr/search?query=Cold+Press+Lab,Deliveroo: HTTP 404
+Coral Poke,coral-poke,,missing,,https://deliveroo.fr/fr/search?query=Coral+Poke,broken,https://deliveroo.fr/fr/search?query=Coral+Poke,Deliveroo: HTTP 404
+Cosmic Bowls,cosmic-bowls,,missing,,https://deliveroo.fr/fr/search?query=Cosmic+Bowls,broken,https://deliveroo.fr/fr/search?query=Cosmic+Bowls,Deliveroo: HTTP 404
+Coutume Café,coutume-cafe,,missing,,https://deliveroo.fr/fr/search?query=Coutume+Cafe,broken,https://deliveroo.fr/fr/search?query=Coutume+Cafe,Deliveroo: HTTP 404
+Crisp & Co,crisp-and-co,,missing,,https://deliveroo.fr/fr/search?query=Crisp+%26+Co,broken,https://deliveroo.fr/fr/search?query=Crisp+%26+Co,Deliveroo: HTTP 404
+Crisp Greens Bastille,crisp-greens-bastille,,missing,,https://deliveroo.fr/fr/search?query=Crisp+Greens+Bastille,broken,https://deliveroo.fr/fr/search?query=Crisp+Greens+Bastille,Deliveroo: HTTP 404
+Cuillier Montmartre,cuillier-montmartre,,missing,,https://deliveroo.fr/fr/search?query=Cuillier+Montmartre,broken,https://deliveroo.fr/fr/search?query=Cuillier+Montmartre,Deliveroo: HTTP 404
+Daily Monop Bastille,daily-monop-bastille,,missing,,https://deliveroo.fr/fr/search?query=Daily+Monop+Bastille,broken,https://deliveroo.fr/fr/search?query=Daily+Monop+Bastille,Deliveroo: HTTP 404
+Daily Monop Châtelet,daily-monop-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Daily+Monop+Chatelet,broken,https://deliveroo.fr/fr/search?query=Daily+Monop+Chatelet,Deliveroo: HTTP 404
+Daily Pic,daily-pic,,missing,,https://deliveroo.fr/fr/search?query=Daily+Pic,broken,https://deliveroo.fr/fr/search?query=Daily+Pic,Deliveroo: HTTP 404
+Daluma,daluma,,missing,,https://deliveroo.fr/fr/search?query=Daluma,broken,https://deliveroo.fr/fr/search?query=Daluma,Deliveroo: HTTP 404
+Daylesford Marais,daylesford-marais,,missing,,https://deliveroo.fr/fr/search?query=Daylesford+Marais,broken,https://deliveroo.fr/fr/search?query=Daylesford+Marais,Deliveroo: HTTP 404
+Daylesford Organic Paris,daylesford-organic-paris,,missing,,https://deliveroo.fr/fr/search?query=Daylesford+Organic+Paris,broken,https://deliveroo.fr/fr/search?query=Daylesford+Organic+Paris,Deliveroo: HTTP 404
+Daylesford Saint-Germain,daylesford-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Daylesford+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Daylesford+Saint-Germain,Deliveroo: HTTP 404
+Detox Bar,detox-bar,,missing,,https://deliveroo.fr/fr/search?query=Detox+Bar,broken,https://deliveroo.fr/fr/search?query=Detox+Bar,Deliveroo: HTTP 404
+Earth Café Marais,earth-cafe-marais,,missing,,https://deliveroo.fr/fr/search?query=Earth+Cafe+Marais,broken,https://deliveroo.fr/fr/search?query=Earth+Cafe+Marais,Deliveroo: HTTP 404
+East Side Burgers,east-side-burgers,,missing,,https://deliveroo.fr/fr/search?query=East+Side+Burgers,broken,https://deliveroo.fr/fr/search?query=East+Side+Burgers,Deliveroo: HTTP 404
+Eat Smart Paris,eat-smart-paris,,missing,,https://deliveroo.fr/fr/search?query=Eat+Smart+Paris,broken,https://deliveroo.fr/fr/search?query=Eat+Smart+Paris,Deliveroo: HTTP 404
+Echo,echo-paris,,missing,,https://deliveroo.fr/fr/search?query=Echo+Paris,broken,https://deliveroo.fr/fr/search?query=Echo+Paris,Deliveroo: HTTP 404
+Exki Bastille,exki-bastille,,missing,,https://deliveroo.fr/fr/search?query=Exki+Bastille,broken,https://deliveroo.fr/fr/search?query=Exki+Bastille,Deliveroo: HTTP 404
+Exki Bourse,exki-bourse,,missing,,https://deliveroo.fr/fr/search?query=Exki+Bourse,broken,https://deliveroo.fr/fr/search?query=Exki+Bourse,Deliveroo: HTTP 404
+Exki Châtelet,exki-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Exki+Chatelet,broken,https://deliveroo.fr/fr/search?query=Exki+Chatelet,Deliveroo: HTTP 404
+Exki Châtelet Les Halles,exki-chatelet-les-halles,,missing,,https://deliveroo.fr/fr/search?query=Exki+Chatelet+Les+Halles,broken,https://deliveroo.fr/fr/search?query=Exki+Chatelet+Les+Halles,Deliveroo: HTTP 404
+Exki Hôtel de Ville,exki-hotel-de-ville,,missing,,https://deliveroo.fr/fr/search?query=Exki+Hotel+de+Ville,broken,https://deliveroo.fr/fr/search?query=Exki+Hotel+de+Ville,Deliveroo: HTTP 404
+Exki Madeleine,exki-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Exki+Madeleine,broken,https://deliveroo.fr/fr/search?query=Exki+Madeleine,Deliveroo: HTTP 404
+Exki République,exki-republique,,missing,,https://deliveroo.fr/fr/search?query=Exki+Republique,broken,https://deliveroo.fr/fr/search?query=Exki+Republique,Deliveroo: HTTP 404
+Exki Saint-Germain,exki-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Exki+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Exki+Saint-Germain,Deliveroo: HTTP 404
+Exki Strasbourg-Saint-Denis,exki-strasbourg-saint-denis,,missing,,https://deliveroo.fr/fr/search?query=Exki+Strasbourg-Saint-Denis,broken,https://deliveroo.fr/fr/search?query=Exki+Strasbourg-Saint-Denis,Deliveroo: HTTP 404
+Field Greens Café,field-greens-cafe,,missing,,https://deliveroo.fr/fr/search?query=Field+Greens+Cafe,broken,https://deliveroo.fr/fr/search?query=Field+Greens+Cafe,Deliveroo: HTTP 404
+Fit & Lean,fit-and-lean,,missing,,https://deliveroo.fr/fr/search?query=Fit+%26+Lean,broken,https://deliveroo.fr/fr/search?query=Fit+%26+Lean,Deliveroo: HTTP 404
+Foundation Tea House,foundation-tea-house,,missing,,https://deliveroo.fr/fr/search?query=Foundation+Tea+House,broken,https://deliveroo.fr/fr/search?query=Foundation+Tea+House,Deliveroo: HTTP 404
+Fragments Coffee,fragments-coffee,,missing,,https://deliveroo.fr/fr/search?query=Fragments+Coffee,broken,https://deliveroo.fr/fr/search?query=Fragments+Coffee,Deliveroo: HTTP 404
+Free & Healthy,free-and-healthy,,missing,,https://deliveroo.fr/fr/search?query=Free+Healthy,broken,https://deliveroo.fr/fr/search?query=Free+Healthy,Deliveroo: HTTP 404
+Fringe Coffee,fringe-coffee,,missing,,https://deliveroo.fr/fr/search?query=Fringe+Coffee,broken,https://deliveroo.fr/fr/search?query=Fringe+Coffee,Deliveroo: HTTP 404
+Garden Bowl Café,garden-bowl-cafe,,missing,,https://deliveroo.fr/fr/search?query=Garden+Bowl+Cafe,broken,https://deliveroo.fr/fr/search?query=Garden+Bowl+Cafe,Deliveroo: HTTP 404
+Garden Salad Bar,garden-salad-bar,,missing,,https://deliveroo.fr/fr/search?query=Garden+Salad+Bar,broken,https://deliveroo.fr/fr/search?query=Garden+Salad+Bar,Deliveroo: HTTP 404
+Gentle Gourmet,gentle-gourmet,,missing,,https://deliveroo.fr/fr/search?query=Gentle+Gourmet,broken,https://deliveroo.fr/fr/search?query=Gentle+Gourmet,Deliveroo: HTTP 404
+Glow Juice Bar,glow-juice-bar,,missing,,https://deliveroo.fr/fr/search?query=Glow+Juice+Bar,broken,https://deliveroo.fr/fr/search?query=Glow+Juice+Bar,Deliveroo: HTTP 404
+Green Factory,green-factory,,missing,,https://deliveroo.fr/fr/search?query=Green+Factory,broken,https://deliveroo.fr/fr/search?query=Green+Factory,Deliveroo: HTTP 404
+Greenheart République,greenheart-republique,,missing,,https://deliveroo.fr/fr/search?query=Greenheart+Republique,broken,https://deliveroo.fr/fr/search?query=Greenheart+Republique,Deliveroo: HTTP 404
+GreenSheep Burger,greensheep-burger,,missing,,https://deliveroo.fr/fr/search?query=GreenSheep+Burger,broken,https://deliveroo.fr/fr/search?query=GreenSheep+Burger,Deliveroo: HTTP 404
+Hank Vegan Burger,hank-vegan-burger,,missing,,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger,broken,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger,Deliveroo: HTTP 404
+Hank Vegan Burger Bastille,hank-vegan-burger-bastille,,missing,,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger+Bastille,broken,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger+Bastille,Deliveroo: HTTP 404
+Hank Vegan Burger Saint-Germain,hank-vegan-burger-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Hank+Vegan+Burger+Saint-Germain,Deliveroo: HTTP 404
+Hardware Société,hardware-societe,,missing,,https://deliveroo.fr/fr/search?query=Hardware+Societe,broken,https://deliveroo.fr/fr/search?query=Hardware+Societe,Deliveroo: HTTP 404
+Hawaii Bowl Paris,hawaii-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Hawaii+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Hawaii+Bowl+Paris,Deliveroo: HTTP 404
+Hawaiian Poke Bastille,hawaiian-poke-bastille,,missing,,https://deliveroo.fr/fr/search?query=Hawaiian+Poke+Bastille,broken,https://deliveroo.fr/fr/search?query=Hawaiian+Poke+Bastille,Deliveroo: HTTP 404
+Healthy Bowl Bar,healthy-bowl-bar,,missing,,https://deliveroo.fr/fr/search?query=Healthy+Bowl+Bar,broken,https://deliveroo.fr/fr/search?query=Healthy+Bowl+Bar,Deliveroo: HTTP 404
+Healthy Box Paris,healthy-box-paris,,missing,,https://deliveroo.fr/fr/search?query=Healthy+Box+Paris,broken,https://deliveroo.fr/fr/search?query=Healthy+Box+Paris,Deliveroo: HTTP 404
+Healthy Express Paris,healthy-express-paris,,missing,,https://deliveroo.fr/fr/search?query=Healthy+Express+Paris,broken,https://deliveroo.fr/fr/search?query=Healthy+Express+Paris,Deliveroo: HTTP 404
+Helmut Newcake,helmut-newcake,,missing,,https://deliveroo.fr/fr/search?query=Helmut+Newcake,broken,https://deliveroo.fr/fr/search?query=Helmut+Newcake,Deliveroo: HTTP 404
+Hexagone Café,hexagone-cafe,,missing,,https://deliveroo.fr/fr/search?query=Hexagone+Cafe,broken,https://deliveroo.fr/fr/search?query=Hexagone+Cafe,Deliveroo: HTTP 404
+Hexagone Marais,hexagone-marais,,missing,,https://deliveroo.fr/fr/search?query=Hexagone+Marais,broken,https://deliveroo.fr/fr/search?query=Hexagone+Marais,Deliveroo: HTTP 404
+Hivi Poke Beaubourg,hivi-poke-beaubourg,,missing,,https://deliveroo.fr/fr/search?query=Hivi+Poke+Beaubourg,broken,https://deliveroo.fr/fr/search?query=Hivi+Poke+Beaubourg,Deliveroo: HTTP 404
+Holy Bowl Pigalle,holy-bowl-pigalle,,missing,,https://deliveroo.fr/fr/search?query=Holy+Bowl+Pigalle,broken,https://deliveroo.fr/fr/search?query=Holy+Bowl+Pigalle,Deliveroo: HTTP 404
+Holy Poke Opéra,holy-poke-opera,,missing,,https://deliveroo.fr/fr/search?query=Holy+Poke+Opera,broken,https://deliveroo.fr/fr/search?query=Holy+Poke+Opera,Deliveroo: HTTP 404
+Holybelly 19,holybelly-19,,missing,,https://deliveroo.fr/fr/search?query=Holybelly+19,broken,https://deliveroo.fr/fr/search?query=Holybelly+19,Deliveroo: HTTP 404
+Holybelly 5,holybelly-5,,missing,,https://deliveroo.fr/fr/search?query=Holybelly+5,broken,https://deliveroo.fr/fr/search?query=Holybelly+5,Deliveroo: HTTP 404
+Holybelly Père Lachaise,holybelly-pere-lachaise,,missing,,https://deliveroo.fr/fr/search?query=Holybelly+Pere+Lachaise,broken,https://deliveroo.fr/fr/search?query=Holybelly+Pere+Lachaise,Deliveroo: HTTP 404
+Holycow Juice,holycow-juice,,missing,,https://deliveroo.fr/fr/search?query=Holycow+Juice,broken,https://deliveroo.fr/fr/search?query=Holycow+Juice,Deliveroo: HTTP 404
+Honor Café,honor-cafe,,missing,,https://deliveroo.fr/fr/search?query=Honor+Cafe,broken,https://deliveroo.fr/fr/search?query=Honor+Cafe,Deliveroo: HTTP 404
+Hula Poke,hula-poke,,missing,,https://deliveroo.fr/fr/search?query=Hula+Poke,broken,https://deliveroo.fr/fr/search?query=Hula+Poke,Deliveroo: HTTP 404
+Hummus Bar Paris,hummus-bar-paris,,missing,,https://deliveroo.fr/fr/search?query=Hummus+Bar+Paris,broken,https://deliveroo.fr/fr/search?query=Hummus+Bar+Paris,Deliveroo: HTTP 404
+Hyperfit Kitchen,hyperfit-kitchen,,missing,,https://deliveroo.fr/fr/search?query=Hyperfit+Kitchen,broken,https://deliveroo.fr/fr/search?query=Hyperfit+Kitchen,Deliveroo: HTTP 404
+Inca Bowl,inca-bowl,,missing,,https://deliveroo.fr/fr/search?query=Inca+Bowl,broken,https://deliveroo.fr/fr/search?query=Inca+Bowl,Deliveroo: HTTP 404
+Iron Bowl Madeleine,iron-bowl-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Iron+Bowl+Madeleine,broken,https://deliveroo.fr/fr/search?query=Iron+Bowl+Madeleine,Deliveroo: HTTP 404
+Iron Bowl Paris,iron-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Iron+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Iron+Bowl+Paris,Deliveroo: HTTP 404
+Island Poké Châtelet,island-poke-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Island+Poke+Chatelet,broken,https://deliveroo.fr/fr/search?query=Island+Poke+Chatelet,Deliveroo: HTTP 404
+Island Poké Saint-Germain,island-poke-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Island+Poke+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Island+Poke+Saint-Germain,Deliveroo: HTTP 404
+Jah Jah by Le Tricycle,jah-jah-by-le-tricycle,,missing,,https://deliveroo.fr/fr/search?query=Jah+Jah,broken,https://deliveroo.fr/fr/search?query=Jah+Jah,Deliveroo: HTTP 404
+Jardin du Thé,jardin-du-the,,missing,,https://deliveroo.fr/fr/search?query=Jardin+du+The,broken,https://deliveroo.fr/fr/search?query=Jardin+du+The,Deliveroo: HTTP 404
+Joe & The Juice Châtelet,joe-and-the-juice-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Chatelet,broken,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Chatelet,Deliveroo: HTTP 404
+Joe & The Juice Madeleine,joe-and-the-juice-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Madeleine,broken,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Madeleine,Deliveroo: HTTP 404
+Joe & The Juice Saint-Lazare,joe-and-the-juice-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Joe+The+Juice+Saint-Lazare,Deliveroo: HTTP 404
+Joie Végétale,joie-vegetale,,missing,,https://deliveroo.fr/fr/search?query=Joie+Vegetale,broken,https://deliveroo.fr/fr/search?query=Joie+Vegetale,Deliveroo: HTTP 404
+Juice Lab Paris,juice-lab-paris,,missing,,https://deliveroo.fr/fr/search?query=Juice+Lab+Paris,broken,https://deliveroo.fr/fr/search?query=Juice+Lab+Paris,Deliveroo: HTTP 404
+Kale Brothers,kale-brothers,,missing,,https://deliveroo.fr/fr/search?query=Kale+Brothers,broken,https://deliveroo.fr/fr/search?query=Kale+Brothers,Deliveroo: HTTP 404
+Kale Lab Marais,kale-lab-marais,,missing,,https://deliveroo.fr/fr/search?query=Kale+Lab+Marais,broken,https://deliveroo.fr/fr/search?query=Kale+Lab+Marais,Deliveroo: HTTP 404
+Karma Bowl,karma-bowl,,missing,,https://deliveroo.fr/fr/search?query=Karma+Bowl,broken,https://deliveroo.fr/fr/search?query=Karma+Bowl,Deliveroo: HTTP 404
+KB Cafeshop,kb-cafeshop,,missing,,https://deliveroo.fr/fr/search?query=KB+Cafeshop,broken,https://deliveroo.fr/fr/search?query=KB+Cafeshop,Deliveroo: HTTP 404
+Kitchen Light Paris,kitchen-light-paris,,missing,,https://deliveroo.fr/fr/search?query=Kitchen+Light+Paris,broken,https://deliveroo.fr/fr/search?query=Kitchen+Light+Paris,Deliveroo: HTTP 404
+Kozy Bosquet,kozy-bosquet,,missing,,https://deliveroo.fr/fr/search?query=Kozy+Bosquet,broken,https://deliveroo.fr/fr/search?query=Kozy+Bosquet,Deliveroo: HTTP 404
+Kozy République,kozy-republique,,missing,,https://deliveroo.fr/fr/search?query=Kozy+Republique,broken,https://deliveroo.fr/fr/search?query=Kozy+Republique,Deliveroo: HTTP 404
+L'as du Fallafel,las-du-fallafel,,missing,,https://deliveroo.fr/fr/search?query=L%27as+du+Fallafel,broken,https://deliveroo.fr/fr/search?query=L%27as+du+Fallafel,Deliveroo: HTTP 404
+La Guinguette d'Angèle,la-guinguette-dangele,,missing,,https://deliveroo.fr/fr/search?query=La+Guinguette+d%27Ang%C3%A8le,broken,https://deliveroo.fr/fr/search?query=La+Guinguette+d%27Ang%C3%A8le,Deliveroo: HTTP 404
+La Régularité,la-regularite,,missing,,https://deliveroo.fr/fr/search?query=La+Regularite,broken,https://deliveroo.fr/fr/search?query=La+Regularite,Deliveroo: HTTP 404
+La Vegan Diner,la-vegan-diner,,missing,,https://deliveroo.fr/fr/search?query=La+Vegan+Diner,broken,https://deliveroo.fr/fr/search?query=La+Vegan+Diner,Deliveroo: HTTP 404
+La Vie Claire Café,la-vie-claire-cafe,,missing,,https://deliveroo.fr/fr/search?query=La+Vie+Claire+Cafe,broken,https://deliveroo.fr/fr/search?query=La+Vie+Claire+Cafe,Deliveroo: HTTP 404
+Ladurée Healthy,laduree-healthy,,missing,,https://deliveroo.fr/fr/search?query=Laduree+Healthy,broken,https://deliveroo.fr/fr/search?query=Laduree+Healthy,Deliveroo: HTTP 404
+Land&Monkeys,land-and-monkeys,,missing,,https://deliveroo.fr/fr/search?query=Land+Monkeys,broken,https://deliveroo.fr/fr/search?query=Land+Monkeys,Deliveroo: HTTP 404
+Lava Poke,lava-poke,,missing,,https://deliveroo.fr/fr/search?query=Lava+Poke,broken,https://deliveroo.fr/fr/search?query=Lava+Poke,Deliveroo: HTTP 404
+Le Bal Café,le-bal-cafe,,missing,,https://deliveroo.fr/fr/search?query=Le+Bal+Cafe,broken,https://deliveroo.fr/fr/search?query=Le+Bal+Cafe,Deliveroo: HTTP 404
+Le Bichat,le-bichat,,missing,,https://deliveroo.fr/fr/search?query=Le+Bichat,broken,https://deliveroo.fr/fr/search?query=Le+Bichat,Deliveroo: HTTP 404
+Le Cube Matcha,le-cube-matcha,,missing,,https://deliveroo.fr/fr/search?query=Le+Cube+Matcha,broken,https://deliveroo.fr/fr/search?query=Le+Cube+Matcha,Deliveroo: HTTP 404
+Le Cube Matcha Bastille,le-cube-matcha-bastille,,missing,,https://deliveroo.fr/fr/search?query=Le+Cube+Matcha+Bastille,broken,https://deliveroo.fr/fr/search?query=Le+Cube+Matcha+Bastille,Deliveroo: HTTP 404
+Le Marché Paris,le-marche-paris,,missing,,https://deliveroo.fr/fr/search?query=Le+Marche+Paris,broken,https://deliveroo.fr/fr/search?query=Le+Marche+Paris,Deliveroo: HTTP 404
+Le Pain Quotidien Bastille,le-pain-quotidien-bastille,,missing,,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Bastille,broken,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Bastille,Deliveroo: HTTP 404
+Le Pain Quotidien Champs-Élysées,le-pain-quotidien-champs-elysees,,missing,,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Champs-Elysees,broken,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Champs-Elysees,Deliveroo: HTTP 404
+Le Pain Quotidien Marais,le-pain-quotidien-marais,,missing,,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Marais,broken,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Marais,Deliveroo: HTTP 404
+Le Pain Quotidien Opéra,le-pain-quotidien-opera,,missing,,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Opera,broken,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Opera,Deliveroo: HTTP 404
+Le Pain Quotidien Saint-Sulpice,le-pain-quotidien-saint-sulpice,,missing,,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Saint-Sulpice,broken,https://deliveroo.fr/fr/search?query=Le+Pain+Quotidien+Saint-Sulpice,Deliveroo: HTTP 404
+Le Potager de Charlotte,le-potager-de-charlotte,,missing,,https://deliveroo.fr/fr/search?query=Le+Potager+de+Charlotte,broken,https://deliveroo.fr/fr/search?query=Le+Potager+de+Charlotte,Deliveroo: HTTP 404
+Le Potager du Marais,le-potager-du-marais,,missing,,https://deliveroo.fr/fr/search?query=Le+Potager+du+Marais,broken,https://deliveroo.fr/fr/search?query=Le+Potager+du+Marais,Deliveroo: HTTP 404
+Le Récamier,le-recamier,,missing,,https://deliveroo.fr/fr/search?query=Le+Recamier,broken,https://deliveroo.fr/fr/search?query=Le+Recamier,Deliveroo: HTTP 404
+Le Tournesol Vegan,le-tournesol-vegan,,missing,,https://deliveroo.fr/fr/search?query=Le+Tournesol+Vegan,broken,https://deliveroo.fr/fr/search?query=Le+Tournesol+Vegan,Deliveroo: HTTP 404
+Le Verger Salad,le-verger-salad,,missing,,https://deliveroo.fr/fr/search?query=Le+Verger+Salad,broken,https://deliveroo.fr/fr/search?query=Le+Verger+Salad,Deliveroo: HTTP 404
+Lean Cuisine Paris,lean-cuisine-paris,,missing,,https://deliveroo.fr/fr/search?query=Lean+Cuisine+Paris,broken,https://deliveroo.fr/fr/search?query=Lean+Cuisine+Paris,Deliveroo: HTTP 404
+Lean Kitchen Paris,lean-kitchen-paris,,missing,,https://deliveroo.fr/fr/search?query=Lean+Kitchen+Paris,broken,https://deliveroo.fr/fr/search?query=Lean+Kitchen+Paris,Deliveroo: HTTP 404
+Lean Lab Paris,lean-lab-paris,,missing,,https://deliveroo.fr/fr/search?query=Lean+Lab+Paris,broken,https://deliveroo.fr/fr/search?query=Lean+Lab+Paris,Deliveroo: HTTP 404
+Light Lunch Paris,light-lunch-paris,,missing,,https://deliveroo.fr/fr/search?query=Light+Lunch+Paris,broken,https://deliveroo.fr/fr/search?query=Light+Lunch+Paris,Deliveroo: HTTP 404
+Loustic,loustic,,missing,,https://deliveroo.fr/fr/search?query=Loustic,broken,https://deliveroo.fr/fr/search?query=Loustic,Deliveroo: HTTP 404
+Loving Hut Marais,loving-hut-marais,,missing,,https://deliveroo.fr/fr/search?query=Loving+Hut+Marais,broken,https://deliveroo.fr/fr/search?query=Loving+Hut+Marais,Deliveroo: HTTP 404
+Loving Hut Paris,loving-hut-paris,,missing,,https://deliveroo.fr/fr/search?query=Loving+Hut+Paris,broken,https://deliveroo.fr/fr/search?query=Loving+Hut+Paris,Deliveroo: HTTP 404
+Low Carb Lab,low-carb-lab,,missing,,https://deliveroo.fr/fr/search?query=Low+Carb+Lab,broken,https://deliveroo.fr/fr/search?query=Low+Carb+Lab,Deliveroo: HTTP 404
+Lumière Brunch,lumiere-brunch,,missing,,https://deliveroo.fr/fr/search?query=Lumiere+Brunch,broken,https://deliveroo.fr/fr/search?query=Lumiere+Brunch,Deliveroo: HTTP 404
+Macha Café Protein,macha-cafe-protein,,missing,,https://deliveroo.fr/fr/search?query=Macha+Cafe+Protein,broken,https://deliveroo.fr/fr/search?query=Macha+Cafe+Protein,Deliveroo: HTTP 404
+Macro Lab Marais,macro-lab-marais,,missing,,https://deliveroo.fr/fr/search?query=Macro+Lab+Marais,broken,https://deliveroo.fr/fr/search?query=Macro+Lab+Marais,Deliveroo: HTTP 404
+Macro Light Paris,macro-light-paris,,missing,,https://deliveroo.fr/fr/search?query=Macro+Light+Paris,broken,https://deliveroo.fr/fr/search?query=Macro+Light+Paris,Deliveroo: HTTP 404
+Maisie Café,maisie-cafe,,missing,,https://deliveroo.fr/fr/search?query=Maisie+Caf%C3%A9,broken,https://deliveroo.fr/fr/search?query=Maisie+Caf%C3%A9,Deliveroo: HTTP 404
+Maisie Café Bastille,maisie-cafe-bastille,,missing,,https://deliveroo.fr/fr/search?query=Maisie+Cafe+Bastille,broken,https://deliveroo.fr/fr/search?query=Maisie+Cafe+Bastille,Deliveroo: HTTP 404
+Maison Plisson,maison-plisson,,missing,,https://deliveroo.fr/fr/search?query=Maison+Plisson,broken,https://deliveroo.fr/fr/search?query=Maison+Plisson,Deliveroo: HTTP 404
+Mantra Bowl,mantra-bowl,,missing,,https://deliveroo.fr/fr/search?query=Mantra+Bowl,broken,https://deliveroo.fr/fr/search?query=Mantra+Bowl,Deliveroo: HTTP 404
+Marché Saint-Quentin Bio,marche-saint-quentin-bio,,missing,,https://deliveroo.fr/fr/search?query=Marche+Saint-Quentin+Bio,broken,https://deliveroo.fr/fr/search?query=Marche+Saint-Quentin+Bio,Deliveroo: HTTP 404
+Marlette Concept Store,marlette-concept-store,,missing,,https://deliveroo.fr/fr/search?query=Marlette+Concept+Store,broken,https://deliveroo.fr/fr/search?query=Marlette+Concept+Store,Deliveroo: HTTP 404
+Matamata Coffee Bar,matamata-coffee-bar,,missing,,https://deliveroo.fr/fr/search?query=Matamata+Coffee+Bar,broken,https://deliveroo.fr/fr/search?query=Matamata+Coffee+Bar,Deliveroo: HTTP 404
+Matcha Café Wabi,matcha-cafe-wabi,,missing,,https://deliveroo.fr/fr/search?query=Matcha+Cafe+Wabi,broken,https://deliveroo.fr/fr/search?query=Matcha+Cafe+Wabi,Deliveroo: HTTP 404
+Matcha House Marais,matcha-house-marais,,missing,,https://deliveroo.fr/fr/search?query=Matcha+House+Marais,broken,https://deliveroo.fr/fr/search?query=Matcha+House+Marais,Deliveroo: HTTP 404
+Matcha Mochi,matcha-mochi,,missing,,https://deliveroo.fr/fr/search?query=Matcha+Mochi,broken,https://deliveroo.fr/fr/search?query=Matcha+Mochi,Deliveroo: HTTP 404
+Mediterranean Bowl,mediterranean-bowl,,missing,,https://deliveroo.fr/fr/search?query=Mediterranean+Bowl,broken,https://deliveroo.fr/fr/search?query=Mediterranean+Bowl,Deliveroo: HTTP 404
+Miznon Marais,miznon-marais,,missing,,https://deliveroo.fr/fr/search?query=Miznon+Marais,broken,https://deliveroo.fr/fr/search?query=Miznon+Marais,Deliveroo: HTTP 404
+Mojo Juice,mojo-juice,,missing,,https://deliveroo.fr/fr/search?query=Mojo+Juice,broken,https://deliveroo.fr/fr/search?query=Mojo+Juice,Deliveroo: HTTP 404
+Mokonuts,mokonuts,,missing,,https://deliveroo.fr/fr/search?query=Mokonuts,broken,https://deliveroo.fr/fr/search?query=Mokonuts,Deliveroo: HTTP 404
+Mokoy Vegan,mokoy-vegan,,missing,,https://deliveroo.fr/fr/search?query=Mokoy+Vegan,broken,https://deliveroo.fr/fr/search?query=Mokoy+Vegan,Deliveroo: HTTP 404
+Mosaïque Bowl,mosaique-bowl,,missing,,https://deliveroo.fr/fr/search?query=Mosaique+Bowl,broken,https://deliveroo.fr/fr/search?query=Mosaique+Bowl,Deliveroo: HTTP 404
+Mûre,mure,,missing,,https://deliveroo.fr/fr/search?query=Mure,broken,https://deliveroo.fr/fr/search?query=Mure,Deliveroo: HTTP 404
+NamNam Marais,namnam-marais,,missing,,https://deliveroo.fr/fr/search?query=NamNam+Marais,broken,https://deliveroo.fr/fr/search?query=NamNam+Marais,Deliveroo: HTTP 404
+NamNam Paris,namnam-paris,,missing,,https://deliveroo.fr/fr/search?query=NamNam+Paris,broken,https://deliveroo.fr/fr/search?query=NamNam+Paris,Deliveroo: HTTP 404
+Nanashi,nanashi,,missing,,https://deliveroo.fr/fr/search?query=Nanashi,broken,https://deliveroo.fr/fr/search?query=Nanashi,Deliveroo: HTTP 404
+Naturalia Café,naturalia-cafe,,missing,,https://deliveroo.fr/fr/search?query=Naturalia+Cafe,broken,https://deliveroo.fr/fr/search?query=Naturalia+Cafe,Deliveroo: HTTP 404
+Naturalia Café Bastille,naturalia-cafe-bastille,,missing,,https://deliveroo.fr/fr/search?query=Naturalia+Cafe+Bastille,broken,https://deliveroo.fr/fr/search?query=Naturalia+Cafe+Bastille,Deliveroo: HTTP 404
+Naturalia Le Comptoir Bourse,naturalia-le-comptoir-bourse,,missing,,https://deliveroo.fr/fr/search?query=Naturalia+Le+Comptoir+Bourse,broken,https://deliveroo.fr/fr/search?query=Naturalia+Le+Comptoir+Bourse,Deliveroo: HTTP 404
+NoBeef Bistro,nobeef-bistro,,missing,,https://deliveroo.fr/fr/search?query=NoBeef+Bistro,broken,https://deliveroo.fr/fr/search?query=NoBeef+Bistro,Deliveroo: HTTP 404
+NoGlu Faubourg,noglu-faubourg,,missing,,https://deliveroo.fr/fr/search?query=NoGlu+Faubourg,broken,https://deliveroo.fr/fr/search?query=NoGlu+Faubourg,Deliveroo: HTTP 404
+NoGlu Marais,noglu-marais,,missing,,https://deliveroo.fr/fr/search?query=NoGlu+Marais,broken,https://deliveroo.fr/fr/search?query=NoGlu+Marais,Deliveroo: HTTP 404
+Nordic Bowl,nordic-bowl,,missing,,https://deliveroo.fr/fr/search?query=Nordic+Bowl,broken,https://deliveroo.fr/fr/search?query=Nordic+Bowl,Deliveroo: HTTP 404
+Ocean Poke République,ocean-poke-republique,,missing,,https://deliveroo.fr/fr/search?query=Ocean+Poke+Republique,broken,https://deliveroo.fr/fr/search?query=Ocean+Poke+Republique,Deliveroo: HTTP 404
+Olive & Bowl,olive-and-bowl,,missing,,https://deliveroo.fr/fr/search?query=Olive+et+Bowl,broken,https://deliveroo.fr/fr/search?query=Olive+et+Bowl,Deliveroo: HTTP 404
+Organic Republic Paris,organic-republic-paris,,missing,,https://deliveroo.fr/fr/search?query=Organic+Republic+Paris,broken,https://deliveroo.fr/fr/search?query=Organic+Republic+Paris,Deliveroo: HTTP 404
+Pacific Poke,pacific-poke,,missing,,https://deliveroo.fr/fr/search?query=Pacific+Poke,broken,https://deliveroo.fr/fr/search?query=Pacific+Poke,Deliveroo: HTTP 404
+Performance Plate,performance-plate,,missing,,https://deliveroo.fr/fr/search?query=Performance+Plate,broken,https://deliveroo.fr/fr/search?query=Performance+Plate,Deliveroo: HTTP 404
+Petit Plisson,petit-plisson,,missing,,https://deliveroo.fr/fr/search?query=Petit+Plisson,broken,https://deliveroo.fr/fr/search?query=Petit+Plisson,Deliveroo: HTTP 404
+Phở Bowl Healthy,pho-bowl-healthy,,missing,,https://deliveroo.fr/fr/search?query=Pho+Bowl+Healthy,broken,https://deliveroo.fr/fr/search?query=Pho+Bowl+Healthy,Deliveroo: HTTP 404
+Plant Burger Bastille,plant-burger-bastille,,missing,,https://deliveroo.fr/fr/search?query=Plant+Burger+Bastille,broken,https://deliveroo.fr/fr/search?query=Plant+Burger+Bastille,Deliveroo: HTTP 404
+Plant Burger Lab,plant-burger-lab,,missing,,https://deliveroo.fr/fr/search?query=Plant+Burger+Lab,broken,https://deliveroo.fr/fr/search?query=Plant+Burger+Lab,Deliveroo: HTTP 404
+Plantes & Compagnie,plantes-et-compagnie,,missing,,https://deliveroo.fr/fr/search?query=Plantes+et+Compagnie,broken,https://deliveroo.fr/fr/search?query=Plantes+et+Compagnie,Deliveroo: HTTP 404
+PNY Bastille,pny-bastille,,missing,,https://deliveroo.fr/fr/search?query=PNY+Bastille,broken,https://deliveroo.fr/fr/search?query=PNY+Bastille,Deliveroo: HTTP 404
+PNY Le Marais,pny-le-marais,,missing,,https://deliveroo.fr/fr/search?query=PNY+Le+Marais,broken,https://deliveroo.fr/fr/search?query=PNY+Le+Marais,Deliveroo: HTTP 404
+PNY République,pny-republique,,missing,,https://deliveroo.fr/fr/search?query=PNY+Republique,broken,https://deliveroo.fr/fr/search?query=PNY+Republique,Deliveroo: HTTP 404
+PNY Saint-Germain,pny-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=PNY+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=PNY+Saint-Germain,Deliveroo: HTTP 404
+Pokawa,pokawa-061c8bb9,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Pokawa,pokawa-8ebc55a8,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Pokawa,pokawa-9e349171,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Pokawa,pokawa-b55de952,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Pokawa,pokawa-08d92ab1,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Pokawa Bastille,pokawa-bastille,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Bastille,broken,https://deliveroo.fr/fr/search?query=Pokawa+Bastille,Deliveroo: HTTP 404
+Pokawa Beaubourg,pokawa-beaubourg,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Beaubourg,broken,https://deliveroo.fr/fr/search?query=Pokawa+Beaubourg,Deliveroo: HTTP 404
+Pokawa Belleville,pokawa-belleville,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Belleville,broken,https://deliveroo.fr/fr/search?query=Pokawa+Belleville,Deliveroo: HTTP 404
+Pokawa Buttes-Chaumont,pokawa-buttes-chaumont,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Buttes-Chaumont,broken,https://deliveroo.fr/fr/search?query=Pokawa+Buttes-Chaumont,Deliveroo: HTTP 404
+Pokawa Cardinet,pokawa-cardinet,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Cardinet,broken,https://deliveroo.fr/fr/search?query=Pokawa+Cardinet,Deliveroo: HTTP 404
+Pokawa Châtelet,pokawa-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Chatelet,broken,https://deliveroo.fr/fr/search?query=Pokawa+Chatelet,Deliveroo: HTTP 404
+Pokawa Madeleine,pokawa-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Madeleine,broken,https://deliveroo.fr/fr/search?query=Pokawa+Madeleine,Deliveroo: HTTP 404
+Pokawa Marais,pokawa-marais,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Marais,broken,https://deliveroo.fr/fr/search?query=Pokawa+Marais,Deliveroo: HTTP 404
+Pokawa Montparnasse,pokawa-montparnasse,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Montparnasse,broken,https://deliveroo.fr/fr/search?query=Pokawa+Montparnasse,Deliveroo: HTTP 404
+Pokawa Opéra,pokawa-opera,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Opera,broken,https://deliveroo.fr/fr/search?query=Pokawa+Opera,Deliveroo: HTTP 404
+Pokawa Passy,pokawa-passy,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Passy,broken,https://deliveroo.fr/fr/search?query=Pokawa+Passy,Deliveroo: HTTP 404
+Pokawa Pigalle,pokawa-pigalle,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Pigalle,broken,https://deliveroo.fr/fr/search?query=Pokawa+Pigalle,Deliveroo: HTTP 404
+Pokawa Place d'Italie,pokawa-place-italie,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Place+Italie,broken,https://deliveroo.fr/fr/search?query=Pokawa+Place+Italie,Deliveroo: HTTP 404
+Pokawa République,pokawa-republique,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Republique,broken,https://deliveroo.fr/fr/search?query=Pokawa+Republique,Deliveroo: HTTP 404
+Pokawa Saint-Lazare,pokawa-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Pokawa+Saint-Lazare,Deliveroo: HTTP 404
+Pokawa Strasbourg-Saint-Denis,pokawa-strasbourg-saint-denis,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Strasbourg-Saint-Denis,broken,https://deliveroo.fr/fr/search?query=Pokawa+Strasbourg-Saint-Denis,Deliveroo: HTTP 404
+Pokawa Ternes,pokawa-ternes,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Ternes,broken,https://deliveroo.fr/fr/search?query=Pokawa+Ternes,Deliveroo: HTTP 404
+Pokawa Tour Eiffel,pokawa-tour-eiffel,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Tour+Eiffel,broken,https://deliveroo.fr/fr/search?query=Pokawa+Tour+Eiffel,Deliveroo: HTTP 404
+Pokawa Trocadéro,pokawa-trocadero,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Trocadero,broken,https://deliveroo.fr/fr/search?query=Pokawa+Trocadero,Deliveroo: HTTP 404
+Pokawa Voltaire,pokawa-voltaire,,missing,,https://deliveroo.fr/fr/search?query=Pokawa+Voltaire,broken,https://deliveroo.fr/fr/search?query=Pokawa+Voltaire,Deliveroo: HTTP 404
+Poke Bar Châtelet,poke-bar-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Poke+Bar+Chatelet,broken,https://deliveroo.fr/fr/search?query=Poke+Bar+Chatelet,Deliveroo: HTTP 404
+Poke House Saint-Germain,poke-house-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Poke+House+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Poke+House+Saint-Germain,Deliveroo: HTTP 404
+Pokeworks Marais,pokeworks-marais,,missing,,https://deliveroo.fr/fr/search?query=Pokeworks+Marais,broken,https://deliveroo.fr/fr/search?query=Pokeworks+Marais,Deliveroo: HTTP 404
+Pousse Pousse,pousse-pousse,,missing,,https://deliveroo.fr/fr/search?query=Pousse+Pousse,broken,https://deliveroo.fr/fr/search?query=Pousse+Pousse,Deliveroo: HTTP 404
+Power Lunch Paris,power-lunch-paris,,missing,,https://deliveroo.fr/fr/search?query=Power+Lunch+Paris,broken,https://deliveroo.fr/fr/search?query=Power+Lunch+Paris,Deliveroo: HTTP 404
+Powerfood Bastille,powerfood-bastille,,missing,,https://deliveroo.fr/fr/search?query=Powerfood+Bastille,broken,https://deliveroo.fr/fr/search?query=Powerfood+Bastille,Deliveroo: HTTP 404
+Powerfood Marais,powerfood-marais,,missing,,https://deliveroo.fr/fr/search?query=Powerfood+Marais,broken,https://deliveroo.fr/fr/search?query=Powerfood+Marais,Deliveroo: HTTP 404
+Press Paris,press-paris,,missing,,https://deliveroo.fr/fr/search?query=Press+Paris,broken,https://deliveroo.fr/fr/search?query=Press+Paris,Deliveroo: HTTP 404
+Pret A Manger Bastille,pret-a-manger-bastille,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Bastille,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Bastille,Deliveroo: HTTP 404
+Pret A Manger Bourse,pret-a-manger-bourse,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Bourse,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Bourse,Deliveroo: HTTP 404
+Pret A Manger Châtelet,pret-a-manger-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Chatelet,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Chatelet,Deliveroo: HTTP 404
+Pret A Manger Madeleine,pret-a-manger-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Madeleine,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Madeleine,Deliveroo: HTTP 404
+Pret A Manger Opéra,pret-a-manger-opera,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Opera,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Opera,Deliveroo: HTTP 404
+Pret A Manger République,pret-a-manger-republique,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Republique,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Republique,Deliveroo: HTTP 404
+Pret A Manger Saint-Lazare,pret-a-manger-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Pret+A+Manger+Saint-Lazare,Deliveroo: HTTP 404
+Protein Kitchen Bastille,protein-kitchen-bastille,,missing,,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Bastille,broken,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Bastille,Deliveroo: HTTP 404
+Protein Kitchen Châtelet,protein-kitchen-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Chatelet,broken,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Chatelet,Deliveroo: HTTP 404
+Protein Kitchen Madeleine,protein-kitchen-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Madeleine,broken,https://deliveroo.fr/fr/search?query=Protein+Kitchen+Madeleine,Deliveroo: HTTP 404
+Ramo Falafel,ramo-falafel,,missing,,https://deliveroo.fr/fr/search?query=Ramo+Falafel,broken,https://deliveroo.fr/fr/search?query=Ramo+Falafel,Deliveroo: HTTP 404
+Raw Lab Paris,raw-lab-paris,,missing,,https://deliveroo.fr/fr/search?query=Raw+Lab+Paris,broken,https://deliveroo.fr/fr/search?query=Raw+Lab+Paris,Deliveroo: HTTP 404
+Recovery Lunch,recovery-lunch,,missing,,https://deliveroo.fr/fr/search?query=Recovery+Lunch,broken,https://deliveroo.fr/fr/search?query=Recovery+Lunch,Deliveroo: HTTP 404
+Reef Bowl Paris,reef-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Reef+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Reef+Bowl+Paris,Deliveroo: HTTP 404
+Rooibos Café Bio,rooibos-cafe-bio,,missing,,https://deliveroo.fr/fr/search?query=Rooibos+Cafe+Bio,broken,https://deliveroo.fr/fr/search?query=Rooibos+Cafe+Bio,Deliveroo: HTTP 404
+Roots & Greens,roots-and-greens,,missing,,https://deliveroo.fr/fr/search?query=Roots+Greens,broken,https://deliveroo.fr/fr/search?query=Roots+Greens,Deliveroo: HTTP 404
+Rose & Thé Vegan,rose-et-the-vegan,,missing,,https://deliveroo.fr/fr/search?query=Rose+et+The+Vegan,broken,https://deliveroo.fr/fr/search?query=Rose+et+The+Vegan,Deliveroo: HTTP 404
+Sain Boulangerie,sain-boulangerie,,missing,,https://deliveroo.fr/fr/search?query=Sain+Boulangerie,broken,https://deliveroo.fr/fr/search?query=Sain+Boulangerie,Deliveroo: HTTP 404
+Sain Pigalle,sain-pigalle,,missing,,https://deliveroo.fr/fr/search?query=Sain+Pigalle,broken,https://deliveroo.fr/fr/search?query=Sain+Pigalle,Deliveroo: HTTP 404
+Sakura Tea House,sakura-tea-house,,missing,,https://deliveroo.fr/fr/search?query=Sakura+Tea+House,broken,https://deliveroo.fr/fr/search?query=Sakura+Tea+House,Deliveroo: HTTP 404
+Salad & Co Madeleine,salad-and-co-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Salad+Co+Madeleine,broken,https://deliveroo.fr/fr/search?query=Salad+Co+Madeleine,Deliveroo: HTTP 404
+Salad House Paris,salad-house-paris,,missing,,https://deliveroo.fr/fr/search?query=Salad+House+Paris,broken,https://deliveroo.fr/fr/search?query=Salad+House+Paris,Deliveroo: HTTP 404
+Salad Lab Marais,salad-lab-marais,,missing,,https://deliveroo.fr/fr/search?query=Salad+Lab+Marais,broken,https://deliveroo.fr/fr/search?query=Salad+Lab+Marais,Deliveroo: HTTP 404
+Salad Studio,salad-studio,,missing,,https://deliveroo.fr/fr/search?query=Salad+Studio,broken,https://deliveroo.fr/fr/search?query=Salad+Studio,Deliveroo: HTTP 404
+Salade Box,salade-box,,missing,,https://deliveroo.fr/fr/search?query=Salade+Box,broken,https://deliveroo.fr/fr/search?query=Salade+Box,Deliveroo: HTTP 404
+Sea Sun Poke,sea-sun-poke,,missing,,https://deliveroo.fr/fr/search?query=Sea+Sun+Poke,broken,https://deliveroo.fr/fr/search?query=Sea+Sun+Poke,Deliveroo: HTTP 404
+Season Marais,season-marais,,missing,,https://deliveroo.fr/fr/search?query=Season+Marais,broken,https://deliveroo.fr/fr/search?query=Season+Marais,Deliveroo: HTTP 404
+Season Paris,season-paris,,missing,,https://deliveroo.fr/fr/search?query=Season+Paris,broken,https://deliveroo.fr/fr/search?query=Season+Paris,Deliveroo: HTTP 404
+Sencha Atelier,sencha-atelier,,missing,,https://deliveroo.fr/fr/search?query=Sencha+Atelier,broken,https://deliveroo.fr/fr/search?query=Sencha+Atelier,Deliveroo: HTTP 404
+Sève Cuisine Végétale,seve-cuisine-vegetale,,missing,,https://deliveroo.fr/fr/search?query=Seve+Cuisine+Vegetale,broken,https://deliveroo.fr/fr/search?query=Seve+Cuisine+Vegetale,Deliveroo: HTTP 404
+Sherlin Halal,sherlin-halal,,missing,,https://deliveroo.fr/fr/search?query=Sherlin+Halal,broken,https://deliveroo.fr/fr/search?query=Sherlin+Halal,Deliveroo: HTTP 404
+Smoothie Bowl Bar,smoothie-bowl-bar,,missing,,https://deliveroo.fr/fr/search?query=Smoothie+Bowl+Bar,broken,https://deliveroo.fr/fr/search?query=Smoothie+Bowl+Bar,Deliveroo: HTTP 404
+Smoothie Story,smoothie-story,,missing,,https://deliveroo.fr/fr/search?query=Smoothie+Story,broken,https://deliveroo.fr/fr/search?query=Smoothie+Story,Deliveroo: HTTP 404
+So Nat,so-nat,,missing,,https://deliveroo.fr/fr/search?query=So+Nat,broken,https://deliveroo.fr/fr/search?query=So+Nat,Deliveroo: HTTP 404
+Soft Lunch Paris,soft-lunch-paris,,missing,,https://deliveroo.fr/fr/search?query=Soft+Lunch+Paris,broken,https://deliveroo.fr/fr/search?query=Soft+Lunch+Paris,Deliveroo: HTTP 404
+Sol Semilla,sol-semilla,,missing,,https://deliveroo.fr/fr/search?query=Sol+Semilla,broken,https://deliveroo.fr/fr/search?query=Sol+Semilla,Deliveroo: HTTP 404
+Sol Semilla Marais,sol-semilla-marais,,missing,,https://deliveroo.fr/fr/search?query=Sol+Semilla+Marais,broken,https://deliveroo.fr/fr/search?query=Sol+Semilla+Marais,Deliveroo: HTTP 404
+Soul Kitchen,soul-kitchen,,missing,,https://deliveroo.fr/fr/search?query=Soul+Kitchen,broken,https://deliveroo.fr/fr/search?query=Soul+Kitchen,Deliveroo: HTTP 404
+Spirit Bowl,spirit-bowl,,missing,,https://deliveroo.fr/fr/search?query=Spirit+Bowl,broken,https://deliveroo.fr/fr/search?query=Spirit+Bowl,Deliveroo: HTTP 404
+Steel Cyclewear,steel-cyclewear,,missing,,https://deliveroo.fr/fr/search?query=Steel+Cyclewear,broken,https://deliveroo.fr/fr/search?query=Steel+Cyclewear,Deliveroo: HTTP 404
+Strada Café,strada-cafe,,missing,,https://deliveroo.fr/fr/search?query=Strada+Cafe,broken,https://deliveroo.fr/fr/search?query=Strada+Cafe,Deliveroo: HTTP 404
+Strength Bowl,strength-bowl,,missing,,https://deliveroo.fr/fr/search?query=Strength+Bowl,broken,https://deliveroo.fr/fr/search?query=Strength+Bowl,Deliveroo: HTTP 404
+Substance Café,substance-cafe,,missing,,https://deliveroo.fr/fr/search?query=Substance+Cafe,broken,https://deliveroo.fr/fr/search?query=Substance+Cafe,Deliveroo: HTTP 404
+Sun Juice Café,sun-juice-cafe,,missing,,https://deliveroo.fr/fr/search?query=Sun+Juice+Cafe,broken,https://deliveroo.fr/fr/search?query=Sun+Juice+Cafe,Deliveroo: HTTP 404
+Sun Poke Paris,sun-poke-paris,,missing,,https://deliveroo.fr/fr/search?query=Sun+Poke+Paris,broken,https://deliveroo.fr/fr/search?query=Sun+Poke+Paris,Deliveroo: HTTP 404
+Sunset Poke,sunset-poke,,missing,,https://deliveroo.fr/fr/search?query=Sunset+Poke,broken,https://deliveroo.fr/fr/search?query=Sunset+Poke,Deliveroo: HTTP 404
+Surf Bowl Paris,surf-bowl-paris,,missing,,https://deliveroo.fr/fr/search?query=Surf+Bowl+Paris,broken,https://deliveroo.fr/fr/search?query=Surf+Bowl+Paris,Deliveroo: HTTP 404
+Sweetch Bastille,sweetch-bastille,,missing,,https://deliveroo.fr/fr/search?query=Sweetch+Bastille,broken,https://deliveroo.fr/fr/search?query=Sweetch+Bastille,Deliveroo: HTTP 404
+Sweetch Marais,sweetch-marais,,missing,,https://deliveroo.fr/fr/search?query=Sweetch+Marais,broken,https://deliveroo.fr/fr/search?query=Sweetch+Marais,Deliveroo: HTTP 404
+Sweetch Paris,sweetch-paris,,missing,,https://deliveroo.fr/fr/search?query=Sweetch+Paris,broken,https://deliveroo.fr/fr/search?query=Sweetch+Paris,Deliveroo: HTTP 404
+Sweetgreen Châtelet,sweetgreen-chatelet,,missing,,https://deliveroo.fr/fr/search?query=Sweetgreen+Chatelet,broken,https://deliveroo.fr/fr/search?query=Sweetgreen+Chatelet,Deliveroo: HTTP 404
+Sweetgreen Marais,sweetgreen-marais,,missing,,https://deliveroo.fr/fr/search?query=Sweetgreen+Marais,broken,https://deliveroo.fr/fr/search?query=Sweetgreen+Marais,Deliveroo: HTTP 404
+Sweetgreen Saint-Germain,sweetgreen-saint-germain,,missing,,https://deliveroo.fr/fr/search?query=Sweetgreen+Saint-Germain,broken,https://deliveroo.fr/fr/search?query=Sweetgreen+Saint-Germain,Deliveroo: HTTP 404
+Tekés,tekes-paris,,missing,,https://deliveroo.fr/fr/search?query=Tek%C3%A9s,broken,https://deliveroo.fr/fr/search?query=Tek%C3%A9s,Deliveroo: HTTP 404
+Telescope Café,telescope-cafe,,missing,,https://deliveroo.fr/fr/search?query=Telescope+Cafe,broken,https://deliveroo.fr/fr/search?query=Telescope+Cafe,Deliveroo: HTTP 404
+Ten Belles Bread,ten-belles-bread,,missing,,https://deliveroo.fr/fr/search?query=Ten+Belles+Bread,broken,https://deliveroo.fr/fr/search?query=Ten+Belles+Bread,Deliveroo: HTTP 404
+The Protein Lab,the-protein-lab,,missing,,https://deliveroo.fr/fr/search?query=The+Protein+Lab,broken,https://deliveroo.fr/fr/search?query=The+Protein+Lab,Deliveroo: HTTP 404
+Tien Hiang,tien-hiang,,missing,,https://deliveroo.fr/fr/search?query=Tien+Hiang,broken,https://deliveroo.fr/fr/search?query=Tien+Hiang,Deliveroo: HTTP 404
+Tomo Pâtisserie,tomo-patisserie,,missing,,https://deliveroo.fr/fr/search?query=Tomo+Patisserie,broken,https://deliveroo.fr/fr/search?query=Tomo+Patisserie,Deliveroo: HTTP 404
+Toraya Paris,toraya-paris,,missing,,https://deliveroo.fr/fr/search?query=Toraya+Paris,broken,https://deliveroo.fr/fr/search?query=Toraya+Paris,Deliveroo: HTTP 404
+Toss Salad Paris,toss-salad-paris,,missing,,https://deliveroo.fr/fr/search?query=Toss+Salad+Paris,broken,https://deliveroo.fr/fr/search?query=Toss+Salad+Paris,Deliveroo: HTTP 404
+Train Eat Paris,train-eat-paris,,missing,,https://deliveroo.fr/fr/search?query=Train+Eat+Paris,broken,https://deliveroo.fr/fr/search?query=Train+Eat+Paris,Deliveroo: HTTP 404
+Treize Café,treize-cafe,,missing,,https://deliveroo.fr/fr/search?query=Treize+Cafe,broken,https://deliveroo.fr/fr/search?query=Treize+Cafe,Deliveroo: HTTP 404
+Tribu Bowl,tribu-bowl,,missing,,https://deliveroo.fr/fr/search?query=Tribu+Bowl,broken,https://deliveroo.fr/fr/search?query=Tribu+Bowl,Deliveroo: HTTP 404
+Tropical Bowl,tropical-bowl,,missing,,https://deliveroo.fr/fr/search?query=Tropical+Bowl,broken,https://deliveroo.fr/fr/search?query=Tropical+Bowl,Deliveroo: HTTP 404
+Tunafish Paris,tunafish-paris,,missing,,https://deliveroo.fr/fr/search?query=Tunafish+Paris,broken,https://deliveroo.fr/fr/search?query=Tunafish+Paris,Deliveroo: HTTP 404
+Umami Matcha Café,umami-matcha-cafe,,missing,,https://deliveroo.fr/fr/search?query=Umami+Matcha+Cafe,broken,https://deliveroo.fr/fr/search?query=Umami+Matcha+Cafe,Deliveroo: HTTP 404
+Veggie Patch,veggie-patch,,missing,,https://deliveroo.fr/fr/search?query=Veggie+Patch,broken,https://deliveroo.fr/fr/search?query=Veggie+Patch,Deliveroo: HTTP 404
+Verdura Vegan,verdura-vegan,,missing,,https://deliveroo.fr/fr/search?query=Verdura+Vegan,broken,https://deliveroo.fr/fr/search?query=Verdura+Vegan,Deliveroo: HTTP 404
+Verdure Paris,verdure-paris,,missing,,https://deliveroo.fr/fr/search?query=Verdure+Paris,broken,https://deliveroo.fr/fr/search?query=Verdure+Paris,Deliveroo: HTTP 404
+Vert Box,vert-box,,missing,,https://deliveroo.fr/fr/search?query=Vert+Box,broken,https://deliveroo.fr/fr/search?query=Vert+Box,Deliveroo: HTTP 404
+Vert Cantine,vert-cantine,,missing,,https://deliveroo.fr/fr/search?query=Vert+Cantine,broken,https://deliveroo.fr/fr/search?query=Vert+Cantine,Deliveroo: HTTP 404
+VG Pâtisserie,vg-patisserie,,missing,,https://deliveroo.fr/fr/search?query=VG+Patisserie,broken,https://deliveroo.fr/fr/search?query=VG+Patisserie,Deliveroo: HTTP 404
+Vibrant Juice,vibrant-juice,,missing,,https://deliveroo.fr/fr/search?query=Vibrant+Juice,broken,https://deliveroo.fr/fr/search?query=Vibrant+Juice,Deliveroo: HTTP 404
+Vital Juicery,vital-juicery,,missing,,https://deliveroo.fr/fr/search?query=Vital+Juicery,broken,https://deliveroo.fr/fr/search?query=Vital+Juicery,Deliveroo: HTTP 404
+Vital Lunch,vital-lunch,,missing,,https://deliveroo.fr/fr/search?query=Vital+Lunch,broken,https://deliveroo.fr/fr/search?query=Vital+Lunch,Deliveroo: HTTP 404
+Volcano Poke,volcano-poke,,missing,,https://deliveroo.fr/fr/search?query=Volcano+Poke,broken,https://deliveroo.fr/fr/search?query=Volcano+Poke,Deliveroo: HTTP 404
+Wave Poke Marais,wave-poke-marais,,missing,,https://deliveroo.fr/fr/search?query=Wave+Poke+Marais,broken,https://deliveroo.fr/fr/search?query=Wave+Poke+Marais,Deliveroo: HTTP 404
+Wholesome Café,wholesome-cafe,,missing,,https://deliveroo.fr/fr/search?query=Wholesome+Cafe,broken,https://deliveroo.fr/fr/search?query=Wholesome+Cafe,Deliveroo: HTTP 404
+Wild & The Moon,wild-the-moon-9abaee56,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Wild & The Moon,wild-and-the-moon-paris,,missing,,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon,broken,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon,Deliveroo: HTTP 404
+Wild & The Moon,wild-the-moon-efb0e77b,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Wild & The Moon,wild-the-moon-be6c8870,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Wild & The Moon,wild-the-moon-a9a9bb8f,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Wild & The Moon,wild-the-moon-7fda18a4,https://ubereats.com,placeholder,https://ubereats.com,https://deliveroo.fr,placeholder,https://deliveroo.fr,Uber: root_homepage_only | Deliveroo: root_homepage_only
+Wild & The Moon Madeleine,wild-and-the-moon-madeleine,,missing,,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Madeleine,broken,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Madeleine,Deliveroo: HTTP 404
+Wild & The Moon Marais,wild-and-the-moon-marais,,missing,,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Marais,broken,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Marais,Deliveroo: HTTP 404
+Wild & The Moon Saint-Lazare,wild-and-the-moon-saint-lazare,,missing,,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Saint-Lazare,broken,https://deliveroo.fr/fr/search?query=Wild+%26+The+Moon+Saint-Lazare,Deliveroo: HTTP 404
+Workout Foods,workout-foods,,missing,,https://deliveroo.fr/fr/search?query=Workout+Foods,broken,https://deliveroo.fr/fr/search?query=Workout+Foods,Deliveroo: HTTP 404
+Yantra Bowl,yantra-bowl,,missing,,https://deliveroo.fr/fr/search?query=Yantra+Bowl,broken,https://deliveroo.fr/fr/search?query=Yantra+Bowl,Deliveroo: HTTP 404
+Yoji Matcha Bar,yoji-matcha-bar,,missing,,https://deliveroo.fr/fr/search?query=Yoji+Matcha+Bar,broken,https://deliveroo.fr/fr/search?query=Yoji+Matcha+Bar,Deliveroo: HTTP 404
+Yuman,yuman,,missing,,https://deliveroo.fr/fr/search?query=Yuman,broken,https://deliveroo.fr/fr/search?query=Yuman,Deliveroo: HTTP 404
+Yumi Lunch,yumi-lunch,,missing,,https://deliveroo.fr/fr/search?query=Yumi+Lunch,broken,https://deliveroo.fr/fr/search?query=Yumi+Lunch,Deliveroo: HTTP 404
+Zenith Bowl,zenith-bowl,,missing,,https://deliveroo.fr/fr/search?query=Zenith+Bowl,broken,https://deliveroo.fr/fr/search?query=Zenith+Bowl,Deliveroo: HTTP 404

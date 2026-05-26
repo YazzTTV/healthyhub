@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import RestaurantImageBadge from "@/components/RestaurantImageBadge";
+import RestaurantImagePlaceholder from "@/components/RestaurantImagePlaceholder";
 import {
-  getRestaurantImage,
-  getRestaurantImageFromPool,
-  RESTAURANT_IMAGE_ULTIMATE_FALLBACK,
+  getTrustedRestaurantImage,
   type RestaurantImageSource,
 } from "@/lib/restaurant-images";
 
@@ -13,57 +14,71 @@ type Props = {
   className?: string;
   alt: string;
   loading?: "lazy" | "eager";
+  sizes?: string;
+  /** Masque le badge de confiance (ex. vignettes très petites). */
+  hideBadge?: boolean;
 };
 
+const imgDeps = (r: RestaurantImageSource) => [
+  r.id,
+  r.image_url,
+  r.image_status,
+  r.image_source_note,
+  r.image_source_url,
+];
+
+const DEFAULT_SIZES = "(max-width: 768px) 100vw, 33vw";
+
 /**
- * Affiche l’image restaurant (URL base si crédible, sinon pool Unsplash).
- * En cas d’échec de chargement, enchaîne pool puis image de secours fixe.
+ * Affiche l’image restaurant selon image_status (sources vérifiées uniquement).
+ * Placeholder neutre si manquante ; badge de confiance si applicable.
  */
 export default function RestaurantImage({
   restaurant,
-  className,
+  className = "object-cover",
   alt,
   loading = "lazy",
+  sizes = DEFAULT_SIZES,
+  hideBadge = false,
 }: Props) {
-  const candidates = useMemo(() => {
-    const primary = getRestaurantImage(restaurant);
-    const pool = getRestaurantImageFromPool(restaurant);
-    const u = RESTAURANT_IMAGE_ULTIMATE_FALLBACK;
-    return [...new Set([primary, pool, u])];
-  }, [
-    restaurant.id,
-    restaurant.image_url,
-    restaurant.slug,
-    restaurant.name,
-    restaurant.category,
-  ]);
+  const trusted = useMemo(
+    () => getTrustedRestaurantImage(restaurant),
+    imgDeps(restaurant)
+  );
 
-  const [idx, setIdx] = useState(0);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
-    setIdx(0);
-  }, [
-    restaurant.id,
-    restaurant.image_url,
-    restaurant.slug,
-    restaurant.name,
-    restaurant.category,
-  ]);
+    setLoadFailed(false);
+  }, imgDeps(restaurant));
 
-  const src =
-    candidates[Math.min(idx, candidates.length - 1)] ??
-    RESTAURANT_IMAGE_ULTIMATE_FALLBACK;
+  const showImage =
+    trusted.mode === "image" && trusted.src && !loadFailed;
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={alt}
-      className={className}
-      loading={loading}
-      onError={() => {
-        setIdx((i) => (i < candidates.length - 1 ? i + 1 : i));
-      }}
-    />
+    <div className="relative h-full w-full">
+      {showImage ? (
+        <Image
+          src={trusted.src!}
+          alt={alt}
+          fill
+          sizes={sizes}
+          loading={loading}
+          className={className}
+          onError={() => setLoadFailed(true)}
+        />
+      ) : (
+        <RestaurantImagePlaceholder name={alt} className={className} />
+      )}
+      {showImage &&
+      !hideBadge &&
+      trusted.badgeLabel &&
+      trusted.badgeTone ? (
+        <RestaurantImageBadge
+          label={trusted.badgeLabel}
+          tone={trusted.badgeTone}
+        />
+      ) : null}
+    </div>
   );
 }

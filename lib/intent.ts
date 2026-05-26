@@ -1,4 +1,9 @@
 import { displayHealthyScore } from "@/lib/healthy-score";
+import {
+  effectiveCalorieBand,
+  effectiveCleanBand,
+  effectiveProteinBand,
+} from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
 import { getRestaurantBrandProfile } from "@/lib/restaurant-branding";
 
@@ -333,9 +338,9 @@ export function normalizeRestaurantNutritionProfile(
 function resolveNutritionProfile(restaurant: RestaurantListItem): NutritionProfile {
   const inferred = getCategoryProfile(restaurant);
   return {
-    proteinLevel: restaurant.protein_level ?? inferred.proteinLevel,
-    calorieLevel: restaurant.calorie_level ?? inferred.calorieLevel,
-    cleanLevel: restaurant.clean_level ?? inferred.cleanLevel,
+    proteinLevel: effectiveProteinBand(restaurant) ?? inferred.proteinLevel,
+    calorieLevel: effectiveCalorieBand(restaurant) ?? inferred.calorieLevel,
+    cleanLevel: effectiveCleanBand(restaurant) ?? inferred.cleanLevel,
   };
 }
 
@@ -358,6 +363,8 @@ export function getRestaurantIntentScore(
 
   if (intent === "FOCUS_PRODUCTIVITY") {
     let score = scoreBase;
+    if (restaurant.focus_productivity_fit === true) score += 24;
+    if (restaurant.breakfast_fit === true) score += 8;
     if (nutrition.cleanLevel === "high") score += 20;
     if (nutrition.calorieLevel !== "high") score += 18;
     if (hasAnyCategory(restaurant, ["salad", "salade", "poke", "vegan", "organic", "bowl"])) score += 14;
@@ -367,6 +374,7 @@ export function getRestaurantIntentScore(
 
   if (intent === "MUSCLE_RECOVERY") {
     let score = scoreBase;
+    if (restaurant.muscle_recovery_fit === true) score += 26;
     if (nutrition.proteinLevel === "high") score += 24;
     if (nutrition.calorieLevel !== "low") score += 8;
     if (hasAnyCategory(restaurant, ["protein", "poke", "bowl", "grill", "poulet"])) score += 14;
@@ -376,6 +384,7 @@ export function getRestaurantIntentScore(
 
   if (intent === "LEAN_LIGHT") {
     let score = scoreBase;
+    if (restaurant.lunch_light_fit === true) score += 22;
     if (nutrition.calorieLevel !== "high") score += 20;
     if (nutrition.cleanLevel === "high") score += 16;
     if (hasAnyCategory(restaurant, ["salad", "salade", "vegan", "poke", "organic"])) score += 12;
@@ -384,6 +393,8 @@ export function getRestaurantIntentScore(
 
   if (intent === "CLEAN_RESET") {
     let score = scoreBase;
+    if (restaurant.vegan_friendly === true) score += 10;
+    if (restaurant.gluten_free_possible === true) score += 6;
     if (nutrition.cleanLevel === "high") score += 24;
     if (healthy >= 4) score += 16;
     if (hasAnyCategory(restaurant, ["vegan", "organic", "salad", "salade", "poke", "bowl"])) score += 12;
@@ -391,6 +402,7 @@ export function getRestaurantIntentScore(
   }
 
   let score = scoreBase;
+  if (restaurant.pleasure_without_cracking_fit === true) score += 22;
   if (healthy >= 3) score += 16;
   if (hasAnyCategory(restaurant, ["brunch", "burger", "poke", "bowl", "protein"])) score += 14;
   if (nutrition.cleanLevel !== "low") score += 8;
@@ -410,6 +422,9 @@ export function getRecommendedDishForIntent(
   restaurant: RestaurantListItem,
   intent: IntentMode
 ) {
+  const sig = restaurant.signature_dish_name?.trim();
+  if (sig) return sig;
+
   const profile = getRestaurantBrandProfile(restaurant);
   const brandPool = BRAND_DISH_POOL_BY_INTENT[profile]?.[intent];
   const pool = brandPool && brandPool.length > 0 ? brandPool : DISH_POOL_BY_INTENT[intent];
@@ -422,6 +437,11 @@ export function getIntentReason(
   restaurant: RestaurantListItem,
   intent: IntentMode
 ) {
+  const why = restaurant.why_this_score?.trim();
+  if (why) {
+    return why.length > 160 ? `${why.slice(0, 157)}…` : why;
+  }
+
   const nutrition = resolveNutritionProfile(restaurant);
   if (intent === "FOCUS_PRODUCTIVITY") {
     if (nutrition.cleanLevel === "high" && nutrition.calorieLevel !== "high") {

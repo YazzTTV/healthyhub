@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import TrackedRestaurantNavLink from "@/components/analytics/TrackedRestaurantNavLink";
+import RestaurantImage from "@/components/RestaurantImage";
 import { useEffect, useState } from "react";
+import { recentlyViewedEntryToAnalytics } from "@/lib/analytics";
 import { getRecentlyViewed, type ViewedEntry } from "@/lib/recently-viewed";
 
 export default function RecentlyViewed() {
@@ -29,24 +31,26 @@ export default function RecentlyViewed() {
       </div>
       <div className="scrollbar-none flex gap-3 overflow-x-auto pb-2">
         {list.map((entry) => (
-          <Link
+          <TrackedRestaurantNavLink
             key={entry.id}
             href={`/restaurants/${entry.id}`}
+            restaurant={recentlyViewedEntryToAnalytics(entry)}
+            placement="recently_viewed"
             className="group relative flex w-[220px] shrink-0 flex-col overflow-hidden rounded-[20px] bg-white shadow-soft ring-1 ring-ink/[0.06] transition hover:-translate-y-0.5 hover:shadow-elevated"
           >
             <div className="relative aspect-[5/3] w-full overflow-hidden bg-brand-light">
-              {entry.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={entry.image_url}
-                  alt={entry.name}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-3xl">
-                  🥗
-                </div>
-              )}
+              <RestaurantImage
+                restaurant={{
+                  id: entry.id,
+                  name: entry.name,
+                  slug: null,
+                  image_url: entry.image_url,
+                  image_status: entry.image_status,
+                }}
+                alt={entry.name}
+                hideBadge
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+              />
             </div>
             <div className="space-y-1 p-3">
               <p className="truncate text-[13.5px] font-semibold tracking-tight text-ink">
@@ -56,7 +60,7 @@ export default function RecentlyViewed() {
                 {[entry.category, entry.city].filter(Boolean).join(" · ")}
               </p>
             </div>
-          </Link>
+          </TrackedRestaurantNavLink>
         ))}
       </div>
     </section>

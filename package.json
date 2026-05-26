@@ -3,12 +3,14 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
-    "dev:clean": "rm -rf .next && next dev -p 3000",
+    "dev": "WATCHPACK_POLLING=true next dev -p 3000",
+    "dev:clean": "rm -rf .next && WATCHPACK_POLLING=true next dev -p 3000",
+    "dev:fresh": "sh -c 'ulimit -n 16384 2>/dev/null || true; rm -rf .next && exec env WATCHPACK_POLLING=true next dev -p 3000'",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "check:links": "tsx scripts/check-restaurant-links.ts",
+    "verify:order-links": "tsx scripts/verify-order-links.ts",
     "check:images": "tsx scripts/check-restaurant-images.ts"
   },
   "dependencies": {

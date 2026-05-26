@@ -63,3 +63,18 @@ values
     'https://www.ubereats.com/',
     null
   );
+
+-- ---------------------------------------------------------------------------
+-- Schéma enrichi (référence) — colonnes utilisées par l’app Next.js.
+-- À appliquer / migrer selon ton projet Supabase réel.
+-- Voir `lib/restaurant-select.ts` pour la liste exacte des `select`.
+--
+-- Exemples : arrondissement, postal_code, full_address, google_maps_url,
+-- google_rating, google_review_count, verified_by_healthyhub,
+-- healthyhub_editor_note, why_this_score, calorie_density,
+-- vegan_friendly, gluten_free_possible, breakfast_fit, lunch_light_fit,
+-- muscle_recovery_fit, focus_productivity_fit, pleasure_without_cracking_fit,
+-- signature_dish_*, takeaway_possible, dine_in_possible, delivery_possible,
+-- delivery_status (ex. VALID_EXACT, VALID_CHAIN_LOCATION_UNCLEAR),
+-- public_email, instagram_url, phone
+-- ---------------------------------------------------------------------------
