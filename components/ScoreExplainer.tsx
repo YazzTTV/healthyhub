@@ -1,75 +1,12 @@
 import Link from "next/link";
-import {
-  getHealthyScoreExplainer,
-  type HealthyScoreExplainerParts,
-} from "@/lib/healthy-score";
+import { getHealthyScoreExplainer } from "@/lib/healthy-score";
 import type { Restaurant, RestaurantListItem } from "@/lib/types";
 
-function fallbackFromScoreOnly(score: number): Omit<
-  HealthyScoreExplainerParts,
-  "score"
-> {
-  if (score >= 4.65) {
-    return {
-      tierLabel: "Référence",
-      tierLine:
-        "Carte très alignée « healthy » : ingrédients frais, peu transformés.",
-      contextLine:
-        "Sans le détail du lieu, on s’appuie sur la valeur du score affiché.",
-    };
-  }
-  if (score >= 4.25) {
-    return {
-      tierLabel: "Très solide",
-      tierLine: "Bonne cohérence pour un repas équilibré au quotidien.",
-      contextLine:
-        "Sans le détail du lieu, on s’appuie sur la valeur du score affiché.",
-    };
-  }
-  if (score >= 3.85) {
-    return {
-      tierLabel: "Bon choix",
-      tierLine:
-        "Option fiable selon ce que tu commandes (sauces, portions, toppings).",
-      contextLine:
-        "Sans le détail du lieu, on s’appuie sur la valeur du score affiché.",
-    };
-  }
-  if (score >= 3.45) {
-    return {
-      tierLabel: "Correct",
-      tierLine:
-        "Encore dans une logique healthy, avec un peu plus de marge sur le confort.",
-      contextLine:
-        "Sans le détail du lieu, on s’appuie sur la valeur du score affiché.",
-    };
-  }
-  return {
-    tierLabel: "Comfort healthy",
-    tierLine:
-      "Profil plus gourmand ou plus dense — idéal occasionnel si tu restes attentif.",
-    contextLine:
-      "Sans le détail du lieu, on s’appuie sur la valeur du score affiché.",
-  };
-}
+type Props = { restaurant: Restaurant | RestaurantListItem };
 
-type Props =
-  | { restaurant: Restaurant | RestaurantListItem; score?: never }
-  | { score: number | null; restaurant?: never };
-
-export default function ScoreExplainer(props: Props) {
-  let parts: HealthyScoreExplainerParts | null = null;
-
-  if ("restaurant" in props && props.restaurant) {
-    parts = getHealthyScoreExplainer(props.restaurant);
-  } else if ("score" in props && props.score != null) {
-    const score = props.score;
-    parts = { score, ...fallbackFromScoreOnly(score) };
-  }
-
-  if (!parts) return null;
-
-  const { score, tierLabel, tierLine, contextLine } = parts;
+export default function ScoreExplainer({ restaurant }: Props) {
+  const parts = getHealthyScoreExplainer(restaurant);
+  const { score, tierLine, contextLine } = parts;
 
   return (
     <details className="group rounded-[16px] bg-white p-4 ring-1 ring-ink/[0.06]">
@@ -95,16 +32,18 @@ export default function ScoreExplainer(props: Props) {
       </summary>
 
       <div className="mt-3 space-y-3 text-[13px] leading-relaxed text-ink-soft">
-        <p>
-          <span className="font-semibold text-brand-deep">{tierLabel} · </span>
-          {tierLine}
-        </p>
-        <p>{contextLine}</p>
+        <p>{tierLine}</p>
+        {contextLine ? <p>{contextLine}</p> : null}
         <p>
           On note chaque adresse sur 5 critères : fraîcheur &amp; sourcing,
           équilibre nutritionnel, transparence du menu, cohérence du
           positionnement, retours terrain.
         </p>
+        {parts.isInferred ? (
+          <p className="text-[11.5px] text-ink/45">
+            Score estimé par HealthyHub sur le profil du lieu — mis à jour à chaque visite terrain.
+          </p>
+        ) : null}
         <Link
           href="/about"
           className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-dark hover:text-brand"

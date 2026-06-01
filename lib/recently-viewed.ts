@@ -7,6 +7,8 @@ export type ViewedEntry = {
   id: string;
   name: string;
   image_url: string | null;
+  signature_dish_name?: string | null;
+  signature_dish_image_url?: string | null;
   image_status?: string | null;
   category: string | null;
   city: string | null;

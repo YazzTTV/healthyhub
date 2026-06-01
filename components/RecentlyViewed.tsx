@@ -5,6 +5,7 @@ import RestaurantImage from "@/components/RestaurantImage";
 import { useEffect, useState } from "react";
 import { recentlyViewedEntryToAnalytics } from "@/lib/analytics";
 import { getRecentlyViewed, type ViewedEntry } from "@/lib/recently-viewed";
+import { getSignatureDishName } from "@/lib/signature-dish";
 
 export default function RecentlyViewed() {
   const [list, setList] = useState<ViewedEntry[]>([]);
@@ -44,12 +45,18 @@ export default function RecentlyViewed() {
                   id: entry.id,
                   name: entry.name,
                   slug: null,
+                  category: entry.category,
                   image_url: entry.image_url,
                   image_status: entry.image_status,
+                  signature_dish_name: entry.signature_dish_name ?? null,
+                  signature_dish_image_url:
+                    entry.signature_dish_image_url ?? null,
                 }}
                 alt={entry.name}
-                hideBadge
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                dishName={getSignatureDishName({
+                  signature_dish_name: entry.signature_dish_name ?? null,
+                })}
               />
             </div>
             <div className="space-y-1 p-3">

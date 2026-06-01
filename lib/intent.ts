@@ -5,7 +5,6 @@ import {
   effectiveProteinBand,
 } from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
-import { getRestaurantBrandProfile } from "@/lib/restaurant-branding";
 
 type NutritionLevel = "low" | "medium" | "high";
 
@@ -60,180 +59,6 @@ const LEVEL_VALUE: Record<NutritionLevel, number> = {
   low: 1,
   medium: 2,
   high: 3,
-};
-
-const DISH_POOL_BY_INTENT: Record<IntentMode, string[]> = {
-  FOCUS_PRODUCTIVITY: [
-    "Poke saumon avocat, edamame & riz vinaigre",
-    "Salade quinoa, poulet grille & legumes croquants",
-    "Buddha bowl tofu, legumes rotis & sauce tahini",
-  ],
-  MUSCLE_RECOVERY: [
-    "Bowl poulet grille, riz complet & legumes verts",
-    "Poke thon, avocat & double proteine",
-    "Assiette saumon, patate douce & brocoli",
-  ],
-  LEAN_LIGHT: [
-    "Salade fraiche proteinee, avocat & sauce legere",
-    "Bowl vegan legumes croquants & quinoa",
-    "Poke light saumon, concombre & edamame",
-  ],
-  CLEAN_RESET: [
-    "Bowl vegan superfoods, patate douce & pois chiches",
-    "Salade detox quinoa, graines & legumes frais",
-    "Poke clean avocat, edamame & sauce citron vert",
-  ],
-  PLEASURE_WITHOUT_CRACKING: [
-    "Burger clean au poulet grille & patate douce",
-    "Brunch healthy avocat toast & oeufs bio",
-    "Bowl gourmand saumon, mangue & avocat",
-  ],
-};
-
-const BRAND_DISH_POOL_BY_INTENT: Record<
-  ReturnType<typeof getRestaurantBrandProfile>,
-  Partial<Record<IntentMode, string[]>>
-> = {
-  poke_chain: {
-    FOCUS_PRODUCTIVITY: [
-      "Poke saumon avocat, edamame & riz vinaigre",
-      "Poke thon sesame, concombre & wakame",
-      "Poke tofu grille, quinoa & legumes croquants",
-    ],
-    MUSCLE_RECOVERY: [
-      "Poke double proteine saumon-thon & riz complet",
-      "Poke poulet grille, avocat & edamame",
-      "Poke saumon, quinoa & mix graines",
-    ],
-    LEAN_LIGHT: [
-      "Poke light saumon, concombre, chou & sauce citron",
-      "Poke tofu, crudites & base salade",
-      "Poke crevettes, mangue & legumes verts",
-    ],
-    CLEAN_RESET: [
-      "Poke clean avocat, edamame & sauce yuzu",
-      "Poke vegan quinoa, legumes crus & algues",
-      "Poke saumon, chou kale & vinaigrette sesame light",
-    ],
-    PLEASURE_WITHOUT_CRACKING: [
-      "Poke gourmand saumon, mangue & avocat",
-      "Poke spicy thon, oignons frits legers & sesame",
-      "Poke signature mix proteins & toppings crunchy",
-    ],
-  },
-  salad_counter: {
-    FOCUS_PRODUCTIVITY: [
-      "Salade quinoa poulet, legumes croquants & graines",
-      "Salade saumon fume, avocat & concombre",
-      "Salade lentilles, feta, herbes & citron",
-    ],
-    MUSCLE_RECOVERY: [
-      "Salade proteinee poulet grille, oeuf & quinoa",
-      "Salade boeuf maigre, pois chiches & crudites",
-      "Salade thon, haricots verts & pommes de terre vapeur",
-    ],
-    LEAN_LIGHT: [
-      "Salade verte avocat, concombre & vinaigrette legere",
-      "Salade crudites, tofu grille & citron",
-      "Salade kale, edamame & graines de courge",
-    ],
-    CLEAN_RESET: [
-      "Salade detox quinoa, chou kale & legumes frais",
-      "Bowl super greens, avocat & graines",
-      "Salade vegan complete, legumes du jour & tahini",
-    ],
-    PLEASURE_WITHOUT_CRACKING: [
-      "Salade Caesar healthy poulet grille",
-      "Salade composee saumon, avocat & parmesan leger",
-      "Bowl gourmand quinoa, feta & legumes rotis",
-    ],
-  },
-  juice_bar: {
-    FOCUS_PRODUCTIVITY: [
-      "Sandwich complet dinde-avocat + jus vert",
-      "Acai bowl granola maison + cold press",
-      "Wrap poulet grille + smoothie proteine",
-    ],
-    MUSCLE_RECOVERY: [
-      "Protein shake banane-cacahuete + sandwich poulet",
-      "Wrap dinde-avocat + shot gingembre",
-      "Bowl granola grec + smoothie proteine",
-    ],
-    LEAN_LIGHT: [
-      "Jus vert detox + salad jar legere",
-      "Smoothie fruits rouges + chia pudding",
-      "Wrap veggie light + citronnade maison",
-    ],
-    CLEAN_RESET: [
-      "Cold press celery-concombre-citron + bowl fruits",
-      "Smoothie green matcha + energy balls",
-      "Jus detox curcuma + salade quinoa",
-    ],
-    PLEASURE_WITHOUT_CRACKING: [
-      "Smoothie cacao-banane + toast avocat",
-      "Acai bowl gourmand + shot ginger",
-      "Sandwich signature + jus presse minute",
-    ],
-  },
-  vegan_cafe: {
-    CLEAN_RESET: [
-      "Bowl vegan patate douce, pois chiches & tahini",
-      "Assiette legumes rotis, quinoa & houmous",
-      "Curry vegetal coco, lentilles & riz complet",
-    ],
-    LEAN_LIGHT: [
-      "Salade kale, tofu grille & sauce citron",
-      "Buddha bowl legumes verts & quinoa",
-      "Soupe legumes maison + petite salade",
-    ],
-  },
-  protein_kitchen: {
-    MUSCLE_RECOVERY: [
-      "Bowl poulet grille, riz complet & legumes verts",
-      "Assiette saumon, patate douce & brocoli",
-      "Bowl boeuf maigre, quinoa & legumes",
-    ],
-    FOCUS_PRODUCTIVITY: [
-      "Bowl dinde, quinoa & legumes de saison",
-      "Salade proteinee poulet-avocat",
-      "Assiette saumon, riz complet & crudites",
-    ],
-  },
-  clean_burger: {
-    PLEASURE_WITHOUT_CRACKING: [
-      "Burger clean poulet grille + patate douce",
-      "Burger veggie proteine + salade maison",
-      "Burger boeuf maigre + coleslaw leger",
-    ],
-    MUSCLE_RECOVERY: [
-      "Burger proteine boeuf maigre + salade",
-      "Burger poulet grille + bowl quinoa",
-      "Double steak clean + legumes grilles",
-    ],
-  },
-  brunch_cafe: {
-    FOCUS_PRODUCTIVITY: [
-      "Avocado toast, oeufs bio & salade",
-      "Granola maison, yaourt grec & fruits rouges",
-      "Omelette legumes + pain complet",
-    ],
-    PLEASURE_WITHOUT_CRACKING: [
-      "Pancakes proteines, fruits rouges & yaourt",
-      "French toast brioche complete & fruits",
-      "Brunch signature oeufs, avocado & granola",
-    ],
-  },
-  bakery_light: {},
-  coffee_light: {},
-  asian_bowl: {},
-  mediterranean_healthy: {
-    CLEAN_RESET: [
-      "Assiette mediterraneenne legumes, houmous & quinoa",
-      "Bowl falafel au four, taboule & crudites",
-      "Salade grecque proteinee & herbes fraiches",
-    ],
-  },
-  default_healthy: {},
 };
 
 export const INTENT_MODES: IntentDefinition[] = [
@@ -409,63 +234,14 @@ export function getRestaurantIntentScore(
   return score;
 }
 
-function hashString(value: string) {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-export function getRecommendedDishForIntent(
-  restaurant: RestaurantListItem,
-  intent: IntentMode
-) {
-  const sig = restaurant.signature_dish_name?.trim();
-  if (sig) return sig;
-
-  const profile = getRestaurantBrandProfile(restaurant);
-  const brandPool = BRAND_DISH_POOL_BY_INTENT[profile]?.[intent];
-  const pool = brandPool && brandPool.length > 0 ? brandPool : DISH_POOL_BY_INTENT[intent];
-  const key = restaurant.slug ?? restaurant.id ?? restaurant.name;
-  const index = hashString(`${intent}-${key}`) % pool.length;
-  return pool[index];
-}
-
+/** Texte d’intent — `why_this_score` en base uniquement (pas de phrase générée). */
 export function getIntentReason(
   restaurant: RestaurantListItem,
-  intent: IntentMode
-) {
+  _intent: IntentMode
+): string | null {
   const why = restaurant.why_this_score?.trim();
-  if (why) {
-    return why.length > 160 ? `${why.slice(0, 157)}…` : why;
-  }
-
-  const nutrition = resolveNutritionProfile(restaurant);
-  if (intent === "FOCUS_PRODUCTIVITY") {
-    if (nutrition.cleanLevel === "high" && nutrition.calorieLevel !== "high") {
-      return "Leger, clean et ideal pour rester concentre.";
-    }
-    return "Option equilibree pour garder une energie stable apres le repas.";
-  }
-
-  if (intent === "MUSCLE_RECOVERY") {
-    if (nutrition.proteinLevel === "high") {
-      return "Riche en proteines, ideal apres une seance.";
-    }
-    return "Bon compromis proteines et satiete pour recuperer efficacement.";
-  }
-
-  if (intent === "LEAN_LIGHT") {
-    return "Option plus legere pour garder le controle.";
-  }
-
-  if (intent === "CLEAN_RESET") {
-    return "Repas frais, equilibre et peu transforme.";
-  }
-
-  return "Gourmand, mais plus clean qu'un vrai craquage.";
+  if (!why) return null;
+  return why.length > 160 ? `${why.slice(0, 157)}…` : why;
 }
 
 export function getIntentTag(intent: IntentMode) {

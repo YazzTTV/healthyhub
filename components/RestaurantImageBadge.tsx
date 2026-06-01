@@ -1,29 +1,32 @@
-import type { TrustedRestaurantImageTone } from "@/lib/restaurant-images";
+import type { TrustImageTone } from "@/lib/restaurant-images";
 
 const TONE_CLASSES: Record<
-  NonNullable<TrustedRestaurantImageTone>,
+  TrustImageTone,
   string
 > = {
   verified:
-    "bg-white/95 text-brand-deep ring-1 ring-brand/15 backdrop-blur-sm",
+    "bg-white/90 text-brand-deep ring-brand/25 shadow-sm backdrop-blur-sm",
   brand:
-    "bg-white/95 text-ink-soft ring-1 ring-ink/10 backdrop-blur-sm",
+    "bg-white/90 text-ink/80 ring-ink/12 shadow-sm backdrop-blur-sm",
   indicative:
-    "bg-ink/55 text-white/95 backdrop-blur-sm",
+    "bg-white/85 text-ink/70 ring-ink/10 shadow-sm backdrop-blur-sm",
 };
 
+type Props = {
+  label: string;
+  tone: TrustImageTone;
+  className?: string;
+};
+
+/** Pastille discrète sur l’image (confiance source). */
 export default function RestaurantImageBadge({
   label,
   tone,
   className = "",
-}: {
-  label: string;
-  tone: NonNullable<TrustedRestaurantImageTone>;
-  className?: string;
-}) {
+}: Props) {
   return (
     <span
-      className={`pointer-events-none absolute bottom-2.5 left-2.5 z-[1] inline-flex max-w-[calc(100%-1.25rem)] items-center rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.02em] shadow-soft ${TONE_CLASSES[tone]} ${className}`}
+      className={`pointer-events-none absolute bottom-2 left-2 z-[1] max-w-[calc(100%-1rem)] truncate rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] ring-1 ${TONE_CLASSES[tone]} ${className}`}
     >
       {label}
     </span>

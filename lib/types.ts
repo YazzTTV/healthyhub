@@ -5,8 +5,7 @@ export type RestaurantImageStatus =
   | "VERIFIED_EXACT"
   | "VERIFIED_BRAND"
   | "PLATFORM_IMAGE"
-  | "GOOGLE_MAPS_IMAGE"
-  | "FALLBACK_GENERIC"
+  | "PREMIUM_FALLBACK"
   | "MISSING";
 
 export type Restaurant = {
@@ -15,7 +14,7 @@ export type Restaurant = {
   slug: string | null;
   description: string | null;
   image_url: string | null;
-  /** VERIFIED_EXACT, VERIFIED_BRAND, PLATFORM_IMAGE, GOOGLE_MAPS_IMAGE, FALLBACK_GENERIC, MISSING */
+  /** VERIFIED_EXACT, VERIFIED_BRAND, PLATFORM_IMAGE, PREMIUM_FALLBACK, MISSING */
   image_status?: RestaurantImageStatus | string | null;
   image_source_note?: string | null;
   image_source_url?: string | null;
@@ -63,6 +62,8 @@ export type Restaurant = {
   focus_productivity_fit?: boolean | null;
   pleasure_without_cracking_fit?: boolean | null;
   signature_dish_name?: string | null;
+  /** Photo du plat signature (repli si `image_url` absent). */
+  signature_dish_image_url?: string | null;
   signature_dish_description?: string | null;
   signature_dish_calories?: number | null;
   signature_dish_protein?: number | null;

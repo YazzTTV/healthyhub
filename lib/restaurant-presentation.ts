@@ -1,4 +1,8 @@
-import { getBestOrderLink } from "@/lib/order-links";
+import { hasOrderPlatformLinks } from "@/lib/order-links";
+import {
+  effectiveCalorieBand,
+  effectiveProteinBand,
+} from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
 
 function hasValidatedDeliveryLink(
@@ -10,19 +14,50 @@ function hasValidatedDeliveryLink(
     | "deliveroo_status"
   >
 ): boolean {
-  return getBestOrderLink(restaurant) != null;
+  return hasOrderPlatformLinks(restaurant);
 }
 
-/** Raison courte « éditoriale » pour expliquer pourquoi le spot est mis en avant */
-export function getBenefitTag(category: string | null) {
-  const normalized = (category ?? "").toLowerCase();
-  if (normalized.includes("protein")) return "Idéal post-entraînement";
-  if (normalized.includes("vegan")) return "100% végétal";
-  if (normalized.includes("salad") || normalized.includes("salade"))
-    return "Pause déj légère";
-  if (normalized.includes("poke")) return "Riche en protéines";
-  if (normalized.includes("brunch")) return "Parfait le week-end";
-  return "Spot équilibré";
+/**
+ * Tag éditorial « Idéal pour · » — hiérarchie de confiance :
+ * 1. Flags DB explicites (muscle_recovery_fit, etc.)     → fiabilité maximale
+ * 2. Colonnes nutritionnelles DB (protein_level, etc.)   → inférence fiable
+ * 3. Catégorie (derniers recours, seulement cas clairs)  → inférence raisonnable
+ * Jamais de libellé générique pour tous : mieux vaut null que "Spot équilibré".
+ */
+export function getBenefitTag(
+  restaurant: Pick<
+    RestaurantListItem,
+    | "category"
+    | "protein_level"
+    | "calorie_level"
+    | "calorie_density"
+    | "muscle_recovery_fit"
+    | "lunch_light_fit"
+    | "focus_productivity_fit"
+    | "pleasure_without_cracking_fit"
+    | "vegan_friendly"
+  >
+): string | null {
+  // Tier 1 — flags éditoriaux explicites
+  if (restaurant.muscle_recovery_fit === true) return "Idéal post-entraînement";
+  if (restaurant.lunch_light_fit === true) return "Pause déj légère";
+  if (restaurant.focus_productivity_fit === true) return "Focus & énergie";
+  if (restaurant.pleasure_without_cracking_fit === true) return "Plaisir sans craquer";
+
+  // Tier 2 — colonnes nutritionnelles DB
+  const protein = effectiveProteinBand(restaurant);
+  const cal = effectiveCalorieBand(restaurant);
+  if (protein === "high" && cal !== "high") return "Idéal post-entraînement";
+  if (cal === "low") return "Option légère";
+
+  // Tier 3 — catégorie (seulement cas non-ambigus)
+  const cat = (restaurant.category ?? "").toLowerCase();
+  if (restaurant.vegan_friendly === true || cat.includes("vegan")) return "100% végétal";
+  if (cat.includes("poke")) return "Riche en protéines";
+  if (cat.includes("salad") || cat.includes("salade")) return "Pause déj légère";
+  if (cat.includes("brunch")) return "Parfait le week-end";
+
+  return null;
 }
 
 /**

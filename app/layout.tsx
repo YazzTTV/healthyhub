@@ -39,9 +39,6 @@ export default function RootLayout({
               <Link href="/discover" className="hover:text-brand-dark">
                 La carte
               </Link>
-              <Link href="/classement" className="hover:text-brand-dark">
-                Classement
-              </Link>
               <Link href="/about" className="hover:text-brand-dark">
                 Méthodologie
               </Link>

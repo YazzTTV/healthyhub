@@ -7,7 +7,6 @@ import {
   getValidatedUberEatsUrl,
   type OrderProvider,
 } from "@/lib/order-links";
-import { isDeliveryStatusCommanderAllowed } from "@/lib/order-delivery-status";
 import { trackUserHistory } from "@/lib/user-data";
 import type { RestaurantListItem } from "@/lib/types";
 
@@ -26,7 +25,6 @@ type Props = {
     | "uber_eats_status"
     | "deliveroo_url"
     | "deliveroo_status"
-    | "delivery_status"
   >;
 };
 
@@ -37,7 +35,7 @@ export default function OrderActions({ restaurantId, restaurant }: Props) {
   const deliverooUrl = getValidatedDeliverooUrl(restaurant);
   const hasPlatforms = Boolean(uberEatsUrl || deliverooUrl);
 
-  if (!hasPlatforms || !isDeliveryStatusCommanderAllowed(restaurant.delivery_status)) {
+  if (!hasPlatforms) {
     return null;
   }
 

@@ -4,16 +4,16 @@ import Link from "next/link";
 import { useState } from "react";
 import CommanderLink from "@/components/CommanderLink";
 import RestaurantImage from "@/components/RestaurantImage";
-import VerifiedBadge from "@/components/VerifiedBadge";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import { canShowCommanderForRestaurant } from "@/lib/order-delivery-status";
-import { getBenefitTag } from "@/lib/restaurant-presentation";
-import { isVerified } from "@/lib/restaurant-credibility";
+import NutritionChipsRow from "@/components/NutritionChipsRow";
 import {
-  getPrimarySignatureMacroLine,
+  getExactMacroLine,
   getScoreGlobalDisplay,
 } from "@/lib/restaurant-card-display";
+import { getNutritionOrientationChips } from "@/lib/restaurant-credibility";
 import { getDisplayRating, getDisplayReviewCount } from "@/lib/restaurant-helpers";
+import { getSignatureDishName } from "@/lib/signature-dish";
 import type { RestaurantListItem } from "@/lib/types";
 
 type Props = {
@@ -21,8 +21,8 @@ type Props = {
   isFavorite: boolean;
   isActive: boolean;
   distanceLabel: string | null;
-  whyLine: string;
-  dishLine: string;
+  whyLine: string | null;
+  dishLine: string | null;
   onSelect: () => void;
   onToggleFavorite: () => void;
   onCardClick: () => void;
@@ -47,12 +47,13 @@ export default function DiscoverPanelCard({
     scoreGlobal != null
       ? scoreGlobal.toFixed(1)
       : displayHealthyScore(restaurant).toFixed(1);
-  const tag = getBenefitTag(restaurant.category);
-  const macroLine = getPrimarySignatureMacroLine(restaurant);
+  const exactMacroLine = getExactMacroLine(restaurant);
+  const nutritionChips = getNutritionOrientationChips(restaurant);
   const rating = getDisplayRating(restaurant);
   const reviewCount = getDisplayReviewCount(restaurant);
   const hasCommander = canShowCommanderForRestaurant(restaurant);
   const isMobile = layout === "mobile";
+  const signatureDish = getSignatureDishName(restaurant);
 
   return (
     <article
@@ -68,6 +69,7 @@ export default function DiscoverPanelCard({
             alt={restaurant.name}
             sizes="(max-width: 768px) 80px, 80px"
             className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
+            dishName={signatureDish}
           />
           <HeartButton
             active={isFavorite}
@@ -89,7 +91,7 @@ export default function DiscoverPanelCard({
           {isMobile ? (
             <>
               <p className="truncate text-[11px] text-ink-mute">
-                {[distanceLabel, tag].filter(Boolean).join(" · ")}
+                {distanceLabel ?? ""}
               </p>
               {hasCommander ? (
                 <div className="mt-1" onClick={(e) => e.stopPropagation()}>
@@ -103,19 +105,21 @@ export default function DiscoverPanelCard({
                   </CommanderLink>
                 </div>
               ) : null}
-              {macroLine ? (
+              {exactMacroLine ? (
                 <div onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() => setMacrosOpen((v) => !v)}
                     className="text-[11px] font-semibold text-brand-deep underline-offset-2 hover:underline"
                   >
-                    {macrosOpen ? "Masquer les macros" : "Macros du plat"}
+                    {macrosOpen ? "Masquer les macros" : "Macros du plat (menu)"}
                   </button>
                   {macrosOpen ? (
-                    <p className="mt-0.5 text-[11px] text-ink/75">{macroLine}</p>
+                    <p className="mt-0.5 text-[11px] text-ink/75">{exactMacroLine}</p>
                   ) : null}
                 </div>
+              ) : nutritionChips.length > 0 ? (
+                <NutritionChipsRow chips={nutritionChips} size="sm" />
               ) : null}
             </>
           ) : (
@@ -123,21 +127,15 @@ export default function DiscoverPanelCard({
               <p className="truncate text-[11px] text-ink-mute">
                 {[distanceLabel, whyLine].filter(Boolean).join(" · ")}
               </p>
-              <p className="truncate text-[11px] text-ink/70">
-                <span className="font-semibold text-brand-deep">Plat · </span>
-                {dishLine}
-              </p>
+              {dishLine ? (
+                <p className="truncate text-[11px] text-ink/70">{dishLine}</p>
+              ) : null}
               {rating != null ? (
                 <p className="text-[10.5px] text-ink/55">
                   ★ {rating.toFixed(1)}
                   {reviewCount != null && reviewCount > 0
                     ? ` (${reviewCount})`
                     : ""}
-                  {isVerified(restaurant) ? (
-                    <span className="ml-1.5 inline-flex align-middle">
-                      <VerifiedBadge />
-                    </span>
-                  ) : null}
                 </p>
               ) : null}
             </>

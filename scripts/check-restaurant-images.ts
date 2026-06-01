@@ -163,7 +163,9 @@ async function main(): Promise<void> {
   const supabase = createClient(url, key);
   const { data, error } = await supabase
     .from("restaurants")
-    .select("id, name, slug, image_url, image_status, image_source_note, image_source_url, category")
+    .select(
+      "id, name, slug, image_url, image_status, image_source_note, image_source_url, signature_dish_image_url, signature_dish_description, category"
+    )
     .order("name", { ascending: true });
 
   if (error) {

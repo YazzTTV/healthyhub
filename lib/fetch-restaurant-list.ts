@@ -80,40 +80,6 @@ export async function fetchRestaurantListRows(
   return { data: [], error: lastErr };
 }
 
-/** Top N pour /classement — essaie `score_global` puis `healthy_score`. */
-export async function fetchTopRestaurantsByScore(
-  client: SupabaseClient,
-  limit = 10
-): Promise<{ data: RestaurantListItem[]; error: string | null }> {
-  const orderColumns = ["score_global", "healthy_score"];
-  let lastErr: string | null = null;
-
-  for (const orderColumn of orderColumns) {
-    for (const select of SELECT_ATTEMPTS) {
-      const { data, error } = await client
-        .from("restaurants")
-        .select(select)
-        .order(orderColumn, { ascending: false, nullsFirst: false })
-        .limit(limit);
-      if (!error) {
-        return { data: mapRows(data as unknown[]), error: null };
-      }
-      lastErr = error.message;
-      const m = error.message.toLowerCase();
-      if (
-        !m.includes("column") &&
-        !m.includes("does not exist") &&
-        !m.includes("schema cache") &&
-        !m.includes("relationship")
-      ) {
-        return { data: [], error: lastErr };
-      }
-    }
-  }
-
-  return { data: [], error: lastErr };
-}
-
 /** Favoris / listes par ids — sans `order` imposé (ordre réappliqué côté client si besoin). */
 export async function fetchRestaurantsByIds(
   client: SupabaseClient,

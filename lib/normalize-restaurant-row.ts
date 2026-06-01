@@ -19,9 +19,16 @@ export function normalizeRestaurantRow(row: unknown): RestaurantListItem {
     }
   }
 
-  const { restaurant_scores: _rs, ...rest } = r;
+  const { restaurant_scores: _rs, signature_dish: rawDish, ...rest } = r;
+  const signature_dish_name =
+    (typeof rest.signature_dish_name === "string"
+      ? rest.signature_dish_name
+      : null) ??
+    (typeof rawDish === "string" ? rawDish : null);
+
   return {
     ...(rest as RestaurantListItem),
+    signature_dish_name: signature_dish_name?.trim() || null,
     score_global: score_global != null ? Number(score_global) : null,
   };
 }

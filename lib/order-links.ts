@@ -1,9 +1,10 @@
 import type { RestaurantListItem } from "@/lib/types";
 
-/** Statuts livraison / liens pour lesquels le CTA Commander est autorisé. */
-export const COMMANDER_ALLOWED_DELIVERY_STATUSES = new Set([
-  "VALID_EXACT",
-  "VALID_CHAIN_LOCATION_UNCLEAR",
+/** Statuts plateforme explicitement invalides (absence de statut = OK). */
+const BLOCKED_PLATFORM_STATUSES = new Set([
+  "NOT_FOUND",
+  "INVALID",
+  "SEARCH_PAGE_ONLY",
 ]);
 
 export type OrderProvider = "ubereats" | "deliveroo";
@@ -18,6 +19,12 @@ export const ORDER_PROVIDER_LABELS: Record<OrderProvider, string> = {
   deliveroo: "Deliveroo",
 };
 
+/** @deprecated Utiliser BLOCKED_PLATFORM_STATUSES — conservé pour scripts. */
+export const COMMANDER_ALLOWED_DELIVERY_STATUSES = new Set([
+  "VALID_EXACT",
+  "VALID_CHAIN_LOCATION_UNCLEAR",
+]);
+
 function parseHttpUrl(raw: string | null | undefined): URL | null {
   if (raw == null) return null;
   const trimmed = String(raw).trim();
@@ -31,17 +38,6 @@ function parseHttpUrl(raw: string | null | undefined): URL | null {
   }
 }
 
-/**
- * Uber Eats exige en pratique `…/store/{slug}/{storeId}`.
- * Les URLs `…/store/{slug}` seules renvoient la 404 « taco-bout-awkward ».
- */
-export function uberEatsPathHasStoreId(pathname: string): boolean {
-  const segs = pathname.split("/").filter(Boolean);
-  const storeIdx = segs.findIndex((s) => s.toLowerCase() === "store");
-  if (storeIdx < 0) return false;
-  return segs.length > storeIdx + 2;
-}
-
 /** Racine ou locale seule (ex. `/`, `/fr`) — pas une fiche restaurant. */
 export function isHomepageOnlyPath(pathname: string): boolean {
   const normalizedPath = pathname.replace(/\/+$/, "") || "/";
@@ -52,45 +48,64 @@ export function isHomepageOnlyPath(pathname: string): boolean {
   );
 }
 
-/** Statut plateforme autorisé pour le CTA Commander (si la colonne est renseignée). */
+/** URL de type placeholder (accueil plateforme sans restaurant). */
+export function isPlaceholderOrderUrl(url: string | null | undefined): boolean {
+  const u = parseHttpUrl(url);
+  if (!u) return true;
+  return isHomepageOnlyPath(u.pathname);
+}
+
+/**
+ * Uber Eats exige en pratique `…/store/{slug}/{storeId}` pour les liens les plus fiables.
+ * On accepte aussi les fiches `/store/{slug}` pour ne pas masquer des URLs partielles.
+ */
+export function uberEatsPathHasStoreId(pathname: string): boolean {
+  const segs = pathname.split("/").filter(Boolean);
+  const storeIdx = segs.findIndex((s) => s.toLowerCase() === "store");
+  if (storeIdx < 0) return false;
+  return segs.length > storeIdx + 2;
+}
+
+/** Statut plateforme : bloquer seulement les valeurs explicitement invalides. */
 export function isPlatformLinkStatusAllowed(
   status: string | null | undefined
 ): boolean {
   if (status == null) return true;
   const s = String(status).trim();
   if (s === "") return true;
-  return COMMANDER_ALLOWED_DELIVERY_STATUSES.has(s);
+  return !BLOCKED_PLATFORM_STATUSES.has(s);
 }
 
 /**
- * URL Uber Eats utilisable : domaine Uber Eats, chemin `/store/`, pas recherche ni accueil.
+ * URL Uber Eats utilisable : domaine Uber Eats, pas recherche ni accueil placeholder.
  */
 export function isValidUberEatsUrl(url: string | null | undefined): boolean {
+  if (isPlaceholderOrderUrl(url)) return false;
   const u = parseHttpUrl(url);
   if (!u) return false;
   const host = u.hostname.toLowerCase();
   if (!host.includes("ubereats.com") && !host.includes("uber.com")) return false;
-  if (isHomepageOnlyPath(u.pathname)) return false;
   const path = u.pathname.toLowerCase();
   if (path.includes("/search")) return false;
   if (u.searchParams.has("q")) return false;
-  if (!path.includes("/store/")) return false;
-  return uberEatsPathHasStoreId(u.pathname);
+  if (path.includes("/store")) return true;
+  return u.pathname.split("/").filter(Boolean).length >= 2;
 }
 
 /**
- * URL Deliveroo utilisable : domaine Deliveroo, chemin `/menu/`, pas recherche ni accueil.
+ * URL Deliveroo utilisable : domaine Deliveroo, pas recherche ni accueil placeholder.
  */
 export function isValidDeliverooUrl(url: string | null | undefined): boolean {
+  if (isPlaceholderOrderUrl(url)) return false;
   const u = parseHttpUrl(url);
   if (!u) return false;
   const host = u.hostname.toLowerCase();
   if (!host.includes("deliveroo")) return false;
-  if (isHomepageOnlyPath(u.pathname)) return false;
   const path = u.pathname.toLowerCase();
   if (path.includes("/search")) return false;
   if (u.searchParams.has("query")) return false;
-  return path.includes("/menu/");
+  if (path.includes("/menu")) return true;
+  return u.pathname.split("/").filter(Boolean).length >= 2;
 }
 
 export function getValidatedUberEatsUrl(
@@ -109,6 +124,21 @@ export function getValidatedDeliverooUrl(
   if (!isValidDeliverooUrl(raw)) return null;
   if (!isPlatformLinkStatusAllowed(restaurant.deliveroo_status)) return null;
   return String(raw).trim();
+}
+
+export function hasOrderPlatformLinks(
+  restaurant: Pick<
+    RestaurantListItem,
+    | "uber_eats_url"
+    | "uber_eats_status"
+    | "deliveroo_url"
+    | "deliveroo_status"
+  >
+): boolean {
+  return (
+    getValidatedUberEatsUrl(restaurant) != null ||
+    getValidatedDeliverooUrl(restaurant) != null
+  );
 }
 
 /**

@@ -16,11 +16,11 @@ import { displayHealthyScore } from "@/lib/healthy-score";
 import {
   getIntentReason,
   getIntentTag,
-  getRecommendedDishForIntent,
   getRestaurantIntentScore,
   INTENT_MODES,
   type IntentMode,
 } from "@/lib/intent";
+import { getSignatureDishName, getSpotHighlight } from "@/lib/signature-dish";
 import RestaurantImage from "@/components/RestaurantImage";
 import {
   getDisplayRating,
@@ -290,6 +290,7 @@ export default function DiscoverMap({
                       restaurant={r}
                       alt={r.name}
                       className="h-full w-full object-cover"
+                      dishName={getSignatureDishName(r, activeIntent ?? "CLEAN_RESET")}
                     />
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -318,26 +319,52 @@ export default function DiscoverMap({
                         <span className="inline-flex w-fit items-center rounded-full bg-brand-light px-2.5 py-0.5 text-[11px] font-semibold text-brand-dark">
                           {getIntentTag(activeIntent)}
                         </span>
-                        <p className="text-xs text-ink">
-                          <span className="font-semibold">Plat conseille :</span>{" "}
-                          {getRecommendedDishForIntent(r, activeIntent)}
-                        </p>
-                        <p className="text-xs text-ink/70">
-                          <span className="font-semibold text-ink">Pourquoi :</span>{" "}
-                          {getIntentReason(r, activeIntent)}
-                        </p>
+                        {(() => {
+                          const spot = getSpotHighlight(r);
+                          if (!spot) return null;
+                          return (
+                            <p className="text-xs text-ink">
+                              {spot.kind === "signature_dish" ? (
+                                <>
+                                  <span className="font-semibold">Plat phare · </span>
+                                  {spot.label}
+                                </>
+                              ) : (
+                                <span className="text-ink-soft">{spot.label}</span>
+                              )}
+                            </p>
+                          );
+                        })()}
+                        {getIntentReason(r, activeIntent) ? (
+                          <p className="text-xs text-ink/70">
+                            <span className="font-semibold text-ink">Pourquoi :</span>{" "}
+                            {getIntentReason(r, activeIntent)}
+                          </p>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="mt-1 space-y-1 text-xs text-ink/70">
-                        <p>
-                          <span className="font-semibold text-ink">Plat phare :</span>{" "}
-                          {r.signature_dish_name?.trim() ||
-                            getRecommendedDishForIntent(r, "CLEAN_RESET")}
-                        </p>
-                        <p>
-                          {r.why_this_score?.trim() ||
-                            "Repère sélectionné selon le score healthy et la catégorie."}
-                        </p>
+                        {(() => {
+                          const spot = getSpotHighlight(r);
+                          if (!spot) return null;
+                          return (
+                            <p>
+                              {spot.kind === "signature_dish" ? (
+                                <>
+                                  <span className="font-semibold text-ink">
+                                    Plat phare ·{" "}
+                                  </span>
+                                  {spot.label}
+                                </>
+                              ) : (
+                                <span className="text-ink-soft">{spot.label}</span>
+                              )}
+                            </p>
+                          );
+                        })()}
+                        {r.why_this_score?.trim() ? (
+                          <p>{r.why_this_score.trim()}</p>
+                        ) : null}
                       </div>
                     )}
 
@@ -395,7 +422,15 @@ export default function DiscoverMap({
                 }}
               >
                 <Popup>
-                  <div className="min-w-[200px] space-y-2">
+                  <div className="min-w-[220px] space-y-2">
+                    <div className="relative h-28 w-full overflow-hidden rounded-xl bg-brand-light">
+                      <RestaurantImage
+                        restaurant={r}
+                        alt={r.name}
+                        sizes="220px"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                     <p className="font-semibold">{r.name}</p>
                     <p className="text-xs text-ink/60">
                       {[r.category, r.city].filter(Boolean).join(" · ")}
@@ -416,13 +451,27 @@ export default function DiscoverMap({
                         <p className="pt-1 text-xs font-semibold text-brand-dark">
                           {getIntentTag(activeIntent)}
                         </p>
-                        <p className="text-xs">
-                          <span className="font-semibold">Plat conseille :</span>{" "}
-                          {getRecommendedDishForIntent(r, activeIntent)}
-                        </p>
-                        <p className="text-xs text-ink/70">
-                          {getIntentReason(r, activeIntent)}
-                        </p>
+                        {(() => {
+                          const spot = getSpotHighlight(r);
+                          if (!spot) return null;
+                          return (
+                            <p className="text-xs">
+                              {spot.kind === "signature_dish" ? (
+                                <>
+                                  <span className="font-semibold">Plat phare · </span>
+                                  {spot.label}
+                                </>
+                              ) : (
+                                spot.label
+                              )}
+                            </p>
+                          );
+                        })()}
+                        {getIntentReason(r, activeIntent) ? (
+                          <p className="text-xs text-ink/70">
+                            {getIntentReason(r, activeIntent)}
+                          </p>
+                        ) : null}
                       </>
                     ) : null}
                     <div className="flex border-t border-ink/10 pt-2">

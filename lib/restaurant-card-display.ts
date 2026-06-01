@@ -1,3 +1,5 @@
+import { getMenuMacros } from "@/lib/restaurant-credibility";
+import { hasSignatureDishMacros } from "@/lib/restaurant-helpers";
 import type { RestaurantListItem } from "@/lib/types";
 
 const NEW_DAYS = 7;
@@ -10,27 +12,22 @@ export function getScoreGlobalDisplay(
   return null;
 }
 
-/** Texte court pour une macro du plat signature (priorité protéines → kcal → glucides → lipides). */
+/**
+ * Résumé macro une ligne — uniquement si les 4 valeurs sont en base.
+ * Jamais de macro partielle (ex. protéines seules).
+ */
+export function getExactMacroLine(restaurant: RestaurantListItem): string | null {
+  if (!hasSignatureDishMacros(restaurant)) return null;
+  const macros = getMenuMacros(restaurant);
+  if (!macros) return null;
+  return `${macros.kcal} kcal · ${macros.protein} · ${macros.carbs} · ${macros.fat}`;
+}
+
+/** @deprecated Utiliser `getExactMacroLine` — ne plus afficher de macro partielle. */
 export function getPrimarySignatureMacroLine(
   restaurant: RestaurantListItem
 ): string | null {
-  const p = restaurant.signature_dish_protein;
-  if (p != null && Number.isFinite(Number(p))) {
-    return `${Math.round(Number(p))} g protéines`;
-  }
-  const cal = restaurant.signature_dish_calories;
-  if (cal != null && Number.isFinite(Number(cal))) {
-    return `${Math.round(Number(cal))} kcal`;
-  }
-  const c = restaurant.signature_dish_carbs;
-  if (c != null && Number.isFinite(Number(c))) {
-    return `${Math.round(Number(c))} g glucides`;
-  }
-  const f = restaurant.signature_dish_fats;
-  if (f != null && Number.isFinite(Number(f))) {
-    return `${Math.round(Number(f))} g lipides`;
-  }
-  return null;
+  return getExactMacroLine(restaurant);
 }
 
 export function isNewRestaurantThisWeek(

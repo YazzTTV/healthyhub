@@ -47,15 +47,13 @@ import DiscoverBestChoiceCard from "@/components/DiscoverBestChoiceCard";
 import DiscoverWeekStrip from "@/components/DiscoverWeekStrip";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import RestaurantImage from "@/components/RestaurantImage";
-import VerifiedBadge from "@/components/VerifiedBadge";
-import { isVerified } from "@/lib/restaurant-credibility";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import {
   getIntentReason,
-  getRecommendedDishForIntent,
   getIntentTag,
   type IntentMode,
 } from "@/lib/intent";
+import { getSpotHighlight, getSignatureDishName } from "@/lib/signature-dish";
 import {
   buildWeekSpotlights,
   getBestChoice,
@@ -784,11 +782,14 @@ export default function RestaurantMap({
       ? "bottom-[min(46vh,300px)] sm:bottom-8 lg:bottom-6"
       : "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] sm:bottom-8 lg:bottom-6";
 
-  const getHighlightedDish = (restaurant: RestaurantListItem) => {
-    const intent: IntentMode = activeGoal
-      ? mapGoalToIntent(activeGoal)
-      : "CLEAN_RESET";
-    return getRecommendedDishForIntent(restaurant, intent);
+  /** Plat réel ou concept cuisine — jamais de nom inventé. */
+  const getSpotLine = (restaurant: RestaurantListItem) => {
+    const highlight = getSpotHighlight(restaurant);
+    if (!highlight) return null;
+    if (highlight.kind === "signature_dish") {
+      return { prefix: "Plat phare · ", text: highlight.label };
+    }
+    return { prefix: "", text: highlight.label };
   };
 
   const whyOneLine = (restaurant: RestaurantListItem) =>
@@ -914,7 +915,6 @@ export default function RestaurantMap({
                       <span className="inline-flex h-5 items-center gap-0.5 rounded-full bg-brand px-1.5 text-[10.5px] font-semibold text-white">
                         ● {displayHealthyScore(restaurant).toFixed(1)}
                       </span>
-                      {isVerified(restaurant) ? <VerifiedBadge /> : null}
                     </div>
                   </div>
                 </div>
@@ -934,15 +934,26 @@ export default function RestaurantMap({
                     .join(" · ")}
                 </p>
 
-                {/* Why + Dish — 1 line each */}
-                <p className="mt-1.5 truncate text-[11.5px] leading-snug text-ink/75">
-                  <span className="font-semibold text-brand-deep">Pourquoi · </span>
-                  {whyOneLine(restaurant)}
-                </p>
-                <p className="mt-0.5 truncate text-[11.5px] leading-snug text-ink/70">
-                  <span className="font-semibold text-brand-deep">Plat · </span>
-                  {getHighlightedDish(restaurant)}
-                </p>
+                {whyOneLine(restaurant) ? (
+                  <p className="mt-1.5 truncate text-[11.5px] leading-snug text-ink/75">
+                    <span className="font-semibold text-brand-deep">Pourquoi · </span>
+                    {whyOneLine(restaurant)}
+                  </p>
+                ) : null}
+                {(() => {
+                  const spot = getSpotLine(restaurant);
+                  if (!spot) return null;
+                  return (
+                    <p className="mt-0.5 truncate text-[11.5px] leading-snug text-ink/70">
+                      {spot.prefix ? (
+                        <span className="font-semibold text-brand-deep">
+                          {spot.prefix}
+                        </span>
+                      ) : null}
+                      {spot.text}
+                    </p>
+                  );
+                })()}
 
                 {/* CTA — uniquement fiche restaurant */}
                 <div className="mt-3 flex">
@@ -1010,7 +1021,10 @@ export default function RestaurantMap({
                   distance != null ? `${distance.toFixed(1)} km` : null
                 }
                 whyLine={whyOneLine(restaurant)}
-                dishLine={getHighlightedDish(restaurant)}
+                dishLine={(() => {
+                  const spot = getSpotLine(restaurant);
+                  return spot ? `${spot.prefix}${spot.text}` : null;
+                })()}
                 onSelect={() => {
                   setActiveRestaurantId(restaurant.id);
                   if (
@@ -1105,7 +1119,10 @@ export default function RestaurantMap({
                         distance != null ? `${distance.toFixed(1)} km` : null
                       }
                       whyLine={whyOneLine(restaurant)}
-                      dishLine={getHighlightedDish(restaurant)}
+                      dishLine={(() => {
+                  const spot = getSpotLine(restaurant);
+                  return spot ? `${spot.prefix}${spot.text}` : null;
+                })()}
                       onSelect={() => {
                         setActiveRestaurantId(restaurant.id);
                         if (

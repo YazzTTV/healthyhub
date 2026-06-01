@@ -162,17 +162,22 @@ export type HealthyScoreExplainerParts = {
   tierLabel: string;
   tierLine: string;
   contextLine: string;
+  /** true quand aucun score éditorial n’est en base — score calculé par HealthyHub. */
+  isInferred: boolean;
 };
 
-/** Texte d’explication aligné sur le score effectif et le type de lieu (pas un texte unique). */
+/**
+ * Texte d’explication du score — toujours retourné (jamais null).
+ * `isInferred` indique si le score vient d’une donnée DB réelle ou est calculé.
+ */
 export function getHealthyScoreExplainer(
   restaurant: RestaurantListItem
 ): HealthyScoreExplainerParts {
   const score = getEffectiveHealthyScore(restaurant);
   const band = getScoreBandMeta(restaurant);
-
   const why = restaurant.why_this_score?.trim();
   const editor = restaurant.healthyhub_editor_note?.trim();
+  const hasEditorial = Boolean(why || editor);
 
   let tierLabel: string;
   let tierLine: string;
@@ -208,8 +213,7 @@ export function getHealthyScoreExplainer(
       "Salades et bols légers : la note reflète la fraîcheur et la facilité à rester dans un bon équilibre.",
     poke:
       "Poke / bowls assemblés : beaucoup de contrôle possible, mais sauces et toppings peuvent faire monter l’énergie.",
-    bowl:
-      "Bowls complets : équilibre selon tes choix de base et de topping.",
+    bowl: "Bowls complets : équilibre selon tes choix de base et de topping.",
     light_bowl:
       "Bols type « light » : souvent plus adaptés contrôle calories / digestion.",
     protein:
@@ -234,5 +238,11 @@ export function getHealthyScoreExplainer(
     ? editor
     : tagLines[band.tag] ?? tagLines.default;
 
-  return { score, tierLabel, tierLine, contextLine };
+  return {
+    score,
+    tierLabel,
+    tierLine,
+    contextLine,
+    isInferred: !hasEditorial,
+  };
 }

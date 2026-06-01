@@ -3,6 +3,13 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
+  /**
+   * Évite les vendor-chunks @supabase manquants en dev (erreur sur /restaurants/[id]).
+   * @see https://nextjs.org/docs/app/api-reference/next-config-js/serverComponentsExternalPackages
+   */
+  experimental: {
+    serverComponentsExternalPackages: ["@supabase/supabase-js"],
+  },
   /** Réduit les watchers fichiers (souvent utile sur macOS / EMFILE). */
   webpack: (config, { dev }) => {
     if (dev) {

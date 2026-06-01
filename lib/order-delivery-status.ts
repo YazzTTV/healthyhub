@@ -1,28 +1,22 @@
 import {
-  COMMANDER_ALLOWED_DELIVERY_STATUSES,
   getBestOrderLink,
+  hasOrderPlatformLinks,
 } from "@/lib/order-links";
 
-export { COMMANDER_ALLOWED_DELIVERY_STATUSES };
+export { COMMANDER_ALLOWED_DELIVERY_STATUSES } from "@/lib/order-links";
 
 /**
- * `true` si le statut permet d’afficher le bouton Commander (liens Uber/Deliveroo).
- * Absence de valeur en base → `true` (rétrocompatibilité avant la colonne).
+ * @deprecated Ne plus filtrer sur delivery_status — les liens plateforme suffisent.
  */
 export function isDeliveryStatusCommanderAllowed(
-  status: string | null | undefined
+  _status: string | null | undefined
 ): boolean {
-  if (status == null) return true;
-  const s = String(status).trim();
-  if (s === "") return true;
-  return COMMANDER_ALLOWED_DELIVERY_STATUSES.has(s);
+  return true;
 }
 
+/** Au moins un lien Uber Eats ou Deliveroo valide (hors placeholders). */
 export function canShowCommanderForRestaurant(
-  r: Parameters<typeof getBestOrderLink>[0] & {
-    delivery_status?: string | null;
-  }
+  r: Parameters<typeof getBestOrderLink>[0]
 ): boolean {
-  if (getBestOrderLink(r) == null) return false;
-  return isDeliveryStatusCommanderAllowed(r.delivery_status);
+  return hasOrderPlatformLinks(r);
 }

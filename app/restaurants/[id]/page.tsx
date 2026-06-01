@@ -1,147 +1,51 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { supabase } from "@/lib/supabase";
-import OrderActions from "@/components/OrderActions";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 import RestaurantDetailActions from "@/components/RestaurantDetailActions";
-import RestaurantNavigateCTA from "@/components/RestaurantNavigateCTA";
 import type { Restaurant } from "@/lib/types";
-import { getTrustedRestaurantImageForSharing } from "@/lib/restaurant-images";
+import {
+  getDistinctSignatureDishPhotoUrl,
+  getTrustedRestaurantImageForSharing,
+} from "@/lib/restaurant-images";
 import RestaurantImage from "@/components/RestaurantImage";
-import VerifiedBadge from "@/components/VerifiedBadge";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import ScoreExplainer from "@/components/ScoreExplainer";
-import RestaurantViewTracker from "@/components/RestaurantViewTracker";
 import SocialProof from "@/components/SocialProof";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import { canShowCommanderForRestaurant } from "@/lib/order-delivery-status";
 import { isVerified } from "@/lib/restaurant-credibility";
-import { getBestOrderLink } from "@/lib/order-links";
 import {
-  canShowCommanderForRestaurant,
-  isDeliveryStatusCommanderAllowed,
-} from "@/lib/order-delivery-status";
+  getRestaurantConceptLabel,
+  getSignatureDishDisplay,
+} from "@/lib/signature-dish";
 import { formatParisLocationLine } from "@/lib/restaurant-helpers";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import { fetchRestaurantByIdOrSlug } from "@/lib/fetch-restaurant-detail";
 import RestaurantShareButton from "@/components/RestaurantShareButton";
 
+/** PostHog / analytics — chargés côté client uniquement (évite erreurs vendor-chunks en SSR). */
+const RestaurantViewTracker = dynamic(
+  () => import("@/components/RestaurantViewTracker"),
+  { ssr: false }
+);
+const OrderActions = dynamic(() => import("@/components/OrderActions"), {
+  ssr: false,
+});
+const RestaurantNavigateCTA = dynamic(
+  () => import("@/components/RestaurantNavigateCTA"),
+  { ssr: false }
+);
+
 export const revalidate = 600;
 
-const FALLBACK_DETAILS: Record<string, Restaurant> = {
-  "fallback-1": {
-    id: "fallback-1",
-    slug: null,
-    name: "Green Bowl Paris",
-    description: "Bowls frais, options bio et sauces maison.",
-    image_url: null,
-    city: "Paris",
-    cuisine: "Healthy",
-    category: "Salad",
-    healthy_score: 9.1,
-    tags: ["bio", "frais"],
-    latitude: 48.8615,
-    longitude: 2.3348,
-    rating: null,
-    review_count: null,
-    website_url: null,
-    uber_eats_url: null,
-    deliveroo_url: null,
-    protein_level: "medium",
-    calorie_level: "low",
-    clean_level: "high",
-    recommended_for_weight_loss: true,
-    recommended_for_muscle_gain: false,
-    recommended_for_clean_eating: true,
-    created_at: new Date().toISOString(),
-  },
-  "fallback-2": {
-    id: "fallback-2",
-    slug: null,
-    name: "Protein Club",
-    description: "Menus riches en proteines et legumes de saison.",
-    image_url: null,
-    city: "Paris",
-    cuisine: "Healthy",
-    category: "Protein",
-    healthy_score: 8.7,
-    tags: ["high-protein"],
-    latitude: 48.8708,
-    longitude: 2.3078,
-    rating: null,
-    review_count: null,
-    website_url: null,
-    uber_eats_url: null,
-    deliveroo_url: null,
-    protein_level: "high",
-    calorie_level: "medium",
-    clean_level: "high",
-    recommended_for_weight_loss: false,
-    recommended_for_muscle_gain: true,
-    recommended_for_clean_eating: true,
-    created_at: new Date().toISOString(),
-  },
-  "fallback-3": {
-    id: "fallback-3",
-    slug: null,
-    name: "Poke Atelier",
-    description: "Poke bowls healthy avec poissons et alternatives veggie.",
-    image_url: null,
-    city: "Paris",
-    cuisine: "Healthy",
-    category: "Poke",
-    healthy_score: 8.4,
-    tags: ["omega-3"],
-    latitude: 48.8532,
-    longitude: 2.3499,
-    rating: null,
-    review_count: null,
-    website_url: null,
-    uber_eats_url: null,
-    deliveroo_url: null,
-    protein_level: "high",
-    calorie_level: "medium",
-    clean_level: "high",
-    recommended_for_weight_loss: true,
-    recommended_for_muscle_gain: true,
-    recommended_for_clean_eating: true,
-    created_at: new Date().toISOString(),
-  },
-  "fallback-4": {
-    id: "fallback-4",
-    slug: null,
-    name: "Vegan Corner",
-    description: "Plats vegan gourmands et ingredients non transformes.",
-    image_url: null,
-    city: "Paris",
-    cuisine: "Healthy",
-    category: "Vegan",
-    healthy_score: 9.4,
-    tags: ["vegan"],
-    latitude: 48.8768,
-    longitude: 2.3559,
-    rating: null,
-    review_count: null,
-    website_url: null,
-    uber_eats_url: null,
-    deliveroo_url: null,
-    protein_level: "medium",
-    calorie_level: "medium",
-    clean_level: "high",
-    recommended_for_weight_loss: true,
-    recommended_for_muscle_gain: false,
-    recommended_for_clean_eating: true,
-    created_at: new Date().toISOString(),
-  },
-};
-
 const loadRestaurantRemote = cache((idOrSlug: string) =>
-  fetchRestaurantByIdOrSlug(supabase, idOrSlug)
+  fetchRestaurantByIdOrSlug(createSupabaseServerClient(), idOrSlug)
 );
 
 async function getRestaurant(idOrSlug: string): Promise<Restaurant | null> {
-  if (idOrSlug in FALLBACK_DETAILS) {
-    return FALLBACK_DETAILS[idOrSlug];
-  }
   const row = await loadRestaurantRemote(idOrSlug);
   return row as Restaurant | null;
 }
@@ -198,21 +102,28 @@ export default async function RestaurantDetailPage({
   const restaurant = await getRestaurant(params.id);
   if (!restaurant) notFound();
 
-  const orderLink = getBestOrderLink(restaurant);
   const showCommander = canShowCommanderForRestaurant(restaurant);
+  const signatureDish = getSignatureDishDisplay(restaurant);
+  const conceptLabel = signatureDish
+    ? null
+    : getRestaurantConceptLabel(restaurant);
+  const distinctDishPhoto = getDistinctSignatureDishPhotoUrl(restaurant);
   const healthyDisplay = displayHealthyScore(restaurant);
+  const verified = isVerified(restaurant);
   const siteBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
   const shareUrl = siteBase
     ? `${siteBase}/restaurants/${restaurant.id}`
     : undefined;
 
   return (
-    <article className="space-y-10 py-4 md:py-8">
+    <article className="mx-auto w-full max-w-4xl space-y-10 py-4 md:py-8">
       <RestaurantViewTracker
         id={restaurant.id}
         name={restaurant.name}
         slug={restaurant.slug}
         image_url={restaurant.image_url}
+        signature_dish_name={restaurant.signature_dish_name}
+        signature_dish_image_url={restaurant.signature_dish_image_url}
         image_status={restaurant.image_status}
         category={restaurant.category}
         arrondissement={restaurant.arrondissement}
@@ -229,16 +140,20 @@ export default async function RestaurantDetailPage({
         Retour aux spots
       </Link>
 
-      <header className="grid gap-10 md:grid-cols-[1.1fr_1fr] md:gap-14">
-        <div className="aspect-[4/3] overflow-hidden rounded-[32px] bg-brand-light shadow-elevated ring-1 ring-ink/[0.06]">
+      <header className="grid gap-8 md:grid-cols-2 md:items-start md:gap-10">
+        <div className="relative aspect-[4/3] w-full max-w-full overflow-hidden rounded-[28px] bg-brand-light shadow-elevated ring-1 ring-ink/[0.06] md:rounded-[32px]">
           <RestaurantImage
             restaurant={restaurant}
             alt={restaurant.name}
             className="h-full w-full object-cover"
+            dishName={signatureDish?.name ?? null}
+            dishOverlayVariant="hero"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            loading="eager"
           />
         </div>
 
-        <div className="flex flex-col gap-7">
+        <div className="flex min-w-0 flex-col gap-4">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               {restaurant.city ? (
@@ -251,10 +166,10 @@ export default async function RestaurantDetailPage({
                   {restaurant.category}
                 </span>
               ) : null}
+              {verified ? <VerifiedBadge size="md" /> : null}
               <span className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold text-white">
                 ● {healthyDisplay.toFixed(1)} healthy
               </span>
-              {isVerified(restaurant) ? <VerifiedBadge size="md" /> : null}
             </div>
             <h1 className="text-[40px] font-semibold leading-[1.05] tracking-tighter-display text-ink md:text-[52px]">
               {restaurant.name}
@@ -290,12 +205,56 @@ export default async function RestaurantDetailPage({
               {restaurant.description}
             </p>
           ) : null}
+        </div>
 
+        <div className="flex w-full min-w-0 flex-col gap-7 md:col-span-2">
           <ScoreExplainer restaurant={restaurant} />
+
+          {signatureDish ? (
+            <div className="overflow-hidden rounded-[20px] bg-white ring-1 ring-ink/[0.06]">
+              {distinctDishPhoto ? (
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-brand-light">
+                  <RestaurantImage
+                    restaurant={restaurant}
+                    alt={signatureDish.name}
+                    className="h-full w-full object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    dishName={signatureDish.name}
+                    forceDishImage
+                  />
+                </div>
+              ) : null}
+              <div className="p-4 sm:p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep">
+                  Plat phare
+                </p>
+                <p className="mt-1.5 text-[17px] font-semibold tracking-tight text-ink">
+                  {signatureDish.name}
+                </p>
+                {signatureDish.description ? (
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">
+                    {signatureDish.description}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ) : conceptLabel ? (
+            <div className="rounded-[20px] bg-brand-soft/50 p-4 ring-1 ring-brand/12 sm:p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-deep">
+                Ce qu&apos;on y mange
+              </p>
+              <p className="mt-1.5 text-[17px] font-semibold tracking-tight text-ink">
+                {conceptLabel}
+              </p>
+              {restaurant.cuisine ? (
+                <p className="mt-1.5 text-[14px] text-ink-soft">{restaurant.cuisine}</p>
+              ) : null}
+            </div>
+          ) : null}
 
           <MacrosTeaser
             restaurant={restaurant}
-            dishName={restaurant.signature_dish_name ?? undefined}
+            dishName={signatureDish?.name}
           />
 
           {restaurant.tags && restaurant.tags.length > 0 ? (
@@ -335,12 +294,8 @@ export default async function RestaurantDetailPage({
               </div>
               {!showCommander ? (
                 <p className="text-[13px] text-ink-mute">
-                  {orderLink &&
-                  !isDeliveryStatusCommanderAllowed(restaurant.delivery_status)
-                    ? "La commande via Uber Eats / Deliveroo n’est pas proposée tant que le statut livraison n’est pas validé (exact ou chaîne / lieu flou)."
-                    : restaurant.uber_eats_url || restaurant.deliveroo_url
-                      ? "Livraison non disponible pour ce spot pour le moment."
-                      : "Pas de livraison sur ce spot — passe le voir sur place, ça vaut le détour."}
+                  Pas de livraison en ligne pour ce spot — passe le voir sur place,
+                  ça vaut le détour.
                 </p>
               ) : null}
             </div>

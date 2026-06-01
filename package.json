@@ -11,7 +11,8 @@
     "lint": "next lint",
     "check:links": "tsx scripts/check-restaurant-links.ts",
     "verify:order-links": "tsx scripts/verify-order-links.ts",
-    "check:images": "tsx scripts/check-restaurant-images.ts"
+    "check:images": "tsx scripts/check-restaurant-images.ts",
+    "populate:signature-images": "tsx scripts/populate-signature-dish-images.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

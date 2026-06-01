@@ -50,12 +50,6 @@ export default function Navbar() {
             Pour les restos
           </Link>
           <Link
-            href="/classement"
-            className="hidden rounded-full px-3.5 py-2 text-[13px] font-medium text-ink/65 transition hover:bg-ink/5 hover:text-ink sm:inline-flex"
-          >
-            Classement
-          </Link>
-          <Link
             href="/discover"
             className="inline-flex h-10 items-center justify-center rounded-full bg-brand px-4 text-[13px] font-semibold text-white shadow-soft transition duration-250 ease-out-expo hover:bg-brand-dark hover:shadow-elevated active:translate-y-px"
           >

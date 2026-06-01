@@ -8,16 +8,24 @@ import {
   getServiceModeLabels,
 } from "@/lib/restaurant-presentation";
 import RestaurantImage from "@/components/RestaurantImage";
-import VerifiedBadge from "@/components/VerifiedBadge";
 import SocialProof from "@/components/SocialProof";
-import { isVerified } from "@/lib/restaurant-credibility";
+import VerifiedBadge from "@/components/VerifiedBadge";
+import NutritionChipsRow from "@/components/NutritionChipsRow";
 import RestaurantCardHeart from "@/components/RestaurantCardHeart";
 import RestaurantCardMobileDetails from "@/components/RestaurantCardMobileDetails";
 import {
-  getPrimarySignatureMacroLine,
+  getExactMacroLine,
   getScoreGlobalDisplay,
   isNewRestaurantThisWeek,
 } from "@/lib/restaurant-card-display";
+import {
+  getRestaurantConceptLabel,
+  getSignatureDishName,
+} from "@/lib/signature-dish";
+import {
+  getNutritionOrientationChips,
+  isVerified,
+} from "@/lib/restaurant-credibility";
 
 export default function RestaurantCard({
   restaurant,
@@ -26,7 +34,14 @@ export default function RestaurantCard({
 }) {
   const serviceLabels = getServiceModeLabels(restaurant);
   const scoreGlobal = getScoreGlobalDisplay(restaurant);
-  const macroLine = getPrimarySignatureMacroLine(restaurant);
+  const exactMacroLine = getExactMacroLine(restaurant);
+  const signatureDish = getSignatureDishName(restaurant);
+  const conceptLabel = signatureDish ? null : getRestaurantConceptLabel(restaurant);
+  const verified = isVerified(restaurant);
+  // Editorial benefit tag — DB flags > nutrition bands > category
+  const benefitTag = getBenefitTag(restaurant);
+  // Qualitative nutrition chips from DB columns
+  const nutritionChips = getNutritionOrientationChips(restaurant);
   const isNew = isNewRestaurantThisWeek(restaurant);
 
   return (
@@ -41,12 +56,11 @@ export default function RestaurantCard({
                 {scoreGlobal.toFixed(1)} global
               </>
             ) : (
-              <>
-                ● {displayHealthyScore(restaurant).toFixed(1)} healthy
-              </>
+              <>● {displayHealthyScore(restaurant).toFixed(1)} healthy</>
             )}
           </span>
         </div>
+
         <TrackedRestaurantNavLink
           href={`/restaurants/${restaurant.id}`}
           restaurant={restaurant}
@@ -59,9 +73,10 @@ export default function RestaurantCard({
               alt={restaurant.name}
               sizes="(max-width: 768px) 100vw, 33vw"
               className="h-full w-full object-cover transition duration-500 ease-out-expo group-hover:scale-[1.04]"
+              dishName={signatureDish}
             />
-
             <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
+              {verified ? <VerifiedBadge size="sm" /> : null}
               {isNew ? (
                 <span className="rounded-full bg-brand-dark px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-soft">
                   Nouveau
@@ -72,7 +87,6 @@ export default function RestaurantCard({
                   {restaurant.city}
                 </span>
               ) : null}
-              {isVerified(restaurant) ? <VerifiedBadge /> : null}
             </div>
           </div>
 
@@ -80,6 +94,7 @@ export default function RestaurantCard({
             <h3 className="text-[17px] font-semibold tracking-tight text-ink">
               {restaurant.name}
             </h3>
+
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-1 text-[11px] font-semibold text-white md:hidden">
                 ●{" "}
@@ -95,24 +110,45 @@ export default function RestaurantCard({
 
             <RestaurantCardMobileDetails
               restaurant={restaurant}
-              tag={getBenefitTag(restaurant.category)}
-              macroLine={macroLine}
+              dishName={signatureDish}
+              categoryLabel={conceptLabel}
+              benefitTag={benefitTag}
+              exactMacroLine={exactMacroLine}
+              nutritionChips={nutritionChips}
             />
 
+            {/* Desktop content */}
             <div className="hidden flex-col gap-2 md:flex">
-              {macroLine ? (
+              {/* Dish name (real) or category label (factual fallback) */}
+              {signatureDish ? (
                 <p className="text-[12px] font-medium text-brand-deep">
-                  Plat phare · {macroLine}
+                  Plat phare · {signatureDish}
+                  {exactMacroLine ? (
+                    <span className="font-normal text-ink/65"> · {exactMacroLine}</span>
+                  ) : null}
+                </p>
+              ) : conceptLabel ? (
+                <p className="text-[12px] font-medium text-ink-soft">{conceptLabel}</p>
+              ) : null}
+
+              {/* Benefit tag — editorial, not social */}
+              {benefitTag ? (
+                <p className="text-[12.5px] leading-snug text-ink/75">
+                  <span className="font-semibold text-brand-deep">Idéal pour · </span>
+                  {benefitTag}
                 </p>
               ) : null}
-              <p className="text-[12.5px] leading-snug text-ink/75">
-                <span className="font-semibold text-brand-deep">Pourquoi · </span>
-                {getBenefitTag(restaurant.category)}
-              </p>
+
               {restaurant.cuisine ? (
                 <p className="text-[13px] text-ink-mute">{restaurant.cuisine}</p>
               ) : null}
+
               <SocialProof restaurant={restaurant} showRating={false} />
+
+              {!exactMacroLine && nutritionChips.length > 0 ? (
+                <NutritionChipsRow chips={nutritionChips} />
+              ) : null}
+
               {serviceLabels.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {serviceLabels.map((label) => (

@@ -9,9 +9,8 @@ import {
   getReasonChips,
   getReasonSentence,
 } from "@/lib/recommendations";
-import { isVerified } from "@/lib/restaurant-credibility";
-import VerifiedBadge from "@/components/VerifiedBadge";
 import RestaurantImage from "@/components/RestaurantImage";
+import { getSpotLineLabel, getSignatureDishName } from "@/lib/signature-dish";
 import TrackedRestaurantNavLink from "@/components/analytics/TrackedRestaurantNavLink";
 
 type Pick = {
@@ -101,6 +100,7 @@ export default function TopPicksStrip({
           const r = pick.restaurant;
           const reason = getReasonSentence(r);
           const chips = getReasonChips(r);
+          const spotLine = getSpotLineLabel(r);
           return (
             <TrackedRestaurantNavLink
               key={r.id}
@@ -115,6 +115,7 @@ export default function TopPicksStrip({
                   restaurant={r}
                   alt={r.name}
                   className="h-full w-full object-cover transition duration-500 ease-out-expo group-hover:scale-[1.04]"
+                  dishName={getSignatureDishName(r)}
                 />
                 <span
                   className={`absolute left-3 top-3 inline-flex h-7 items-center rounded-full px-3 text-[10.5px] font-semibold uppercase tracking-[0.12em] shadow-soft ${
@@ -125,9 +126,6 @@ export default function TopPicksStrip({
                 >
                   {pick.badge}
                 </span>
-                {isVerified(r) ? (
-                  <VerifiedBadge className="absolute right-3 top-3" />
-                ) : null}
               </div>
 
               <div className="flex flex-1 flex-col gap-3 p-5">
@@ -138,6 +136,11 @@ export default function TopPicksStrip({
                   <p className="mt-0.5 text-[12.5px] text-ink-mute">
                     {[r.category, r.city].filter(Boolean).join(" · ")}
                   </p>
+                  {spotLine ? (
+                    <p className="mt-1 text-[12px] font-medium text-brand-deep">
+                      {spotLine}
+                    </p>
+                  ) : null}
                 </div>
 
                 <p className="text-[13.5px] leading-relaxed text-ink-soft">

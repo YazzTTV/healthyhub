@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { getFavoriteRestaurants } from "@/lib/user-data";
 import type { RestaurantListItem } from "@/lib/types";
 import RestaurantImage from "@/components/RestaurantImage";
+import { getSpotLineLabel, getSignatureDishName } from "@/lib/signature-dish";
 
 export default function FavoritesPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -124,6 +125,7 @@ export default function FavoritesPage() {
                   restaurant={restaurant}
                   alt={restaurant.name}
                   className="h-full w-full object-cover transition duration-500 ease-out-expo group-hover:scale-[1.04]"
+                  dishName={getSignatureDishName(restaurant)}
                 />
               </div>
               <div className="flex flex-1 flex-col gap-1 p-5">
@@ -133,6 +135,11 @@ export default function FavoritesPage() {
                 <p className="text-[13px] text-ink-mute">
                   {[restaurant.category, restaurant.city].filter(Boolean).join(" · ")}
                 </p>
+                {getSpotLineLabel(restaurant) ? (
+                  <p className="text-[12px] font-medium text-brand-deep">
+                    {getSpotLineLabel(restaurant)}
+                  </p>
+                ) : null}
               </div>
             </Link>
           ))}
