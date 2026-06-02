@@ -22,6 +22,7 @@ import {
 } from "@/lib/intent";
 import { getSignatureDishName, getSpotHighlight } from "@/lib/signature-dish";
 import RestaurantImage from "@/components/RestaurantImage";
+import { getMapPopupImageUrl } from "@/lib/restaurant-images";
 import {
   getDisplayRating,
   getDisplayReviewCount,
@@ -396,7 +397,9 @@ export default function DiscoverMap({
           <MapContainer
             center={userPos ?? PARIS}
             zoom={13}
-            scrollWheelZoom
+            scrollWheelZoom={false}
+            touchZoom
+            doubleClickZoom
             className="h-full w-full"
           >
             <TileLayer
@@ -422,14 +425,27 @@ export default function DiscoverMap({
                 }}
               >
                 <Popup>
+                  {(() => {
+                    const popupImageUrl = getMapPopupImageUrl(r);
+                    return (
                   <div className="min-w-[220px] space-y-2">
                     <div className="relative h-28 w-full overflow-hidden rounded-xl bg-brand-light">
-                      <RestaurantImage
-                        restaurant={r}
-                        alt={r.name}
-                        sizes="220px"
-                        className="h-full w-full object-cover"
-                      />
+                      {popupImageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={popupImageUrl}
+                          alt={r.name}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <RestaurantImage
+                          restaurant={r}
+                          alt={r.name}
+                          sizes="220px"
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                     </div>
                     <p className="font-semibold">{r.name}</p>
                     <p className="text-xs text-ink/60">
@@ -483,6 +499,8 @@ export default function DiscoverMap({
                       </Link>
                     </div>
                   </div>
+                    );
+                  })()}
                 </Popup>
               </Marker>
             ))}

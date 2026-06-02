@@ -1,7 +1,6 @@
 /** Skeleton affiché pendant le chargement RSC de /discover. */
 export default function DiscoverPageSkeleton() {
   return (
-    <div className="-mb-10 -mt-10 -mx-5 sm:-mx-6 md:-mx-8 lg:-mx-10">
       <section className="relative h-[calc(100vh-4rem)] min-h-[680px] w-full overflow-hidden bg-cream-deep">
         <div className="flex h-14 items-center justify-between gap-3 border-b border-ink/[0.06] bg-cream/90 px-4 backdrop-blur sm:px-6">
           <div className="h-9 w-32 animate-pulse rounded-full bg-white/80 ring-1 ring-ink/[0.06]" />
@@ -30,6 +29,5 @@ export default function DiscoverPageSkeleton() {
           </div>
         </div>
       </section>
-    </div>
   );
 }

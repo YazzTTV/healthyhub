@@ -23,6 +23,7 @@ import {
   trackTimeOnDiscover,
 } from "@/lib/analytics";
 import MapMoveTracker from "@/components/map/MapMoveTracker";
+import MapInvalidateSize from "@/components/map/MapInvalidateSize";
 import type { RestaurantListItem } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -47,6 +48,7 @@ import DiscoverBestChoiceCard from "@/components/DiscoverBestChoiceCard";
 import DiscoverWeekStrip from "@/components/DiscoverWeekStrip";
 import MacrosTeaser from "@/components/MacrosTeaser";
 import RestaurantImage from "@/components/RestaurantImage";
+import { getMapPopupImageUrl } from "@/lib/restaurant-images";
 import { displayHealthyScore } from "@/lib/healthy-score";
 import {
   getIntentReason,
@@ -444,6 +446,10 @@ export default function RestaurantMap({
   }, []);
 
   useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
     const init = async () => {
       const currentUser = await getCurrentUser();
@@ -456,7 +462,6 @@ export default function RestaurantMap({
       } else {
         setFavorites(readFavoriteIdsFromStorage());
       }
-      setHydrated(true);
     };
     void init();
 
@@ -543,7 +548,6 @@ export default function RestaurantMap({
   useEffect(() => {
     if (!hydrated) return;
     setLeafletReady(true);
-    return () => setLeafletReady(false);
   }, [hydrated]);
 
   const getRestaurantDistance = (restaurant: RestaurantListItem) => {
@@ -844,12 +848,16 @@ export default function RestaurantMap({
       {/* === Map === */}
       {leafletReady ? (
       <MapContainer
+        key="discover-map"
         center={PARIS_CENTER}
         zoom={12}
-        scrollWheelZoom
+        scrollWheelZoom={false}
+        touchZoom
+        doubleClickZoom
         zoomControl={false}
         className="h-full w-full"
       >
+        <MapInvalidateSize />
         <RecenterMap center={mapCenter} />
         <MapMoveTracker />
         <TileLayer
@@ -889,16 +897,29 @@ export default function RestaurantMap({
             }}
           >
             <Popup className="healthyhub-popup" closeButton={false} maxWidth={300}>
+              {(() => {
+                const popupImageUrl = getMapPopupImageUrl(restaurant);
+                return (
               <div className="w-[260px]">
                 {/* Header — name + heart + thumb */}
                 <div className="flex items-start gap-3">
                   <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-brand-light">
-                    <RestaurantImage
-                      restaurant={restaurant}
-                      alt={restaurant.name}
-                      sizes="56px"
-                      className="h-full w-full object-cover"
-                    />
+                    {popupImageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={popupImageUrl}
+                        alt={restaurant.name}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <RestaurantImage
+                        restaurant={restaurant}
+                        alt={restaurant.name}
+                        sizes="56px"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
@@ -973,6 +994,8 @@ export default function RestaurantMap({
                   </Link>
                 </div>
               </div>
+                );
+              })()}
             </Popup>
           </Marker>
           );

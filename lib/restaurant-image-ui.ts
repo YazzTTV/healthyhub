@@ -19,3 +19,9 @@ export function categoryDisplayLabel(category?: string | null): string | null {
   if (!raw) return null;
   return raw;
 }
+
+export function cuisineDisplayLabel(cuisine?: string | null): string | null {
+  const raw = cuisine?.trim();
+  if (!raw) return null;
+  return raw;
+}

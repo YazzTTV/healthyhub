@@ -17,6 +17,9 @@ export type RestaurantImageSource = Pick<
   | "name"
   | "slug"
   | "category"
+  | "restaurant_image_url"
+  | "restaurant_interior_image_url"
+  | "storefront_image_url"
   | "image_url"
   | "image_status"
   | "signature_dish_image_url"
@@ -53,6 +56,13 @@ const NON_CREDIBLE_FRAGMENTS = [
   "via.placeholder",
   "placeholder",
   "picsum.photos",
+  "factory",
+  "machinery",
+  "machine",
+  "industrial",
+  "logo-only",
+  "placeholder-logo",
+  "kitchen-equipment",
 ];
 
 /** Visuels synthétiques Manus (texte intégré) — jamais affichés comme photo food. */
@@ -103,22 +113,65 @@ export function normalizeRestaurantImageStatus(
     : null;
 }
 
-export function resolveHttpsImageUrl(
+/** Chemins locaux / imports batch — jamais affichables. */
+function isLocalOrRelativePath(url: string): boolean {
+  const t = url.trim();
+  return (
+    t.startsWith("/home/") ||
+    t.startsWith("/upload/") ||
+    (t.startsWith("/") && !t.startsWith("//"))
+  );
+}
+
+/** Normalise `//`, `http://` → `https://`. Rejette chemins locaux. */
+export function normalizeExternalImageUrl(
   url: string | null | undefined
 ): string | null {
   const trimmed = url?.trim();
-  if (!trimmed || !isCredibleRestaurantImageUrl(trimmed)) return null;
-  return trimmed;
+  if (!trimmed || isLocalOrRelativePath(trimmed)) return null;
+
+  let normalized = trimmed;
+  if (normalized.startsWith("//")) {
+    normalized = `https:${normalized}`;
+  } else if (/^http:\/\//i.test(normalized)) {
+    normalized = `https://${normalized.slice(7)}`;
+  } else if (!/^https:\/\//i.test(normalized)) {
+    return null;
+  }
+
+  if (normalized.length < 20) return null;
+  return normalized;
+}
+
+export function resolveHttpsImageUrl(
+  url: string | null | undefined
+): string | null {
+  const normalized = normalizeExternalImageUrl(url);
+  if (!normalized || !isCredibleRestaurantImageUrl(normalized)) return null;
+  return normalized;
 }
 
 function resolveDisplayImageUrl(
   url: string | null | undefined
 ): string | null {
-  const resolved = resolveHttpsImageUrl(url);
-  if (resolved) return resolved;
-  const trimmed = url?.trim();
-  if (trimmed && /^https:\/\//i.test(trimmed)) return trimmed;
-  return null;
+  const normalized = normalizeExternalImageUrl(url);
+  if (!normalized) return null;
+  if (isSyntheticPlaceholderImageUrl(normalized)) return null;
+  if (isCredibleRestaurantImageUrl(normalized)) return normalized;
+  const lower = normalized.toLowerCase();
+  if (NON_CREDIBLE_FRAGMENTS.some((frag) => lower.includes(frag))) return null;
+  return normalized;
+}
+
+/** Dernier recours avant placeholder (ex. manuscdn) — https valide uniquement. */
+export function resolveLastResortImageUrl(
+  url: string | null | undefined
+): string | null {
+  const normalized = normalizeExternalImageUrl(url);
+  if (!normalized) return null;
+  const lower = normalized.toLowerCase();
+  if (NON_CREDIBLE_FRAGMENTS.some((frag) => lower.includes(frag))) return null;
+  return normalized;
 }
 
 /** URL https affichable, hors visuels synthétiques type manuscdn. */
@@ -174,13 +227,23 @@ function hasSignatureDishLabel(
 export function resolveSignatureDishImageUrl(
   r: Pick<
     RestaurantImageSource,
-    "signature_dish_image_url" | "image_url" | "signature_dish_name"
+    | "signature_dish_image_url"
+    | "restaurant_image_url"
+    | "restaurant_interior_image_url"
+    | "storefront_image_url"
+    | "image_url"
+    | "signature_dish_name"
   >
 ): string | null {
   const fromColumn = resolveUsableImageUrl(r.signature_dish_image_url);
   if (fromColumn) return fromColumn;
   if (hasSignatureDishLabel(r)) {
-    return resolveUsableImageUrl(r.image_url);
+    return (
+      resolveUsableImageUrl(r.restaurant_image_url) ??
+      resolveUsableImageUrl(r.restaurant_interior_image_url) ??
+      resolveUsableImageUrl(r.storefront_image_url) ??
+      resolveUsableImageUrl(r.image_url)
+    );
   }
   return null;
 }
@@ -188,6 +251,9 @@ export function resolveSignatureDishImageUrl(
 export function hasRestaurantImageUrl(
   r: Pick<
     RestaurantImageSource,
+    | "restaurant_image_url"
+    | "restaurant_interior_image_url"
+    | "storefront_image_url"
     | "image_url"
     | "image_status"
     | "signature_dish_image_url"
@@ -195,6 +261,9 @@ export function hasRestaurantImageUrl(
   >
 ): boolean {
   return (
+    resolveUsableImageUrl(r.restaurant_image_url) != null ||
+    resolveUsableImageUrl(r.restaurant_interior_image_url) != null ||
+    resolveUsableImageUrl(r.storefront_image_url) != null ||
     resolveUsableImageUrl(r.image_url) != null ||
     resolveUsableImageUrl(r.signature_dish_image_url) != null
   );
@@ -210,19 +279,32 @@ function pickRestaurantDisplay(r: RestaurantImageSource): DisplayPick | null {
   const status = normalizeRestaurantImageStatus(r.image_status);
   const dishLabel = hasSignatureDishLabel(r);
 
-  // `image_url` enrichi en base (Manus) prime sur d’anciens `signature_dish_image_url`.
-  const main = resolveUsableImageUrl(r.image_url);
-  if (main) {
-    return {
-      src: main,
-      imageContext: dishLabel ? "dish" : imageContextFromStatus(status),
-      trustBadge: null,
-    };
+  const signature = resolveUsableImageUrl(r.signature_dish_image_url);
+  if (signature) return { src: signature, imageContext: "dish", trustBadge: null };
+
+  const restaurant = resolveUsableImageUrl(r.restaurant_image_url);
+  if (restaurant) {
+    return { src: restaurant, imageContext: dishLabel ? "dish" : "restaurant", trustBadge: null };
   }
 
-  const signature = resolveUsableImageUrl(r.signature_dish_image_url);
-  if (signature) {
-    return { src: signature, imageContext: "dish", trustBadge: null };
+  const interior = resolveUsableImageUrl(r.restaurant_interior_image_url);
+  if (interior) {
+    return { src: interior, imageContext: "restaurant", trustBadge: null };
+  }
+
+  const storefront = resolveUsableImageUrl(r.storefront_image_url);
+  if (storefront) {
+    return { src: storefront, imageContext: "restaurant", trustBadge: null };
+  }
+
+  // Legacy fallback, only after hierarchy images.
+  const legacy = resolveUsableImageUrl(r.image_url);
+  if (legacy) {
+    return {
+      src: legacy,
+      imageContext: dishLabel ? "dish" : imageContextFromStatus(status),
+      trustBadge: trustBadgeFromImageStatus(status),
+    };
   }
 
   const cover = resolveUsableImageUrl(r.cover_image_url);
@@ -234,7 +316,71 @@ function pickRestaurantDisplay(r: RestaurantImageSource): DisplayPick | null {
     };
   }
 
+  // Dernier recours : URLs https en base (ex. manuscdn) plutôt qu’un placeholder vide.
+  const lastResortFields = [
+    r.signature_dish_image_url,
+    r.restaurant_image_url,
+    r.restaurant_interior_image_url,
+    r.storefront_image_url,
+    r.image_url,
+    r.cover_image_url,
+  ];
+  for (const raw of lastResortFields) {
+    const fallback = resolveLastResortImageUrl(raw);
+    if (fallback) {
+      return {
+        src: fallback,
+        imageContext: dishLabel ? "dish" : imageContextFromStatus(status),
+        trustBadge: trustBadgeFromImageStatus(status),
+      };
+    }
+  }
+
   return null;
+}
+
+const HERO_FIELD_ORDER = [
+  "signature_dish_image_url",
+  "restaurant_image_url",
+  "restaurant_interior_image_url",
+  "storefront_image_url",
+  "image_url",
+  "cover_image_url",
+] as const;
+
+type HeroImageFields = Pick<RestaurantImageSource, (typeof HERO_FIELD_ORDER)[number]>;
+
+/** Toutes les URLs hero à essayer (ordre hiérarchie + dernier recours), sans doublons. */
+export function getRestaurantHeroImageCandidates(
+  r: HeroImageFields
+): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  const push = (url: string | null | undefined) => {
+    const u = resolveUsableImageUrl(url);
+    if (u && !seen.has(u)) {
+      seen.add(u);
+      out.push(u);
+    }
+  };
+
+  const pushLast = (url: string | null | undefined) => {
+    const u = resolveLastResortImageUrl(url);
+    if (u && !seen.has(u)) {
+      seen.add(u);
+      out.push(u);
+    }
+  };
+
+  for (const key of HERO_FIELD_ORDER) {
+    push(r[key]);
+  }
+  for (const key of HERO_FIELD_ORDER) {
+    pushLast(r[key]);
+  }
+
+  return out;
 }
 
 export function getRestaurantImage(
@@ -265,6 +411,27 @@ export function getDistinctSignatureDishPhotoUrl(
   const hero = getRestaurantImage(r);
   if (hero.mode === "image" && hero.src === dishUrl) return null;
   return dishUrl;
+}
+
+/** Galerie fiche restaurant (hors hero), triée pour raconter le lieu. */
+export function getRestaurantGalleryImageUrls(
+  r: Pick<
+    RestaurantImageSource,
+    "restaurant_image_url" | "restaurant_interior_image_url" | "storefront_image_url"
+  >
+): string[] {
+  const ordered = [
+    resolveUsableImageUrl(r.restaurant_image_url),
+    resolveUsableImageUrl(r.restaurant_interior_image_url),
+    resolveUsableImageUrl(r.storefront_image_url),
+  ].filter((x): x is string => Boolean(x));
+  return Array.from(new Set(ordered));
+}
+
+/** Popups carte: priorité plat, puis façade/hero resto (pas d'images techniques). */
+export function getMapPopupImageUrl(r: HeroImageFields): string | null {
+  const candidates = getRestaurantHeroImageCandidates(r);
+  return candidates[0] ?? null;
 }
 
 /** Section « Plat phare » : photo plat dédiée ou `image_url` si nom de plat en base. */

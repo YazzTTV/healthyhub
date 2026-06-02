@@ -4,7 +4,7 @@ import type { RestaurantListItem } from "@/lib/types";
 
 /** Champs minimaux pour marqueurs carte (léger vs liste complète). */
 const MAP_PIN_SELECT =
-  "id,name,slug,category,city,latitude,longitude,healthy_score,image_url,image_status,signature_dish,signature_dish_image_url,rating,google_rating,google_review_count,verified_by_healthyhub";
+  "id,name,slug,category,city,latitude,longitude,healthy_score,restaurant_image_url,restaurant_interior_image_url,storefront_image_url,image_url,image_status,signature_dish,signature_dish_image_url,rating,google_rating,google_review_count,verified_by_healthyhub";
 
 const MAP_PIN_SELECT_LEGACY =
   "id,name,slug,category,city,latitude,longitude,healthy_score,image_url,image_status,rating,google_rating,google_review_count,verified_by_healthyhub";
@@ -29,6 +29,9 @@ export type DiscoverMapPin = Pick<
   | "latitude"
   | "longitude"
   | "healthy_score"
+  | "restaurant_image_url"
+  | "restaurant_interior_image_url"
+  | "storefront_image_url"
   | "image_url"
   | "image_status"
   | "signature_dish_name"
@@ -54,6 +57,9 @@ function mapPins(
       latitude: r.latitude,
       longitude: r.longitude,
       healthy_score: r.healthy_score,
+      restaurant_image_url: r.restaurant_image_url ?? null,
+      restaurant_interior_image_url: r.restaurant_interior_image_url ?? null,
+      storefront_image_url: r.storefront_image_url ?? null,
       image_url: r.image_url,
       image_status: r.image_status,
       signature_dish_name: includeSignatureImage

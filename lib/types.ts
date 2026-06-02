@@ -13,6 +13,9 @@ export type Restaurant = {
   name: string;
   slug: string | null;
   description: string | null;
+  restaurant_image_url?: string | null;
+  restaurant_interior_image_url?: string | null;
+  storefront_image_url?: string | null;
   image_url: string | null;
   /** VERIFIED_EXACT, VERIFIED_BRAND, PLATFORM_IMAGE, PREMIUM_FALLBACK, MISSING */
   image_status?: RestaurantImageStatus | string | null;
@@ -69,6 +72,7 @@ export type Restaurant = {
   signature_dish_protein?: number | null;
   signature_dish_carbs?: number | null;
   signature_dish_fats?: number | null;
+  macro_confidence?: "LOW" | "MEDIUM" | "HIGH" | string | null;
   takeaway_possible?: boolean | null;
   dine_in_possible?: boolean | null;
   delivery_possible?: boolean | null;
@@ -81,6 +85,8 @@ export type Restaurant = {
   score_global?: number | null;
   /** Résumé court pour SEO / OG (si colonne en base). */
   llm_summary?: string | null;
+  /** Points menu éditoriaux factuels (3-4 puces). */
+  menu_highlights?: string[] | null;
   /** Image Open Graph dédiée (sinon `image_url`). */
   cover_image_url?: string | null;
 };

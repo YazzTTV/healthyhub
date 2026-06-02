@@ -45,7 +45,7 @@ export default function EmailCapture() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="email@exemple.com"
-        className="h-12 flex-1 rounded-full border border-ink/10 bg-white px-5 text-[14px] text-ink placeholder:text-ink/40 shadow-soft transition focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
+        className="h-12 flex-1 rounded-full border border-ink/10 bg-white px-5 text-[16px] text-ink placeholder:text-ink/40 shadow-soft transition focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/20 sm:text-[14px]"
         aria-label="Adresse email"
       />
       <button

@@ -12,6 +12,7 @@
     "check:links": "tsx scripts/check-restaurant-links.ts",
     "verify:order-links": "tsx scripts/verify-order-links.ts",
     "check:images": "tsx scripts/check-restaurant-images.ts",
+    "audit:images": "tsx scripts/audit-image-pipeline.ts",
     "populate:signature-images": "tsx scripts/populate-signature-dish-images.ts"
   },
   "dependencies": {

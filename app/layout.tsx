@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   title: "HealthyHub — Trouve le bon spot healthy autour de toi",
   description:
     "Selon ta localisation, tes objectifs et les restaurants les mieux notés. Découvre des spots healthy pour livraison, à emporter ou sur place — carte pensée comme un compagnon de découverte locale.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

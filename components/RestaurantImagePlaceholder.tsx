@@ -1,5 +1,6 @@
 import {
   categoryDisplayLabel,
+  cuisineDisplayLabel,
   gradientForCategory,
 } from "@/lib/restaurant-image-ui";
 
@@ -7,6 +8,7 @@ type Props = {
   className?: string;
   name?: string;
   category?: string | null;
+  cuisine?: string | null;
 };
 
 function iconForCategory(category?: string | null): string {
@@ -53,15 +55,17 @@ function renderIcon(kind: string) {
   );
 }
 
-/** Placeholder premium par catégorie — sans texte de validation ni badge de source. */
+/** Fallback premium quand aucune photo n’est disponible. */
 export default function RestaurantImagePlaceholder({
   className = "",
   name,
   category,
+  cuisine,
 }: Props) {
   const icon = iconForCategory(category);
   const gradient = gradientForCategory(category);
   const categoryLabel = categoryDisplayLabel(category);
+  const cuisineLabel = cuisineDisplayLabel(cuisine);
 
   return (
     <div
@@ -75,10 +79,10 @@ export default function RestaurantImagePlaceholder({
         <div className="absolute -left-6 top-3 h-16 w-16 rounded-full bg-white/55 blur-xl" />
         <div className="absolute -right-8 bottom-1 h-20 w-20 rounded-full bg-brand/10 blur-xl" />
       </div>
-      <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white/85 shadow-soft ring-1 ring-ink/[0.06]">
+      <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white/90 shadow-soft ring-1 ring-ink/[0.06]">
         <svg
           viewBox="0 0 24 24"
-          className="h-7 w-7 text-brand/30"
+          className="h-7 w-7 text-brand-dark/70"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
@@ -90,10 +94,18 @@ export default function RestaurantImagePlaceholder({
         </svg>
       </div>
       {categoryLabel ? (
-        <p className="relative mt-3 max-w-[80%] truncate text-center text-[10px] font-medium uppercase tracking-[0.12em] text-ink-mute/60">
+        <p className="relative mt-3 max-w-[85%] truncate text-center text-[11px] font-semibold uppercase tracking-[0.1em] text-ink/55">
           {categoryLabel}
         </p>
       ) : null}
+      {cuisineLabel && cuisineLabel !== categoryLabel ? (
+        <p className="relative mt-1 max-w-[85%] truncate text-center text-[11px] text-ink-mute/70">
+          {cuisineLabel}
+        </p>
+      ) : null}
+      <p className="relative mt-2 text-[10px] font-medium text-ink-mute/50">
+        Photo non disponible
+      </p>
     </div>
   );
 }

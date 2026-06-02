@@ -6,6 +6,7 @@ import RestaurantImagePlaceholder from "@/components/RestaurantImagePlaceholder"
 import { gradientForCategory } from "@/lib/restaurant-image-ui";
 import {
   getRestaurantDishImage,
+  getRestaurantHeroImageCandidates,
   getRestaurantImage,
   type RestaurantImageSource,
 } from "@/lib/restaurant-images";
@@ -24,19 +25,10 @@ type Props = {
   dishOverlayVariant?: "compact" | "hero";
 };
 
-const imgDeps = (r: RestaurantImageSource) => [
-  r.id,
-  r.image_url,
-  r.cover_image_url,
-  r.signature_dish_image_url,
-  r.signature_dish_name,
-  r.image_status,
-];
-
 const DEFAULT_SIZES = "(max-width: 768px) 100vw, 33vw";
 
 /**
- * Image restaurant — waterfall + overlay nom du plat (pas de badge de source).
+ * Image restaurant — cascade URL (hiérarchie + repli) + placeholder premium.
  */
 export default function RestaurantImage({
   restaurant,
@@ -48,20 +40,49 @@ export default function RestaurantImage({
   forceDishImage = false,
   dishOverlayVariant = "compact",
 }: Props) {
+  const imageDepsKey = [
+    restaurant.id ?? "",
+    restaurant.restaurant_image_url ?? "",
+    restaurant.restaurant_interior_image_url ?? "",
+    restaurant.storefront_image_url ?? "",
+    restaurant.image_url ?? "",
+    restaurant.cover_image_url ?? "",
+    restaurant.signature_dish_image_url ?? "",
+    restaurant.signature_dish_name ?? "",
+    restaurant.image_status ?? "",
+    forceDishImage ? "1" : "0",
+  ].join("|");
+
   const resolved = useMemo(
-    () => (forceDishImage ? getRestaurantDishImage(restaurant) : getRestaurantImage(restaurant)),
-    [...imgDeps(restaurant), forceDishImage]
+    () =>
+      forceDishImage ? getRestaurantDishImage(restaurant) : getRestaurantImage(restaurant),
+    [imageDepsKey, forceDishImage, restaurant]
   );
-  const [hasFailed, setHasFailed] = useState(false);
+
+  const candidates = useMemo(() => {
+    if (forceDishImage) {
+      const dish = getRestaurantDishImage(restaurant);
+      return dish.mode === "image" && dish.src ? [dish.src] : [];
+    }
+    const list = getRestaurantHeroImageCandidates(restaurant);
+    if (list.length > 0) return list;
+    return resolved.mode === "image" && resolved.src ? [resolved.src] : [];
+  }, [imageDepsKey, forceDishImage, restaurant, resolved]);
+
+  const [candidateIndex, setCandidateIndex] = useState(0);
+  const [useNativeImg, setUseNativeImg] = useState(false);
+  const [exhausted, setExhausted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setHasFailed(false);
+    setCandidateIndex(0);
+    setUseNativeImg(false);
+    setExhausted(false);
     setIsLoading(true);
-  }, [...imgDeps(restaurant), forceDishImage]);
+  }, [imageDepsKey, forceDishImage]);
 
-  const activeUrl = !hasFailed ? resolved.src : null;
-  const showRemote = resolved.mode === "image" && activeUrl != null;
+  const activeUrl = exhausted ? null : (candidates[candidateIndex] ?? null);
+  const showRemote = activeUrl != null;
   const showDishOverlay =
     !isLoading &&
     showRemote &&
@@ -70,24 +91,50 @@ export default function RestaurantImage({
 
   const shimmerGradient = gradientForCategory(restaurant.category);
 
+  const tryNextSource = () => {
+    if (candidateIndex < candidates.length - 1) {
+      setCandidateIndex((i) => i + 1);
+      setUseNativeImg(false);
+      setIsLoading(true);
+      return;
+    }
+    if (!useNativeImg && activeUrl) {
+      setUseNativeImg(true);
+      setIsLoading(true);
+      return;
+    }
+    setExhausted(true);
+    setIsLoading(false);
+  };
+
   return (
     <div className="relative h-full w-full">
       {showRemote ? (
         <>
-          <Image
-            key={activeUrl}
-            src={activeUrl}
-            alt={alt}
-            fill
-            sizes={sizes}
-            loading={loading}
-            className={className}
-            onLoad={() => setIsLoading(false)}
-            onError={() => {
-              setHasFailed(true);
-              setIsLoading(false);
-            }}
-          />
+          {useNativeImg ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={`${activeUrl}-native`}
+              src={activeUrl}
+              alt={alt}
+              className={className}
+              loading={loading}
+              onLoad={() => setIsLoading(false)}
+              onError={tryNextSource}
+            />
+          ) : (
+            <Image
+              key={`${activeUrl}-next`}
+              src={activeUrl}
+              alt={alt}
+              fill
+              sizes={sizes}
+              loading={loading}
+              className={className}
+              onLoad={() => setIsLoading(false)}
+              onError={tryNextSource}
+            />
+          )}
           <div
             className={`absolute inset-0 animate-pulse bg-gradient-to-br ${shimmerGradient} transition-opacity duration-300`}
             style={{ opacity: isLoading ? 1 : 0 }}
@@ -98,6 +145,11 @@ export default function RestaurantImage({
         <RestaurantImagePlaceholder
           name={alt}
           category={restaurant.category}
+          cuisine={
+            "cuisine" in restaurant
+              ? (restaurant as { cuisine?: string | null }).cuisine
+              : null
+          }
           className={className}
         />
       )}

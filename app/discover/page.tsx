@@ -84,10 +84,8 @@ export default function DiscoverPage({ searchParams }: PageProps) {
   const page = discoverPageFromParam(searchParams?.page);
 
   return (
-    <div className="-mb-10 -mt-10 -mx-5 sm:-mx-6 md:-mx-8 lg:-mx-10">
-      <Suspense fallback={<DiscoverPageSkeleton />}>
-        <DiscoverContent page={page} />
-      </Suspense>
-    </div>
+    <Suspense fallback={<DiscoverPageSkeleton />}>
+      <DiscoverContent page={page} />
+    </Suspense>
   );
 }
